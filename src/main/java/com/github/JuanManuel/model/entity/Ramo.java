@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.entity;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Ramo extends Producto{
@@ -9,7 +10,7 @@ public class Ramo extends Producto{
     private Flor florPr;
     private int cantidadFlores;
     private String colorEnvol;
-    private Flor [] floresSecun;
+    private List<Flor> floresSecun;
 
     public Ramo() {}
     public Ramo(int id) {
@@ -17,7 +18,7 @@ public class Ramo extends Producto{
         this.idRamo = id;
     }
 
-    public Ramo(int id, String nombre, Double precio, int stock, String descrip, File img, Flor florPr, int cantidadFlores, String color, Flor[] ar) {
+    public Ramo(int id, String nombre, Double precio, int stock, String descrip, File img, Flor florPr, int cantidadFlores, String color, List<Flor> ar) {
         super(id, nombre, precio, stock, "ramo", descrip, img);
         this.idRamo = id;
         this.florPr = florPr;
@@ -26,7 +27,7 @@ public class Ramo extends Producto{
         this.floresSecun = ar;
     }
 
-    public Ramo(int id, String nombre, Double precio, int stock, String descrip, Flor florPr, int cantidadFlores, String color, Flor[] ar) {
+    public Ramo(int id, String nombre, Double precio, int stock, String descrip, Flor florPr, int cantidadFlores, String color, List<Flor> ar) {
         super(id, nombre, precio, stock, "ramo", descrip);
         this.idRamo = id;
         this.florPr = florPr;
@@ -52,7 +53,7 @@ public class Ramo extends Producto{
         return colorEnvol;
     }
 
-    public Flor[] getFloresSecun() {
+    public List<Flor> getFloresSecun() {
         return floresSecun;
     }
 
@@ -73,7 +74,7 @@ public class Ramo extends Producto{
         this.colorEnvol = colorEnvol;
     }
 
-    public void setFloresSecun(Flor[] floresSecun) {
+    public void setFloresSecun(List<Flor> floresSecun) {
         this.floresSecun = floresSecun;
     }
 
@@ -96,12 +97,12 @@ public class Ramo extends Producto{
     // ToString
     @Override
     public String toString() {
-        return super.toString() + "Ramo{" +
+        return super.toString() + "\nRamo{" +
                 "idRamo=" + idRamo +
                 ", florPr=" + florPr +
                 ", cantidadFlores=" + cantidadFlores +
                 ", colorEnvol='" + colorEnvol + '\'' +
-                ", floresSecun=" + Arrays.toString(floresSecun) +
+                ", floresSecun=" + floresSecun +
                 '}';
     }
 }

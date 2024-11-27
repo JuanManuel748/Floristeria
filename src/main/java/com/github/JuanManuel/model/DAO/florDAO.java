@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.DAO;
 
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.Flor;
+import com.github.JuanManuel.model.entity.Producto;
 import org.h2.util.json.JSONItemType;
 
 import java.io.IOException;
@@ -55,6 +56,7 @@ public class florDAO implements DAO<Flor>{
             ps.setString(1, entity.getNombre());
             ps.setBoolean(2, entity.getTipoFlor());
             ps.setInt(3, entity.getIdFlor());
+            ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -66,8 +68,10 @@ public class florDAO implements DAO<Flor>{
             try (PreparedStatement ps = con.prepareStatement(DELETE)) {
                 ps.setInt(1, entity.getIdProducto());
                 ps.executeUpdate();
+                productoDAO.build().delete(entity);
             } catch (SQLException e) {
                 e.printStackTrace();
+                entity = null;
             }
         }
         return entity;
@@ -75,12 +79,22 @@ public class florDAO implements DAO<Flor>{
 
     @Override
     public Flor findByPK(Flor pk) {
+        Producto pro = productoDAO.build().findByPK(pk);
         Flor result = null;
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
             ps.setInt(1, pk.getIdProducto());
             try (ResultSet rs = ps.executeQuery()) {
                 if(rs.next()) {
                     Flor f = new Flor();
+                    // Atributos producto
+                    f.setIdProducto(pro.getIdProducto());
+                    f.setNombre(pro.getNombre());
+                    f.setPrecio(pro.getPrecio());
+                    f.setStock(pro.getStock());
+                    f.setTipo(pro.getTipo());
+                    f.setDescripcion(pro.getDescripcion());
+                    f.setImg(pro.getImg());
+                    // Atributos flor
                     f.setIdFlor(rs.getInt("idFlor"));
                     f.setColor(rs.getString("color"));
                     f.setTipoFlor(rs.getBoolean("tipo"));
@@ -100,6 +114,45 @@ public class florDAO implements DAO<Flor>{
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     Flor f = new Flor();
+                    // Atributos producto
+                    Producto pro = productoDAO.build().findByPK(new Producto(rs.getInt("idFlor")));
+                    f.setIdProducto(pro.getIdProducto());
+                    f.setNombre(pro.getNombre());
+                    f.setPrecio(pro.getPrecio());
+                    f.setStock(pro.getStock());
+                    f.setTipo(pro.getTipo());
+                    f.setDescripcion(pro.getDescripcion());
+                    f.setImg(pro.getImg());
+                    // Atributos flor
+                    f.setIdFlor(rs.getInt("idFlor"));
+                    f.setColor(rs.getString("color"));
+                    f.setTipoFlor(rs.getBoolean("tipo"));
+                    result.add(f);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public List<Flor> findByType(boolean tipo) {
+        List<Flor> result = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
+            ps.setBoolean(1, tipo);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Flor f = new Flor();
+                    // Atributos producto
+                    Producto pro = productoDAO.build().findByPK(new Producto(rs.getInt("idFlor")));
+                    f.setIdProducto(pro.getIdProducto());
+                    f.setNombre(pro.getNombre());
+                    f.setPrecio(pro.getPrecio());
+                    f.setStock(pro.getStock());
+                    f.setTipo(pro.getTipo());
+                    f.setDescripcion(pro.getDescripcion());
+                    f.setImg(pro.getImg());
+                    // Atributos flor
                     f.setIdFlor(rs.getInt("idFlor"));
                     f.setColor(rs.getString("color"));
                     f.setTipoFlor(rs.getBoolean("tipo"));

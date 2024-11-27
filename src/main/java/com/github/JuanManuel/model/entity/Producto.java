@@ -33,6 +33,16 @@ public class Producto {
         this.img = ImageToByte(img);
     }
 
+    public Producto(int idProducto, String nombre, Double precio, int stock, String tipo, String descripcion, byte[] img) {
+        this.idProducto = idProducto;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.stock = stock;
+        this.tipo = tipo;
+        this.descripcion = descripcion;
+        this.img = img;
+    }
+
     public Producto(int idProducto, String nombre, Double precio, int stock, String tipo, String descripcion) {
         this.idProducto = idProducto;
         this.nombre = nombre;
@@ -121,7 +131,7 @@ public class Producto {
     // ToString
     @Override
     public String toString() {
-        return "Producto{" +
+        return "\nProducto{" +
                 "idProducto=" + idProducto +
                 ", nombre='" + nombre + '\'' +
                 ", precio=" + precio +

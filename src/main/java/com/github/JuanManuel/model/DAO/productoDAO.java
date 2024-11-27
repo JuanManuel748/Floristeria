@@ -116,7 +116,7 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
-    public List<Producto> findByTipo(String tipo) {
+    public List<Producto> findByType(String tipo) {
         List<Producto> result = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
             ps.setString(1, tipo);
