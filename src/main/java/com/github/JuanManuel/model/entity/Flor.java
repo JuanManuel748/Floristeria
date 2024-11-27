@@ -13,6 +13,9 @@ public class Flor extends Producto{
         super(id);
         this.idFlor = id;
     }
+    public Flor(Producto p) {
+        super(p.getIdProducto(), p.getNombre(), p.getPrecio(), p.getStock(), p.getTipo(), p.getDescripcion(), p.getImg());
+    }
 
     public Flor(int id, String nom, Double precio, int stock, String description, File img, String color, boolean tipoF) {
         super(id, nom, precio, stock, "flor", description, img);
@@ -73,7 +76,7 @@ public class Flor extends Producto{
     // ToString
     @Override
     public String toString() {
-        return super.toString()  + "\n" +
+        return super.toString() +
                 "Flor{" +
                 "idFlor=" + idFlor +
                 ", color='" + color + '\'' +

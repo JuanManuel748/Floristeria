@@ -1,21 +1,28 @@
 package com.github.JuanManuel.test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.github.JuanManuel.model.connection.MySQLConnection;
+
+import java.sql.*;
 
 public class TestConnection {
+    private static final String FIND_BY_PK = "SELECT r.*, rm.*, f.* FROM Ramo r JOIN RamoFlores rm ON r.idRamo = rm.Ramo_idRamo JOIN Flor f ON rm.Flor_idFlor = f.idFlor WHERE idRamo = ?";
+
     public static void main(String[] args) {
         Connection con = null;
-        String URL = "jdbc:mysql://localhost:3306/floreyesdb";
-        String ROOT = "root";
-        String PASS = "";
-
         try {
-            con = DriverManager.getConnection(URL, ROOT, PASS);
-            System.out.println("CONEXION EXITOSA");
+            con = MySQLConnection.getConnection();
+            System.out.println("CONECTADO A LA BASE DE DATOS");
+            PreparedStatement ps = con.prepareStatement(FIND_BY_PK);
+            ps.setInt(1, 4);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                System.out.println(rs.getInt("r.idRamo"));
+                System.out.println(rs.getInt("rm.Ramo_idRamo"));
+                System.out.println(rs.getInt("rm.Flor_idFlor"));
+                System.out.println(rs.getInt("f.idFlor"));
+            }
         } catch (SQLException SQLe) {
-            System.out.println("ERROR AL CONECTAR CON LA BASE DE DATOS");
+            SQLe.printStackTrace();
         }
     }
 }
