@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Flor extends Producto{
     private int idFlor;
     private String color;
-    private boolean tipoFlor;
+    private boolean tipoFlor; // Si es verdadero es Flor Principal
 
     public Flor () {super();}
     public Flor(int id) {

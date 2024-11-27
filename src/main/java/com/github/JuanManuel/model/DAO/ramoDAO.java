@@ -139,7 +139,7 @@ public class ramoDAO implements DAO<Ramo>{
                     result = r;
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return result;

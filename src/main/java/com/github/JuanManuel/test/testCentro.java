@@ -5,19 +5,21 @@ import com.github.JuanManuel.model.entity.*;
 
 import java.util.*;
 
-public class testRamo {
+public class testCentro {
     public static void main(String[] args) {
         try {
             List<Flor> flores = new ArrayList<>();
             for(int i = 3; i <6 ; i++) {
                 flores.add(florDAO.build().findByPK(new Flor(i)));
             }
-            Ramo r = new Ramo(6, "Ramo de prueba", 20.99, 1, "Ramo de prueba", florDAO.build().findByPK(new Flor(2)), 5, "verde", flores);
-            //ramoDAO.build().save(r);
-            Ramo ramo = ramoDAO.build().findByPK(r);
-            System.out.println(ramo);
+            Centro c = new Centro(8, "Centro prueba", 50.5, 10, "Centro de prueba", florDAO.build().findByPK(new Flor(2)), "Grande", "", flores);
+            //centroDAO.build().save(c);
+            Centro centro = centroDAO.build().findByPK(c);
+            System.out.println(centro);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 }
+// Unknown column 'Ramo_idRamo' in 'field list'
+//	at com.github.JuanManuel/com.github.JuanManuel.test.testCentro.main(testCentro.java:20)

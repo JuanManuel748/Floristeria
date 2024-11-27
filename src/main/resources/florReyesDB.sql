@@ -1,280 +1,167 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 27-11-2024 a las 10:49:48
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- MySQL Workbench Synchronization
+-- Generated: 2024-11-27 21:34
+-- Model: New Model
+-- Version: 1.0
+-- Project: Name of the project
+-- Author: junpe
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
+CREATE SCHEMA IF NOT EXISTS `floReyesDB` DEFAULT CHARACTER SET utf8;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Usuario` (
+  `telefono` VARCHAR(9) NOT NULL,
+  `nombre` VARCHAR(100) NOT NULL,
+  `contraseña` LONGTEXT NOT NULL,
+  PRIMARY KEY (`telefono`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
---
--- Base de datos: `floreyesdb`
-CREATE SCHEMA IF NOT EXISTS `floReyesDB` DEFAULT CHARACTER SET utf8 ;
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Pedido` (
+  `idPedido` INT(11) NOT NULL,
+  `fechaPedido` VARCHAR(45) NOT NULL,
+  `fechaEntrega` VARCHAR(45) NOT NULL,
+  `total` DECIMAL(10,2) NOT NULL,
+  `estado` ENUM('PAGADO', 'PENDIENTE') NOT NULL DEFAULT 'PENDIENTE',
+  `telefonoUsuario` VARCHAR(9) NOT NULL,
+  PRIMARY KEY (`idPedido`),
+  INDEX `fk_Pedido_Usuario_idx` (`telefonoUsuario` ASC),
+  CONSTRAINT `fk_Pedido_Usuario`
+    FOREIGN KEY (`telefonoUsuario`)
+    REFERENCES `floReyesDB`.`Usuario` (`telefono`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
--- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Producto` (
+  `idProducto` INT(11) NOT NULL,
+  `nombre` VARCHAR(45) NOT NULL,
+  `precio` DECIMAL(10,2) NOT NULL,
+  `stock` INT(11) NOT NULL,
+  `tipo` ENUM('flor', 'complemento', 'centro', 'ramo') NOT NULL,
+  `description` VARCHAR(200) NOT NULL,
+  `imagen` LONGBLOB NULL DEFAULT NULL,
+  PRIMARY KEY (`idProducto`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
---
--- Estructura de tabla para la tabla `centro`
---
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Flor` (
+  `idFlor` INT(11) NOT NULL,
+  `color` VARCHAR(45) NOT NULL,
+  `tipo` TINYINT(4) NOT NULL,
+  PRIMARY KEY (`idFlor`),
+  CONSTRAINT `fk_Flor_Producto`
+    FOREIGN KEY (`idFlor`)
+    REFERENCES `floReyesDB`.`Producto` (`idProducto`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE `centro` (
-  `idCentro` int(11) NOT NULL,
-  `florPrincipal` int(11) NOT NULL,
-  `tamaño` varchar(45) NOT NULL,
-  `frase` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Centro` (
+  `idCentro` INT(11) NOT NULL,
+  `florPrincipal` INT(11) NOT NULL,
+  `tamaño` VARCHAR(45) NOT NULL,
+  `frase` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`idCentro`),
+  INDEX `fk_Centro_Producto_idx` (`idCentro` ASC),
+  INDEX `fk_Centro_Flor_idx` (`florPrincipal` ASC),
+  CONSTRAINT `fk_Centro_Producto`
+    FOREIGN KEY (`idCentro`)
+    REFERENCES `floReyesDB`.`Producto` (`idProducto`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Centro_Flor`
+    FOREIGN KEY (`florPrincipal`)
+    REFERENCES `floReyesDB`.`Flor` (`idFlor`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
--- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Ramo` (
+  `idRamo` INT(11) NOT NULL,
+  `florPrincipal` INT(11) NOT NULL,
+  `cantidadFlores` INT(11) NOT NULL,
+  `colorEnvoltorio` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`idRamo`),
+  INDEX `fk_Ramo_Producto_idx` (`idRamo` ASC),
+  INDEX `fk_Ramo_Flor_idx` (`florPrincipal` ASC),
+  CONSTRAINT `fk_Ramo_Producto`
+    FOREIGN KEY (`idRamo`)
+    REFERENCES `floReyesDB`.`Producto` (`idProducto`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Ramo_Flor`
+    FOREIGN KEY (`florPrincipal`)
+    REFERENCES `floReyesDB`.`Flor` (`idFlor`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
---
--- Estructura de tabla para la tabla `centroflore`
---
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`RamoFlores` (
+  `Flor_idFlor` INT(11) NOT NULL,
+  `Ramo_idRamo` INT(11) NOT NULL,
+  PRIMARY KEY (`Flor_idFlor`, `Ramo_idRamo`),
+  INDEX `fk_RamoFlores_Ramo_idx` (`Ramo_idRamo` ASC),
+  INDEX `fk_RamoFlores_Flor_idx` (`Flor_idFlor` ASC),
+  CONSTRAINT `fk_RamoFlores_Flor`
+    FOREIGN KEY (`Flor_idFlor`)
+    REFERENCES `floReyesDB`.`Flor` (`idFlor`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_RamoFlores_Ramo`
+    FOREIGN KEY (`Ramo_idRamo`)
+    REFERENCES `floReyesDB`.`Ramo` (`idRamo`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE `centroflore` (
-  `Flor_idFlor` int(11) NOT NULL,
-  `Centro_idCentro` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`CentroFlores` (
+  `Flor_idFlor` INT(11) NOT NULL,
+  `Centro_idCentro` INT(11) NOT NULL,
+  PRIMARY KEY (`Flor_idFlor`, `Centro_idCentro`),
+  INDEX `fk_CentroFlores_Centro_idx` (`Centro_idCentro` ASC),
+  INDEX `fk_CentroFlores_Flor_idx` (`Flor_idFlor` ASC),
+  CONSTRAINT `fk_CentroFlores_Flor`
+    FOREIGN KEY (`Flor_idFlor`)
+    REFERENCES `floReyesDB`.`Flor` (`idFlor`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_CentroFlores_Centro`
+    FOREIGN KEY (`Centro_idCentro`)
+    REFERENCES `floReyesDB`.`Centro` (`idCentro`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
--- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `floReyesDB`.`Pedido_Producto` (
+  `Pedido_idPedido` INT(11) NOT NULL,
+  `Producto_idProducto` INT(11) NOT NULL,
+  `cantidad` INT(11) NOT NULL,
+  `subtotal` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`Pedido_idPedido`, `Producto_idProducto`),
+  INDEX `fk_PedidoProducto_Producto_idx` (`Producto_idProducto` ASC),
+  INDEX `fk_PedidoProducto_Pedido_idx` (`Pedido_idPedido` ASC),
+  CONSTRAINT `fk_PedidoProducto_Pedido`
+    FOREIGN KEY (`Pedido_idPedido`)
+    REFERENCES `floReyesDB`.`Pedido` (`idPedido`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_PedidoProducto_Producto`
+    FOREIGN KEY (`Producto_idProducto`)
+    REFERENCES `floReyesDB`.`Producto` (`idProducto`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
---
--- Estructura de tabla para la tabla `flor`
---
-
-CREATE TABLE `flor` (
-  `idFlor` int(11) NOT NULL,
-  `color` varchar(45) NOT NULL,
-  `tipo` tinyint(4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Volcado de datos para la tabla `flor`
---
-
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `pedido`
---
-
-CREATE TABLE `pedido` (
-  `idPedido` int(11) NOT NULL,
-  `fechaPedido` varchar(45) NOT NULL,
-  `fechaEntrega` varchar(45) NOT NULL,
-  `total` decimal(10,2) NOT NULL,
-  `estado` enum('PAGADO','PENDIENTE') NOT NULL DEFAULT 'PENDIENTE',
-  `telefonoUsuario` varchar(9) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Volcado de datos para la tabla `pedido`
---
-
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `pedido_producto`
---
-
-CREATE TABLE `pedido_producto` (
-  `Pedido_idPedido` int(11) NOT NULL,
-  `Producto_idProducto` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL,
-  `subtotal` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `producto`
---
-
-CREATE TABLE `producto` (
-  `idProducto` int(11) NOT NULL,
-  `nombre` varchar(45) NOT NULL,
-  `precio` decimal(10,2) NOT NULL,
-  `stock` int(11) NOT NULL,
-  `tipo` enum('flor','complemento','centro','ramo') NOT NULL,
-  `description` varchar(200) NOT NULL,
-  `imagen` longblob DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Volcado de datos para la tabla `producto`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `ramo`
---
-
-CREATE TABLE `ramo` (
-  `idRamo` int(11) NOT NULL,
-  `florPrincipal` int(11) NOT NULL,
-  `cantidadFlores` int(11) NOT NULL,
-  `colorEnvoltorio` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `ramoflores`
---
-
-CREATE TABLE `ramoflores` (
-  `Flor_idFlor` int(11) NOT NULL,
-  `Ramo_idRamo` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `usuario`
---
-
-CREATE TABLE `usuario` (
-  `telefono` varchar(9) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `contraseña` longtext NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Volcado de datos para la tabla `usuario`
---
-
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `centro`
---
-ALTER TABLE `centro`
-  ADD PRIMARY KEY (`idCentro`),
-  ADD KEY `idFlor_idx` (`florPrincipal`);
-
---
--- Indices de la tabla `centroflore`
---
-ALTER TABLE `centroflore`
-  ADD PRIMARY KEY (`Flor_idFlor`,`Centro_idCentro`),
-  ADD KEY `fk_Flor_has_Centro_Centro1_idx` (`Centro_idCentro`),
-  ADD KEY `fk_Flor_has_Centro_Flor1_idx` (`Flor_idFlor`);
-
---
--- Indices de la tabla `flor`
---
-ALTER TABLE `flor`
-  ADD PRIMARY KEY (`idFlor`);
-
---
--- Indices de la tabla `pedido`
---
-ALTER TABLE `pedido`
-  ADD PRIMARY KEY (`idPedido`),
-  ADD KEY `idUsuario_idx` (`telefonoUsuario`);
-
---
--- Indices de la tabla `pedido_producto`
---
-ALTER TABLE `pedido_producto`
-  ADD PRIMARY KEY (`Pedido_idPedido`,`Producto_idProducto`),
-  ADD KEY `fk_Pedido_has_Producto_Producto1_idx` (`Producto_idProducto`),
-  ADD KEY `fk_Pedido_has_Producto_Pedido1_idx` (`Pedido_idPedido`);
-
---
--- Indices de la tabla `producto`
---
-ALTER TABLE `producto`
-  ADD PRIMARY KEY (`idProducto`);
-
---
--- Indices de la tabla `ramo`
---
-ALTER TABLE `ramo`
-  ADD PRIMARY KEY (`idRamo`),
-  ADD KEY `idFlor_idx` (`florPrincipal`);
-
---
--- Indices de la tabla `ramoflores`
---
-ALTER TABLE `ramoflores`
-  ADD PRIMARY KEY (`Flor_idFlor`,`Ramo_idRamo`),
-  ADD KEY `fk_Flor_has_Ramo_Ramo1_idx` (`Ramo_idRamo`),
-  ADD KEY `fk_Flor_has_Ramo_Flor1_idx` (`Flor_idFlor`);
-
---
--- Indices de la tabla `usuario`
---
-ALTER TABLE `usuario`
-  ADD PRIMARY KEY (`telefono`);
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `centro`
---
-ALTER TABLE `centro`
-  ADD CONSTRAINT `fk_Centro_Flor` FOREIGN KEY (`florPrincipal`) REFERENCES `flor` (`idFlor`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_Centro_Producto` FOREIGN KEY (`idCentro`) REFERENCES `producto` (`idProducto`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `centroflore`
---
-ALTER TABLE `centroflore`
-  ADD CONSTRAINT `fk_CentroFlore_Centro` FOREIGN KEY (`Centro_idCentro`) REFERENCES `centro` (`idCentro`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_CentroFlore_Flor` FOREIGN KEY (`Flor_idFlor`) REFERENCES `flor` (`idFlor`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `flor`
---
-ALTER TABLE `flor`
-  ADD CONSTRAINT `fk_Flor_Producto` FOREIGN KEY (`idFlor`) REFERENCES `producto` (`idProducto`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pedido`
---
-ALTER TABLE `pedido`
-  ADD CONSTRAINT `fk_Pedido_Usuario` FOREIGN KEY (`telefonoUsuario`) REFERENCES `usuario` (`telefono`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pedido_producto`
---
-ALTER TABLE `pedido_producto`
-  ADD CONSTRAINT `fk_PedidoProducto_Pedido` FOREIGN KEY (`Pedido_idPedido`) REFERENCES `pedido` (`idPedido`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_PedidoProducto_Producto` FOREIGN KEY (`Producto_idProducto`) REFERENCES `producto` (`idProducto`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `ramo`
---
-ALTER TABLE `ramo`
-  ADD CONSTRAINT `fk_Ramo_Flor` FOREIGN KEY (`florPrincipal`) REFERENCES `flor` (`idFlor`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_Ramo_Producto` FOREIGN KEY (`idRamo`) REFERENCES `producto` (`idProducto`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `ramoflores`
---
-ALTER TABLE `ramoflores`
-  ADD CONSTRAINT `fk_RamoFlores_Flor` FOREIGN KEY (`Flor_idFlor`) REFERENCES `flor` (`idFlor`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_RamoFlores_Ramo` FOREIGN KEY (`Ramo_idRamo`) REFERENCES `ramo` (`idRamo`) ON DELETE CASCADE ON UPDATE CASCADE;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
