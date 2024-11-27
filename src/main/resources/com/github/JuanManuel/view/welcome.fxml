@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #a8ffb2;" styleClass="black" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.JuanManuel.view.WelcomeController">
+    <children>
+        <ImageView fitHeight="300.0" fitWidth="300.0" layoutX="250.0" layoutY="78.0">
+            <image>
+                <Image url="@images/logoBlanco.png" />
+            </image>
+        </ImageView>
+        <Button fx:id="adminWayButton" layoutX="350.0" layoutY="435.0" mnemonicParsing="false" onAction="#setAdminWayButton" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="Iniciar" textFill="WHITE">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </Button>
+    </children>
+</AnchorPane>
