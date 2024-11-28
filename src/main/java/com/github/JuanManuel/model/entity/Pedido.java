@@ -30,15 +30,6 @@ public class Pedido {
         this.User = usr;
         this.detalles = detalles;
     }
-    public Pedido(String fechaP, String fechaE, Double total, User usr, List<Detalles> detalles) {
-        this.idPedido = searchID();
-        this.fechaEntrega = fechaE;
-        this.fechaPedido = fechaP;
-        this.total = total;
-        this.estado = "PENDIENTE";
-        this.User = usr;
-        this.detalles = detalles;
-    }
 
     // GETTERS
     public int getIdPedido() {
@@ -127,16 +118,5 @@ public class Pedido {
                 '}';
     }
 
-    private int searchID() {
-        int result = 1;
-        List<Pedido> pedidoLS = pedidoDAO.build().findAll();
-        for (Pedido p:pedidoLS) {
-            if (p.getIdPedido() == result) {
-                result++;
-            } else {
-                break;
-            }
-        }
-        return result;
-    }
+
 }

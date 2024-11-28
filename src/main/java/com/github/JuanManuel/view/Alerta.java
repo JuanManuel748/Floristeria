@@ -19,7 +19,6 @@ public class Alerta {
                 alert.setAlertType(Alert.AlertType.WARNING);
                 break;
             default:
-                
                 break;
 
         }
