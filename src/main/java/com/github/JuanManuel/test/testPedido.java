@@ -1,16 +1,21 @@
 package com.github.JuanManuel.test;
 
-import com.github.JuanManuel.model.DAO.pedidoDAO;
-import com.github.JuanManuel.model.DAO.userDAO;
-import com.github.JuanManuel.model.entity.Pedido;
-import com.github.JuanManuel.model.entity.User;
+import com.github.JuanManuel.model.DAO.*;
+import com.github.JuanManuel.model.entity.*;
+
+import java.util.*;
 
 public class testPedido {
     public static void main(String[] args) {
-        Pedido ped = new Pedido("hoy", "mañana", 100.50, userDAO.build().findByPK(new User("666666666")));
-        //pedidoDAO.build().save(ped);
-        Pedido p = new Pedido(1);
-        pedidoDAO.build().setPagado(p);
+
+        // String fechaP, String fechaE, Double total, User usr, List<Detalles> detalles
+        Pedido ped = new Pedido("hoy", "mañana", 10.20, new User("1"), null);
+        List<Detalles> detaller = new ArrayList<>();
+        detaller.add(new Detalles(ped, productoDAO.build().findByPK(new Producto(2)), 5));
+        detaller.add(new Detalles(ped, productoDAO.build().findByPK(new Producto(3)), 5));
+        detaller.add(new Detalles(ped, productoDAO.build().findByPK(new Producto(4)), 5));
+        ped.setDetalles(detaller);
+        pedidoDAO.build().save(ped);
     }
 
 }
