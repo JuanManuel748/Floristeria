@@ -1,8 +1,7 @@
 package com.github.JuanManuel.model.DAO;
 
 import com.github.JuanManuel.model.connection.MySQLConnection;
-import com.github.JuanManuel.model.entity.Pedido;
-import com.github.JuanManuel.model.entity.User;
+import com.github.JuanManuel.model.entity.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -15,11 +14,13 @@ import java.util.List;
 
 public class pedidoDAO implements DAO<Pedido>{
     private static final String INSERT = "INSERT INTO Pedido (idPedido, fechaPedido, fechaEntrega, total, estado, telefonoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_DETALLES = "INSERT INTO Pedido_Producto (Pedido_idPedido, Producto_idProducto, cantidad, subtotal) VALUES (?,?,?,?)";
     private static final String UPDATE = "UPDATE Pedido SET fechaPedido = ?, fechaEntrega = ?, total = ?, estado = ?, telefonoUsuario = ? WHERE idPedido = ?";
+    private static final String UPDATE_DETALLES = "UPDATE Pedido_Producto SET Producto_idProducto = ?, cantidad = ?, subtotal = ? WHERE Pedido_idPedido = ?";
     private static final String DELETE = "DELETE FROM Pedido WHERE idPedido = ?";
-    private static final String FIND_ALL = "SELECT * FROM Pedido";
-    private static final String FIND_BY_PK = "SELECT * FROM Pedido WHERE idPedido = ?";
-    private static final String FIND_BY_USER = "SELECT * FROM Pedido WHERE telefonoUsuario = ?";
+    private static final String FIND_ALL = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto";
+    private static final String FIND_BY_PEDIDO = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto WHERE ped.idPedido = ?";
+    private static final String FIND_BY_USER = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto WHERE ped.telefonoUsuario = ?";
 
     private Connection con;
 
@@ -47,6 +48,16 @@ public class pedidoDAO implements DAO<Pedido>{
             ps.setString(5, entity.getEstado());
             ps.setString(6, entity.getUser().getPhone());
             ps.executeUpdate();
+            List<Detalles> detaller = entity.getDetalles();
+            for (Detalles de : detaller) {
+                try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
+                    ps2.setInt(1, de.getPed().getIdPedido());
+                    ps2.setInt(2, de.getPro().getIdProducto());
+                    ps2.setInt(3, de.getCantidad());
+                    ps2.setDouble(4, de.getSubtotal());
+                    ps2.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             System.out.println("ERROR EN INSERT EN userDAO");
             e.printStackTrace();
@@ -62,6 +73,17 @@ public class pedidoDAO implements DAO<Pedido>{
             ps.setString(5, entity.getUser().getPhone());
             ps.setInt(6, entity.getIdPedido());
             ps.executeUpdate();
+
+            List<Detalles> detaller = entity.getDetalles();
+            for (Detalles de : detaller) {
+                try (PreparedStatement ps2 = con.prepareStatement(UPDATE_DETALLES)) {
+                    ps2.setInt(1, de.getPro().getIdProducto());
+                    ps2.setInt(2, de.getCantidad());
+                    ps2.setDouble(3, de.getSubtotal());
+                    ps2.setInt(4, de.getPed().getIdPedido());
+                    ps2.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             System.out.println("ERROR EN INSERT EN userDAO");
             e.printStackTrace();
@@ -71,17 +93,24 @@ public class pedidoDAO implements DAO<Pedido>{
     @Override
     public Pedido findByPK(Pedido pk) {
         Pedido result = null;
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
+        List<Detalles> detalles = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PEDIDO)) {
             ps.setInt(1, pk.getIdPedido());
             try (ResultSet rs = ps.executeQuery()) {
-                if(rs.next()) {
+                while (rs.next()) {
                     Pedido p = new Pedido();
-                    p.setIdPedido(rs.getInt("idPedido"));
-                    p.setFechaPedido(rs.getString("fechaPedido"));
-                    p.setFechaEntrega(rs.getString("fechaEntrega"));
-                    p.setTotal(rs.getDouble("total"));
-                    p.setEstado(rs.getString("estado"));
-                    p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
+                    // Atributos Pedido
+                    p.setIdPedido(rs.getInt("ped.idPedido"));
+                    p.setFechaPedido(rs.getString("ped.fechaPedido"));
+                    p.setFechaEntrega(rs.getString("ped.fechaEntrega"));
+                    p.setTotal(rs.getDouble("ped.total"));
+                    p.setEstado(rs.getString("ped.estado"));
+                    p.setUser(userDAO.build().findByPK(new User(rs.getString("ped.telefonoUsuario"))));
+                    // Atributos de los detalles del array
+                    Detalles det = new Detalles(p, productoDAO.build().findByPK(new Producto(rs.getInt("pro.idProducto"))), rs.getInt("pp.cantidad"));
+                    detalles.add(det);
+
+                    p.setDetalles(detalles);
                     result = p;
                 }
             }
@@ -94,17 +123,29 @@ public class pedidoDAO implements DAO<Pedido>{
     @Override
     public List<Pedido> findAll() {
         List<Pedido> resultLS = new ArrayList<Pedido>();
+        List<Detalles> detalles = new ArrayList<>();
+        int compTemp = 0;
         try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Pedido p = new Pedido();
-                    p.setIdPedido(rs.getInt("idPedido"));
-                    p.setFechaPedido(rs.getString("fechaPedido"));
-                    p.setFechaEntrega(rs.getString("fechaEntrega"));
-                    p.setTotal(rs.getDouble("total"));
-                    p.setEstado(rs.getString("estado"));
-                    p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
-                    resultLS.add(p);
+                    if(compTemp != rs.getInt("ped.idPedido")) {
+                        detalles = new ArrayList<>();
+                        p.setIdPedido(rs.getInt("ped.idPedido"));
+                        p.setFechaPedido(rs.getString("ped.fechaPedido"));
+                        p.setFechaEntrega(rs.getString("ped.fechaEntrega"));
+                        p.setTotal(rs.getDouble("ped.total"));
+                        p.setEstado(rs.getString("ped.estado"));
+                        p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
+                    }
+                    Detalles det = new Detalles(p, productoDAO.build().findByPK(new Producto(rs.getInt("pro.idProducto"))), rs.getInt("pp.cantidad"));
+                    detalles.add(det);
+                    p.setDetalles(detalles);
+                    if(compTemp != rs.getInt("ped.idPedido")) {
+                        resultLS.add(p);
+                    }
+
+                    compTemp = rs.getInt("ped.idPedido");
                 }
             }
         } catch (SQLException e) {
@@ -115,18 +156,30 @@ public class pedidoDAO implements DAO<Pedido>{
 
     public List<Pedido> findByUser(User u) {
         List<Pedido> resultLS = new ArrayList<Pedido>();
+        List<Detalles> detalles = new ArrayList<>();
+        int compTemp = 0;
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_USER)) {
             ps.setString(1, u.getPhone());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Pedido p = new Pedido();
-                    p.setIdPedido(rs.getInt("idPedido"));
-                    p.setFechaPedido(rs.getString("fechaPedido"));
-                    p.setFechaEntrega(rs.getString("fechaEntrega"));
-                    p.setTotal(rs.getDouble("total"));
-                    p.setEstado(rs.getString("estado"));
-                    p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
-                    resultLS.add(p);
+                    if(compTemp != rs.getInt("ped.idPedido")) {
+                        detalles = new ArrayList<>();
+                        p.setIdPedido(rs.getInt("ped.idPedido"));
+                        p.setFechaPedido(rs.getString("ped.fechaPedido"));
+                        p.setFechaEntrega(rs.getString("ped.fechaEntrega"));
+                        p.setTotal(rs.getDouble("ped.total"));
+                        p.setEstado(rs.getString("ped.estado"));
+                        p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
+                    }
+                    Detalles det = new Detalles(p, productoDAO.build().findByPK(new Producto(rs.getInt("pro.idProducto"))), rs.getInt("pp.cantidad"));
+                    detalles.add(det);
+                    p.setDetalles(detalles);
+                    if(compTemp != rs.getInt("ped.idPedido")) {
+                        resultLS.add(p);
+                    }
+
+                    compTemp = rs.getInt("ped.idPedido");
                 }
             }
         } catch (SQLException e) {

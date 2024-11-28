@@ -100,4 +100,12 @@ public class HomeController extends Controller implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
+    public void goToCart(MouseEvent mouseEvent) {
+        try {
+            App.currentController.changeScene(Scenes.CARRITO, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -12,6 +12,7 @@ public class Pedido {
     private Double total;
     private String estado;
     private User User;
+    private List<Detalles> detalles;
 
 
     public Pedido() {}
@@ -20,21 +21,14 @@ public class Pedido {
         this.idPedido = id;
     }
 
-    public Pedido(int id, String fechaP, String fechaE, Double total, String estado, User usr) {
+    public Pedido(int id, String fechaP, String fechaE, Double total, String estado, User usr, List<Detalles> detalles) {
         this.idPedido = id;
         this.fechaEntrega = fechaE;
         this.fechaPedido = fechaP;
         this.total = total;
         this.estado = estado;
         this.User = usr;
-    }
-    public Pedido(String fechaP, String fechaE, Double total, User usr) {
-        this.idPedido = searchID();
-        this.fechaEntrega = fechaE;
-        this.fechaPedido = fechaP;
-        this.total = total;
-        this.estado = "PENDIENTE";
-        this.User = usr;
+        this.detalles = detalles;
     }
 
     // GETTERS
@@ -62,6 +56,11 @@ public class Pedido {
         return User;
     }
 
+    public List<Detalles> getDetalles() {
+        return detalles;
+    }
+
+
     // SETTERS
     public void setIdPedido(int idPedido) {
         this.idPedido = idPedido;
@@ -87,6 +86,9 @@ public class Pedido {
         User = user;
     }
 
+    public void setDetalles(List<Detalles> detalles) {
+        this.detalles = detalles;
+    }
     // EQUALS
     @Override
     public boolean equals(Object o) {
@@ -112,19 +114,9 @@ public class Pedido {
                 ", total=" + total +
                 ", estado='" + estado + '\'' +
                 ", User=" + User +
+                ", productos=" + detalles +
                 '}';
     }
 
-    private int searchID() {
-        int result = 1;
-        List<Pedido> pedidoLS = pedidoDAO.build().findAll();
-        for (Pedido p:pedidoLS) {
-            if (p.getIdPedido() == result) {
-                result++;
-            } else {
-                break;
-            }
-        }
-        return result;
-    }
+
 }

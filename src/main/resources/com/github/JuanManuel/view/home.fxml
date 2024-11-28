@@ -23,7 +23,7 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Button>
-            <Button fx:id="cartButton" layoutX="610.0" layoutY="14.0" mnemonicParsing="false" onAction="#logout" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Carrito" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+            <Button fx:id="cartButton" layoutX="610.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToCart" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Carrito" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
@@ -38,7 +38,7 @@
             </ImageView>
          </children>
       </Pane>
-      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="187.0" layoutY="132.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="187.0" layoutY="132.0" onMouseClicked="#goToCentros" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/iconoCentro.png" />
          </image>
@@ -47,7 +47,7 @@
          </cursor>
       </ImageView>
       <ImageView fitHeight="150.0" fitWidth="240.0" layoutX="320.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="466.0" layoutY="147.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="466.0" layoutY="147.0" onMouseClicked="#goToPersonalizar" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/iconoPersonalizar.png" />
          </image>
@@ -55,7 +55,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="465.0" layoutY="373.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="465.0" layoutY="373.0" onMouseClicked="#goToProductos" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/iconoProducto.png" />
          </image>
@@ -63,7 +63,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="187.0" layoutY="364.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="150.0" fitWidth="181.0" layoutX="187.0" layoutY="364.0" onMouseClicked="#goToRamos" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/iconoRamo.png" />
          </image>

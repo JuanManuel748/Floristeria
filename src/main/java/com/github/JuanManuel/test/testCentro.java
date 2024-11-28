@@ -21,5 +21,3 @@ public class testCentro {
         }
     }
 }
-// Unknown column 'Ramo_idRamo' in 'field list'
-//	at com.github.JuanManuel/com.github.JuanManuel.test.testCentro.main(testCentro.java:20)

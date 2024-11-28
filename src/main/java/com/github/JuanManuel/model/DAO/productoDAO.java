@@ -18,6 +18,7 @@ public class productoDAO  implements DAO<Producto>{
     private static final String FIND_ALL = "SELECT * FROM Producto";
     private static final String FIND_BY_PK = "SELECT * FROM Producto WHERE idProducto = ?";
     private static final String FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?";
+    private static final String FIND_COMP_BY_NAME = "SELECT * FROM Producto WHERE LOWER(nombre) LIKE ? AND (tipo = ? OR tipo = ?)";
 
     private Connection con;
 
@@ -116,20 +117,49 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
-    public List<Producto> findByType(String tipo) {
+    public List<Producto> findByType(String type) {
         List<Producto> result = new ArrayList<>();
+        //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
-            ps.setString(1, tipo);
+            ps.setString(1, type);
             try (ResultSet rs = ps.executeQuery()) {
-                Producto p = new Producto();
-                p.setIdProducto(rs.getInt("idProducto"));
-                p.setNombre(rs.getString("nombre"));
-                p.setPrecio(rs.getDouble("precio"));
-                p.setStock(rs.getInt("stock"));
-                p.setTipo(rs.getString("tipo"));
-                p.setDescripcion(rs.getString("description"));
-                p.setImg(rs.getBytes("imagen"));
-                result.add(p);
+                while (rs.next()) {
+                    Producto p = new Producto();
+                    p.setIdProducto(rs.getInt("idProducto"));
+                    p.setNombre(rs.getString("nombre"));
+                    p.setPrecio(rs.getDouble("precio"));
+                    p.setStock(rs.getInt("stock"));
+                    p.setTipo(rs.getString("tipo"));
+                    p.setDescripcion(rs.getString("description"));
+                    p.setImg(rs.getBytes("imagen"));
+                    result.add(p);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    public List<Producto> findByComplName(String name, String tipo1, String tipo2) {
+        List<Producto> result = new ArrayList<>();
+        //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
+        try (PreparedStatement ps = con.prepareStatement(FIND_COMP_BY_NAME)) {
+            ps.setString(1, "%" + name.toLowerCase() + "%");
+            ps.setString(2, tipo1);
+            ps.setString(3, tipo2);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Producto p = new Producto();
+                    p.setIdProducto(rs.getInt("idProducto"));
+                    p.setNombre(rs.getString("nombre"));
+                    p.setPrecio(rs.getDouble("precio"));
+                    p.setStock(rs.getInt("stock"));
+                    p.setTipo(rs.getString("tipo"));
+                    p.setDescripcion(rs.getString("description"));
+                    p.setImg(rs.getBytes("imagen"));
+                    result.add(p);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

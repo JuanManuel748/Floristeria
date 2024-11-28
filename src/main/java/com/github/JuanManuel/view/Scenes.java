@@ -19,7 +19,7 @@ public enum Scenes {
     RAMOS("view/ramos.fxml"), // PAGINA CON LOS RAMOS
     PRODUCTOS("view/productos.fxml"), // PAGINA CON LOS PRODUCTOS
     PERSONALIZAR("view/personalizar.fxnk"), // PAGINA PARA PERSONALIZAR UN CENTRO/RAMO
-    CARRITO("view/carrito.fxml"), // PAGINA CON UNA VISTA PREVIA DE LOS PRODUCTOS QUE SE VAN A COMPRAR
+    CARRITO("view/shoppingCart.fxml"), // PAGINA CON UNA VISTA PREVIA DE LOS PRODUCTOS QUE SE VAN A COMPRAR
 
     // PAGINAS ADMIN
 
