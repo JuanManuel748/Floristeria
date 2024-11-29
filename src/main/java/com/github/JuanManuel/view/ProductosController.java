@@ -32,6 +32,8 @@ public class ProductosController extends Controller implements Initializable {
     @FXML
     private Button cartButton;
     @FXML
+    private Button exitButton;
+    @FXML
     private ChoiceBox FilterBox;
     @FXML
     private GridPane boxGrid;
@@ -111,8 +113,8 @@ public class ProductosController extends Controller implements Initializable {
         }
     }
 
-    @FXML
-    public void goToHome(MouseEvent mouseEvent)     {
+
+    public void goToHome(ActionEvent actionEvent)     {
         try {
             App.currentController.changeScene(Scenes.HOME, null);
         } catch (Exception e) {

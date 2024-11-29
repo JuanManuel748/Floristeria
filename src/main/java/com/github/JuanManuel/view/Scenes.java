@@ -18,7 +18,7 @@ public enum Scenes {
     CENTROS("view/centros.fxml"), // PAGINA CON LOS CENTROS
     RAMOS("view/ramos.fxml"), // PAGINA CON LOS RAMOS
     PRODUCTOS("view/productos.fxml"), // PAGINA CON LOS PRODUCTOS
-    PERSONALIZAR("view/personalizar.fxnk"), // PAGINA PARA PERSONALIZAR UN CENTRO/RAMO
+    PERSONALIZAR("view/personalizar.fxml"), // PAGINA PARA PERSONALIZAR UN CENTRO/RAMO
     CARRITO("view/shoppingCart.fxml"), // PAGINA CON UNA VISTA PREVIA DE LOS PRODUCTOS QUE SE VAN A COMPRAR
 
     // PAGINAS ADMIN

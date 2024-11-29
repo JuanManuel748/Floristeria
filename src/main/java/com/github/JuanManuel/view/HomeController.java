@@ -101,7 +101,7 @@ public class HomeController extends Controller implements Initializable {
         }
     }
 
-    public void goToCart(MouseEvent mouseEvent) {
+    public void goToCart(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.CARRITO, null);
         } catch (Exception e) {

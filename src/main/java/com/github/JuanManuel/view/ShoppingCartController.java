@@ -62,10 +62,8 @@ public class ShoppingCartController extends Controller implements Initializable 
     }
 
     public void mostrarDetalles() {
-        // Obtiene la lista de detalles desde la sesión
         List<Detalles> detaller = Session.getInstance().getDetalles();
 
-        // Convierte la lista en una ObservableList para usarla en TableView
         ObservableList<Detalles> detallesObservableList = FXCollections.observableArrayList(detaller);
 
         // Configura las columnas de la tabla
