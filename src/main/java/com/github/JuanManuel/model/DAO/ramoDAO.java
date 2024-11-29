@@ -11,7 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ramoDAO implements DAO<Ramo>{
     private static final String INSERT = "INSERT INTO Ramo (idRamo, florPrincipal, cantidadFlores, colorEnvoltorio) VALUES  (?,?,?,?)";
@@ -21,7 +23,8 @@ public class ramoDAO implements DAO<Ramo>{
     private static final String DELETE = "DELETE FROM Ramo WHERE idRamo = ?";
     private static final String FIND_ALL = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor";
     private static final String FIND_BY_PK = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor WHERE idRamo = ?";
-
+    private static final String FIND_BY_NAME = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE LOWER(p.nombre) LIKE ? AND LOWER(p.description) LIKE ?";
+    private static final String FIND_BY_RANGE = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE p.precio >= ? AND p.precio <= ? AND LOWER(p.description) LIKE ?";
 
 
     private Connection con;
@@ -148,45 +151,136 @@ public class ramoDAO implements DAO<Ramo>{
     @Override
     public List<Ramo> findAll() {
         List<Ramo> result = new ArrayList<>();
-        List<Flor> flores = new ArrayList<>();
-        int compTemp = 0;
+        Map<Integer, Ramo> ramosMap = new HashMap<>(); // Map para evitar duplicados.
         try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
             try (ResultSet rs = ps.executeQuery()) {
-                while(rs.next()) {
-                    Ramo r = new Ramo();
-                    if(compTemp != rs.getInt("r.idRamo")) {
-                        flores = new ArrayList<>();
-                        // Atributos producto
-                        Producto pro = productoDAO.build().findByPK(new Producto(rs.getInt("r.idRamo")));
-                        r.setIdProducto(pro.getIdProducto());
-                        r.setNombre(pro.getNombre());
-                        r.setPrecio(pro.getPrecio());
-                        r.setStock(pro.getStock());
-                        r.setTipo(pro.getTipo());
-                        r.setDescripcion(pro.getDescripcion());
-                        r.setImg(pro.getImg());
-                        // Atributos Ramo
-                        r.setIdRamo(rs.getInt("r.idRamo"));
-                        r.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("r.florPrincipal"))));
-                        r.setCantidadFlores(rs.getInt("r.cantidadFlores"));
-                        r.setColorEnvol(rs.getString("r.colorEnvoltorio"));
+                while (rs.next()) {
+                    int idRamo = rs.getInt("r.idRamo");
+                    Ramo ramo = ramosMap.get(idRamo); // Revisamos si ya existe el ramo.
+
+                    if (ramo == null) { // Si no existe, lo creamos.
+                        ramo = new Ramo();
+                        // Atributos del producto
+                        Producto pro = productoDAO.build().findByPK(new Producto(idRamo));
+                        ramo.setIdProducto(pro.getIdProducto());
+                        ramo.setNombre(pro.getNombre());
+                        ramo.setPrecio(pro.getPrecio());
+                        ramo.setStock(pro.getStock());
+                        ramo.setTipo(pro.getTipo());
+                        ramo.setDescripcion(pro.getDescripcion());
+                        ramo.setImg(pro.getImg());
+
+                        // Atributos del ramo
+                        ramo.setIdRamo(idRamo);
+                        ramo.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("r.florPrincipal"))));
+                        ramo.setCantidadFlores(rs.getInt("r.cantidadFlores"));
+                        ramo.setColorEnvol(rs.getString("r.colorEnvoltorio"));
+
+                        ramo.setFloresSecun(new ArrayList<>()); // Inicializar lista de flores secundarias.
+                        ramosMap.put(idRamo, ramo); // Guardar el ramo en el mapa.
                     }
 
-                    // Atributos de las flores del array
-                    Flor f = florDAO.build().findByPK(new Flor(rs.getInt("rf.Flor_idFlor")));
-                    flores.add(f);
-                    r.setFloresSecun(flores);
-
-                    if(compTemp != rs.getInt("r.idRamo")) {
-                        result.add(r);
-                    }
-
-                    compTemp = rs.getInt("r.idRamo");
+                    // Agregar flor secundaria
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("rf.Flor_idFlor")));
+                    ramo.getFloresSecun().add(florSecundaria);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+        result.addAll(ramosMap.values()); // Pasar los valores del mapa a la lista final.
+        return result;
+    }
+
+
+    public List<Ramo> findByName(String name) {
+        List<Ramo> result = new ArrayList<>();
+        Map<Integer, Ramo> ramosMap = new HashMap<>(); // Map para evitar duplicados.
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
+            ps.setString(1, "%" + name.toLowerCase() + "%");
+            ps.setString(2, "%prehecho%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int idRamo = rs.getInt("r.idRamo");
+                    Ramo ramo = ramosMap.get(idRamo); // Revisamos si ya existe el ramo.
+
+                    if (ramo == null) { // Si no existe, lo creamos.
+                        ramo = new Ramo();
+                        // Atributos del producto
+                        Producto pro = productoDAO.build().findByPK(new Producto(idRamo));
+                        ramo.setIdProducto(pro.getIdProducto());
+                        ramo.setNombre(pro.getNombre());
+                        ramo.setPrecio(pro.getPrecio());
+                        ramo.setStock(pro.getStock());
+                        ramo.setTipo(pro.getTipo());
+                        ramo.setDescripcion(pro.getDescripcion());
+                        ramo.setImg(pro.getImg());
+
+                        // Atributos del ramo
+                        ramo.setIdRamo(idRamo);
+                        ramo.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("r.florPrincipal"))));
+                        ramo.setCantidadFlores(rs.getInt("r.cantidadFlores"));
+                        ramo.setColorEnvol(rs.getString("r.colorEnvoltorio"));
+
+                        ramo.setFloresSecun(new ArrayList<>()); // Inicializar lista de flores secundarias.
+                        ramosMap.put(idRamo, ramo); // Guardar el ramo en el mapa.
+                    }
+
+                    // Agregar flor secundaria
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("rf.Flor_idFlor")));
+                    ramo.getFloresSecun().add(florSecundaria);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        result.addAll(ramosMap.values()); // Pasar los valores del mapa a la lista final.
+        return result;
+    }
+
+    public List<Ramo> findByRange(int min, int max) {
+        List<Ramo> result = new ArrayList<>();
+        Map<Integer, Ramo> ramosMap = new HashMap<>(); // Map para evitar duplicados.
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_RANGE)) {
+            ps.setInt(1, min);
+            ps.setInt(2, max);
+            ps.setString(3, "%prehecho%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int idRamo = rs.getInt("r.idRamo");
+                    Ramo ramo = ramosMap.get(idRamo); // Revisamos si ya existe el ramo.
+
+                    if (ramo == null) { // Si no existe, lo creamos.
+                        ramo = new Ramo();
+                        // Atributos del producto
+                        Producto pro = productoDAO.build().findByPK(new Producto(idRamo));
+                        ramo.setIdProducto(pro.getIdProducto());
+                        ramo.setNombre(pro.getNombre());
+                        ramo.setPrecio(pro.getPrecio());
+                        ramo.setStock(pro.getStock());
+                        ramo.setTipo(pro.getTipo());
+                        ramo.setDescripcion(pro.getDescripcion());
+                        ramo.setImg(pro.getImg());
+
+                        // Atributos del ramo
+                        ramo.setIdRamo(idRamo);
+                        ramo.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("r.florPrincipal"))));
+                        ramo.setCantidadFlores(rs.getInt("r.cantidadFlores"));
+                        ramo.setColorEnvol(rs.getString("r.colorEnvoltorio"));
+
+                        ramo.setFloresSecun(new ArrayList<>()); // Inicializar lista de flores secundarias.
+                        ramosMap.put(idRamo, ramo); // Guardar el ramo en el mapa.
+                    }
+
+                    // Agregar flor secundaria
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("rf.Flor_idFlor")));
+                    ramo.getFloresSecun().add(florSecundaria);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        result.addAll(ramosMap.values()); // Pasar los valores del mapa a la lista final.
         return result;
     }
 
