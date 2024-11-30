@@ -205,7 +205,7 @@ public class AdminFloresController extends Controller implements Initializable {
             if (!validateFields()) {
                 return;
             }
-            florDAO.build().save(flor);
+            florDAO.build().insertFlor(flor);
             Alerta.showAlert("INFORMATION", "Producto insertado", "El producto ha sido insertado en la base de datos exitosamente");
             mostrarProductos(florDAO.build().findAll());
             clearFields();

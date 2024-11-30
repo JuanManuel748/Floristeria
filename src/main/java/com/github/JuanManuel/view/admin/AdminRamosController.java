@@ -124,21 +124,18 @@ public class AdminRamosController extends Controller implements Initializable {
     }
 
     @Override
-    public void onClose(Object output) {
-
-    }
+    public void onClose(Object output) {}
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        secunController = 0;
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));
         stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         colorColumn.setCellValueFactory(new PropertyValueFactory<>("colorEnvol"));
-        colorColumn.setCellValueFactory(new PropertyValueFactory<>("cantidadFlores"));
-
+        nfloresColumn.setCellValueFactory(new PropertyValueFactory<>("cantidadFlores"));
+        setupSpinners();
         imgColumn.setCellValueFactory(new PropertyValueFactory<>("img"));
         imgColumn.setCellFactory(col -> new TableCell<Ramo, byte[]>() {
             @Override
@@ -147,52 +144,27 @@ public class AdminRamosController extends Controller implements Initializable {
                 if (item == null || empty) {
                     setGraphic(null);
                 } else {
-                    try {
-                        Image image = new Image(new ByteArrayInputStream(item));
-                        ImageView imageView = new ImageView(image);
-                        imageView.setFitWidth(50);
-                        imageView.setFitHeight(50);
-                        setGraphic(imageView);
-                    } catch (Exception e) {
-                        setGraphic(null);
-                    }
+                    Image image = new Image(new ByteArrayInputStream(item));
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitWidth(50);
+                    imageView.setFitHeight(50);
+                    setGraphic(imageView);
                 }
             }
         });
-
-
-        ramosTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Ramo selected = ramosTable.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    setRamo(selected);
-                }
-            }
-        });
-
-        priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
-        priceField.getValueFactory().setConverter(new DoubleStringConverter());
-        stockField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
-        stockField.getValueFactory().setConverter(new IntegerStringConverter());
-
-        quantitySpinner.setItems(observableArrayList("3 Flores", "5 Flores", "8 Flores", "10 Flores", "15 Flores"));
-        quantitySpinner.setValue("3 Flores");
-
-        colorField.setItems(FXCollections.observableArrayList(
-                "Rojo", "Verde", "Azul", "Amarillo", "Negro", "Blanco", "Naranja", "Morado",
-                "Rosa", "Gris", "Cian", "Turquesa", "Marrón", "Violeta", "Fucsia", "Oliva",
-                "Oro", "Plata", "Beige", "Índigo", "Transparente"
-        ));
+        colorField.setItems(FXCollections.observableArrayList("Rojo", "Verde", "Azul", "Amarillo", "Negro", "Blanco", "Naranja", "Morado","Rosa", "Gris", "Cian", "Turquesa", "Marrón", "Violeta", "Fucsia", "Oliva","Oro", "Plata", "Beige", "Índigo", "Transparente"));
         colorField.setValue("Transparente");
-
         initializaComboBoc(flPRChoice, floresPrimarias);
         initializaComboBoc(flSecunChoice1, floresSecundarias);
         initializaComboBoc(flSecunChoice2, floresSecundarias);
         initializaComboBoc(flSecunChoice3, floresSecundarias);
+        quantitySpinner.setItems(observableArrayList("3 Flores", "5 Flores", "8 Flores", "10 Flores", "15 Flores"));
+        quantitySpinner.setValue("3 Flores");
 
-        List<Ramo> ls = ramoDAO.build().findAll();
-        mostrarProductos(ls);
+        ramosTable.setOnMouseClicked(event -> handleTableSelection(event));
+        mostrarProductos(ramoDAO.build().findAll());
     }
+
 
     public void initializaComboBoc(ComboBox c, List<Flor> flores) {
         c.setItems(observableArrayList(flores));
@@ -209,72 +181,129 @@ public class AdminRamosController extends Controller implements Initializable {
                 } else {
                     setText(flor.getNombre());
                     imageView.setImage(new Image(new ByteArrayInputStream(flor.getImg())));
-                    imageView.setFitHeight(20); // Ajusta el tamaño de la imagen
+                    imageView.setFitHeight(30);
+                    imageView.setFitWidth(30);
                     imageView.setPreserveRatio(true);
                     setGraphic(imageView);
                 }
             }
         });
 
-        // Configurar el renderizado del elemento seleccionado
         c.setButtonCell((ListCell) c.getCellFactory().call(null));
-        // Seleccionar un valor inicial
         if (!flores.isEmpty()) {
             c.setValue(flores.get(secunController));
             secunController++;
         }
     }
 
+    public boolean validateFields() {
+        boolean result = false;
+        try {
+            if (idField.getText().equals("")) {
+                Alerta.showAlert("ERROR", "ID vacía", "La ID esta vacía, proporciona una id que no este en uso");
+                return result;
+            }
+            int id = Integer.parseInt(idField.getText());
+            String nombre = nameField.getText();
+            if(nombre.equals("")) {
+                Alerta.showAlert("ERROR", "Nombre vacío", "El nombre esta vacío, proporciona un nombre adecuado");
+                return result;
+            }
+            Double price = Double.parseDouble(priceField.getValue().toString());
+            if (price <= 0) {
+                Alerta.showAlert("ERROR", "Precio erróneo", "El precio no puede ser 0 o menos");
+                return result;
+            }
+            int stock = Integer.parseInt(stockField.getValue().toString());
+            if(stock < 0) {
+                Alerta.showAlert("ERROR", "Stock erróneo", "El stock no puede ser menor que 0");
+                return result;
+            }
+            String description = descriptionField.getText();
+            if (description.equals("")) {
+                Alerta.showAlert("ERROR", "Descripcion vacía", "La descripcion esta vacía, proporciona una descripcion adecuada");
+                return result;
+            }
+            int numFlores = Integer.parseInt(quantitySpinner.getValue().toString().substring(0, 2).trim());
+            String color = colorField.getValue().toString();
+            Flor pr = (Flor) flPRChoice.getValue();
+            List<Flor> floresSecun = new ArrayList<>();
+            Flor f1 = (Flor) flSecunChoice1.getValue();
+            Flor f2 = (Flor) flSecunChoice2.getValue();
+            Flor f3 = (Flor) flSecunChoice3.getValue();
+            if (f1.equals(f2) || f1.equals(f3) || f2.equals(f3)) {
+                Alerta.showAlert("ERROR", "Flores de relleno repetidas", "las flores de relleno no se pueden repetir, debes seleccionar 3 distintas");
+                return result;
+            }
+            floresSecun.add(f1);
+            floresSecun.add(f2);
+            floresSecun.add(f3);
+
+            if (ramo == null) {
+                ramo = new Ramo();
+            }
+            ramo.setIdRamo(id);
+            ramo.setIdProducto(id);
+            ramo.setNombre(nombre);
+            ramo.setPrecio(price);
+            ramo.setStock(stock);
+            ramo.setDescripcion(description);
+            ramo.setFlorPr(pr);
+            ramo.setColorEnvol(color);
+            ramo.setCantidadFlores(numFlores);
+            ramo.setFloresSecun(floresSecun);
+            ramo.setTipo("ramo");
+            if(predeterminatedCheck.isSelected()) {
+                ramo.setDescripcion(description + " prehecho");
+            } else {
+                ramo.setDescripcion(description + " personalizado");
+            }
+            result = true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
 
     public void setRamo(Ramo p) {
-        idField.setText(String.valueOf(p.getIdProducto()));
-        nameField.setText(p.getNombre());
-        priceField.getValueFactory().setValue(p.getPrecio());
-        stockField.getValueFactory().setValue(p.getStock());
-        descriptionField.setText(p.getDescripcion());
-        /////////////////////
-        colorField.setValue(p.getColorEnvol());
-        quantitySpinner.setValue(p.getCantidadFlores() + " Flores");
-
-        flPRChoice.setValue(p.getFlorPr());
-        flSecunChoice1.setValue(p.getFloresSecun().get(0));
-        flSecunChoice2.setValue(p.getFloresSecun().get(1));
-        flSecunChoice3.setValue(p.getFloresSecun().get(2));
-
-        byte[] byteImage = p.getImg();
-        Image defaultImage = new Image(imgNull.toURI().toString());
-        if (byteImage != null) {
-            try {
+        try {
+            ramo = p;
+            idField.setText(String.valueOf(p.getIdRamo()));
+            nameField.setText(p.getNombre());
+            priceField.getValueFactory().setValue(p.getPrecio());
+            stockField.getValueFactory().setValue(p.getStock());
+            descriptionField.setText(p.getDescripcion());
+            colorField.setValue(p.getColorEnvol());
+            quantitySpinner.setValue(p.getCantidadFlores() + " Flores");
+            flPRChoice.setValue(p.getFlorPr());
+            flSecunChoice1.setValue(p.getFloresSecun().get(0));
+            flSecunChoice2.setValue(p.getFloresSecun().get(1));
+            flSecunChoice3.setValue(p.getFloresSecun().get(2));
+            if(p.getDescripcion().contains("prehecho")) {
+                predeterminatedCheck.setSelected(true);
+            }
+            byte[] byteImage = p.getImg();
+            Image defaultImage = new Image(imgNull.toURI().toString());
+            if (byteImage != null) {
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteImage);
                 Image image = new Image(byteArrayInputStream);
                 uploadButton.setImage(image);
-            } catch (Exception e) {
+            } else {
                 uploadButton.setImage(defaultImage);
             }
-        } else {
-            uploadButton.setImage(defaultImage);
-        }
-
-        ramo = p;
-    }
-
-    private byte[] imgToByteArray(File file) {
-        try {
-            return java.nio.file.Files.readAllBytes(file.toPath());
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
+
     }
 
-
-    public void mostrarProductos(List<Ramo> array) {
-        ObservableList<Ramo>productoObservableList = FXCollections.observableArrayList(array);
-        ramosTable.setItems(productoObservableList);
+    public void mostrarProductos(List<Ramo> array){
+        ObservableList<Ramo> observableList = FXCollections.observableArrayList(array);
+        ramosTable.setItems(observableList);
         ramosTable.refresh();
     }
 
-    private void clearFields() {
+    public void clearFields() {
         idField.setText("");
         nameField.setText("");
         descriptionField.setText("");
@@ -290,155 +319,24 @@ public class AdminRamosController extends Controller implements Initializable {
         } catch (Exception e) {
             Alerta.showAlert("ERROR", "Error al cargar imagen predeterminada", "No se pudo cargar la imagen predeterminada.");
         }
-        predeterminatedCheck.setSelected(false);
-        quantitySpinner.setValue("3 Flores");
-        colorField.setValue("Transparente");
-        flPRChoice.setValue(flPRChoice.getItems().get(0));
-        flSecunChoice1.setValue(flSecunChoice1.getItems().get(0));
-        flSecunChoice2.setValue(flSecunChoice1.getItems().get(1));
-        flSecunChoice3.setValue(flSecunChoice1.getItems().get(2));
-        img = imgNull;
+
+
+        img = null;
         ramo = null;
     }
 
-    public void uploadImage(MouseEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Imagen");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-        );
-
-        img = fileChooser.showOpenDialog(App.stage);
-
-        if (img != null) {
-            try {
-                if (ramo == null) {
-                    ramo = new Ramo();
-                }
-                ramo.setImg(img);
-
-                Image image = new Image(img.toURI().toString());
-                uploadButton.setImage(image);
-            } catch (Exception e) {
-                Alerta.showAlert("ERROR", "Error al cargar la imagen", "No se pudo cargar la imagen seleccionada.");
-            }
-        } else {
-            Alerta.showAlert("ERROR", "Imagen no seleccionada", "No se seleccionó ninguna imagen.");
-        }
-    }
-
-    public boolean confirm(String header, String content) {
-        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle("CONFIRMATION");
-        alerta.setHeaderText(header);
-        alerta.setContentText(content + ".\n¿Estas seguro?");
-        Optional<ButtonType> result = alerta.showAndWait();
-
-        if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public boolean validateFields() {
-        boolean result = false;
-        try {
-            int id = Integer.parseInt(idField.getText().trim());
-            String nombre = nameField.getText();
-            Double precio = (Double) priceField.getValue();
-            int stock = (int) stockField.getValue();
-            String description = descriptionField.getText();
-            Flor flPR = (Flor) flPRChoice.getValue();
-            Boolean prehecho = predeterminatedCheck.isSelected();
-            List<Flor> floresSecun = new ArrayList<>();
-            floresSecun.add((Flor) flSecunChoice1.getValue());
-            floresSecun.add((Flor) flSecunChoice2.getValue());
-            floresSecun.add((Flor) flSecunChoice3.getValue());
-            String color = String.valueOf(colorField.getValue());
-
-            int cantidad = Integer.parseInt(quantitySpinner.getValue().toString().substring(0, 2).trim());
-
-            if (nombre.equals("")) {
-                if (!confirm("Nombre vacio", "No has puesto un nombre al producto")) {
-                    return result;
-                }
-            }
-            if (precio <= 0) {
-                if (!confirm("Precio menor que 0", "No puedes poner un precio en 0 o en negativo")) {
-                    return result;
-                } else {
-                    return result;
-                }
-            }
-            if (stock == 0) {
-                if (!confirm("Stock en 0", "El stock esta en 0")) {
-                    return result;
-                }
-            }
-            if (stock < 0) {
-                Alerta.showAlert("ERROR", "Stock negativo", "El stock no puede ser menor que 0");
-                return result;
-            }
-            if(description.equals("")) {
-                if (!confirm("Descripcion vacia", "No has puesto ninguna descripcion")) {
-                    return result;
-                }
-            }
-            if(color.equals("")) {
-                if (!confirm("Color vacio", "No has puesto ningun color")) {
-                    return result;
-                }
-            }
-
-            if(uploadButton.getImage() == null) {
-                if (!confirm("Imagen vacia", "No has puesto ningun imagen")) {
-                    return result;
-                } else {
-                    uploadImage(null);
-                }
-            }
-
-            ramo.setIdRamo(id);
-            ramo.setIdProducto(id);
-            ramo.setNombre(nombre);
-            ramo.setPrecio(precio);
-            ramo.setStock(stock);
-            ramo.setDescripcion(description);
-            ramo.setFlorPr(flPR);
-            ramo.setCantidadFlores(cantidad);
-            ramo.setColorEnvol(color);
-            ramo.setFloresSecun(floresSecun);
-            result = true;
-        } catch (NumberFormatException nfe) {
-            nfe.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-
     public void insert(ActionEvent actionEvent) {
         try {
-            if(!validateFields()) {
+            if (!validateFields()) {
                 return;
             }
-
-            if (img != null && img.exists()) {
-                ramo.setImg(imgToByteArray(img));
-            }
-
             ramoDAO.build().insertRamo(ramo);
-            Alerta.showAlert("INFORMATION", "Ramo insertado", "El ramo ha sido insertado en la base de datos exitosamente");
-
-            List<Ramo> allProducts = ramoDAO.build().findAll();
-            mostrarProductos(allProducts);
-
+            Alerta.showAlert("INFORMATION", "Producto insertado", "El producto ha sido insertado en la base de datos exitosamente");
+            mostrarProductos(ramoDAO.build().findAll());
             clearFields();
         } catch (Exception e) {
-            Alerta.showAlert("ERROR", "Ramo NO insertado", "El ramo NO ha sido insertado en la base de datos exitosamente.\nRevisa que la id no este en uso");
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Producto NO insertado", "Error al insertar el producto.");
+            e.printStackTrace();
         }
     }
 
@@ -447,66 +345,59 @@ public class AdminRamosController extends Controller implements Initializable {
             if (!validateFields()) {
                 return;
             }
-
-            if (img != null && img.exists()) {
-                ramo.setImg(imgToByteArray(img)); // Solo se actualiza la imagen si se ha seleccionado una nueva
-            } else if (ramo.getImg() == null || ramo.getImg().length == 0) {
-                // No hacer nada en caso de que no se seleccione una nueva imagen,
-                // y si la imagen no es nula, no modificarla
-                // No asignar null a ramo.setImg()
-            } // Aquí no es necesario asignar null a la imagen si no se ha actualizado
-
-
             ramoDAO.build().updateRamo(ramo);
-            Alerta.showAlert("INFORMATION", "Ramo actualizado", "El ramo ha sido actualizado en la base de datos exitosamente");
-
-            List<Ramo> allProducts = ramoDAO.build().findAll();
-            mostrarProductos(allProducts);
-
+            Alerta.showAlert("INFORMATION", "Producto insertado", "El producto ha sido insertado en la base de datos exitosamente");
+            mostrarProductos(ramoDAO.build().findAll());
             clearFields();
         } catch (Exception e) {
-            Alerta.showAlert("ERROR", "Ramo NO actualizado", "El ramo NO ha sido actualizado en la base de datos exitosamente.\nRevisa que la id no este en uso");
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Producto NO insertado", "Error al insertar el producto.");
+            e.printStackTrace();
         }
     }
 
     public void delete(ActionEvent actionEvent) {
         try {
-            ramoDAO.build().delete(new Ramo(Integer.parseInt(idField.getText().trim())));
-            Alerta.showAlert("INFORMATION", "Ramo eliminado", "El ramo ha sido eliminado en la base de datos exitosamente");
-
-            List<Ramo> allProducts = ramoDAO.build().findAll();
-            mostrarProductos(allProducts);
-
+            if (!validateFields()) {
+                return;
+            }
+            ramoDAO.build().delete(ramo);
+            Alerta.showAlert("INFORMATION", "Producto insertado", "El producto ha sido insertado en la base de datos exitosamente");
+            mostrarProductos(ramoDAO.build().findAll());
             clearFields();
         } catch (Exception e) {
-            Alerta.showAlert("ERROR", "Ramo NO eliminado", "El ramo NO ha sido eliminado en la base de datos exitosamente.\nRevisa que la id no este en uso");
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Producto NO insertado", "Error al insertar el producto.");
+            e.printStackTrace();
         }
     }
 
     public void find(ActionEvent actionEvent) {
+        //////////////////////////
+        // TERMINAR
         try {
-            List<Ramo> lista = new ArrayList<>();
-
+            List<Ramo>findLS = new ArrayList<>();
             switch (selectAlert()) {
-                case 1: // ID
-                    lista.add(ramoDAO.build().findByPK(new Ramo(Integer.parseInt(idField.getText().trim()))));
+                case 1:
+                    int id = Integer.parseInt(idField.getText().trim());
+                    Ramo item = ramoDAO.build().findByPK(new Ramo(id));
+                    if (item != null) {
+                        findLS.add(item);
+                    }
                     break;
-                case 2: // NOMBRE
-                    lista = ramoDAO.build().findByName(nameField.getText().trim());
+                case 2:
+                    String name = nameField.getText().trim();
+                    findLS = ramoDAO.build().findByNames(name);
                     break;
-                case 3: // TIPO
-                    lista = ramoDAO.build().findByType(predeterminatedCheck.isSelected());
+                case 3:
+                    findLS = ramoDAO.build().findByType(predeterminatedCheck.isSelected());
                     break;
-                case 4: // ALL
-                    lista = ramoDAO.build().findAll();
+                case 4:
+                    findLS = ramoDAO.build().findAll();
                     break;
                 default:
                     return;
             }
-            mostrarProductos(lista);
 
+            mostrarProductos(findLS);
             clearFields();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -541,5 +432,52 @@ public class AdminRamosController extends Controller implements Initializable {
 
     }
 
+    public void uploadImage(MouseEvent mouseEvent) {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Seleccionar imagen");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Imágenes", "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif")
+            );
+
+            File selectedFile = fileChooser.showOpenDialog(null);
+
+            if (selectedFile != null) {
+                img = selectedFile;
+                Image image = new Image(selectedFile.toURI().toString());
+                uploadButton.setImage(image);
+
+                if (ramo == null) {
+                    ramo = new Ramo();
+                }
+
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(selectedFile.toPath());
+                ramo.setImg(imageBytes);
+            } else {
+                Alerta.showAlert("INFORMATION", "No se seleccionó ninguna imagen", "Por favor selecciona una imagen.");
+            }
+        } catch (Exception e) {
+            Alerta.showAlert("ERROR", "Error al cargar imagen", "No se pudo cargar la imagen seleccionada.");
+        }
+    }
+
+    private void setupSpinners() {
+        priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
+        priceField.getValueFactory().setConverter(new DoubleStringConverter());
+        stockField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+        stockField.getValueFactory().setConverter(new IntegerStringConverter());
+    }
+
+    private void handleTableSelection(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            Ramo selected = ramosTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                setRamo(selected);
+            } else {
+                Alerta.showAlert("ERROR", "Ningún producto seleccionado", "Haz clic en un producto para seleccionarlo.");
+            }
+        }
+    }
 
 }
+
