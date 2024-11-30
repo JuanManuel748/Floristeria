@@ -4,6 +4,7 @@ import com.github.JuanManuel.model.entity.Producto;
 import com.github.JuanManuel.model.entity.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
@@ -51,27 +52,36 @@ public class ThumbController extends Controller implements Initializable {
     }
 
 
-    public String inputCantidad() {
-        TextInputDialog tid = new TextInputDialog();
-        tid.setTitle("TITUTLO");
-        tid.setHeaderText("CABEZA");
-        tid.setContentText("CONTENIDO");
-        Optional<String> opt = tid.showAndWait();
-        String result = opt.get();
+    public int inputCantidad() {
+        int result = 0;
+        try {
+            TextInputDialog tid = new TextInputDialog();
+            tid.setTitle("Cantidad");
+            tid.setHeaderText("Inserte la cantidad del producto");
+            Optional<String> opt = tid.showAndWait();
+            String st = opt.get();
+            result = Integer.parseInt(st);
+            if (result < 1) {
+                Alerta.showAlert("ERROR", "Error en la cantidad", "No puedes comprar 0 o menos de 0 productos");
+                return 0;
+            }
+            thisVBox.setStyle("-fx-background-color: #008080;");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return result;
     }
 
     public void selectProduc(javafx.event.ActionEvent actionEvent) {
         int cantidad = -1;
-        while(cantidad == -1) {
+        while(cantidad == 0 || cantidad < 0) {
             try {
-                cantidad = Integer.parseInt(inputCantidad());
+                cantidad = inputCantidad();
+                Session.getInstance().addDetalle(producto, cantidad);
             } catch (NumberFormatException e) {
                 cantidad = -1;
                 throw new RuntimeException(e);
             }
         }
-        Session.getInstance().addDetalle(producto, cantidad);
-        thisVBox.setStyle("-fx-background-color: #008080;");
     }
 }

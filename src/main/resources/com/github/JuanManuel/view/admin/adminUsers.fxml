@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #a8ffb2;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.JuanManuel.view.admin.AdminUsersController">
+   <children>
+      <Pane prefHeight="80.0" prefWidth="800.0" style="-fx-background-color: #61e761;">
+         <children>
+            <Text fx:id="nametext" layoutX="190.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="USERS" textAlignment="CENTER" wrappingWidth="420.0">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Text>
+            <Button fx:id="exitButton" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="volver" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <Button fx:id="logoutButton" layoutX="610.0" layoutY="14.0" mnemonicParsing="false" onAction="#logout" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Cerrar Sesión" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="14.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/logoBlanco.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+         </children>
+      </Pane>
+      <TableView fx:id="usersTable" layoutX="50.0" layoutY="100.0" prefHeight="450.0" prefWidth="500.0">
+        <columns>
+          <TableColumn fx:id="phoneColumn" prefWidth="120.0" text="Teléfono" />
+          <TableColumn fx:id="nameColumn" prefWidth="200.0" text="Nombre" />
+            <TableColumn fx:id="passwordColumn" minWidth="7.20001220703125" prefWidth="100.0" text="Contraseña" />
+            <TableColumn fx:id="adminColumn" minWidth="7.20001220703125" text="¿Admin?" />
+        </columns>
+      </TableView>
+      <Pane layoutX="575.0" layoutY="100.0" prefHeight="320.0" prefWidth="200.0">
+         <children>
+            <VBox alignment="TOP_CENTER" prefHeight="320.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Label text="Teléfono:" />
+                  <TextField fx:id="phoneField" />
+                  <Label text="Nombre:" />
+                  <TextField fx:id="nameField" />
+                  <Label text="Contraseña:" />
+                  <TextField fx:id="passwordField" />
+                  <Label text="¿Admin?" />
+                  <CheckBox fx:id="adminCheck" mnemonicParsing="false" text="CheckBox" />
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+            </VBox>
+         </children>
+      </Pane>
+      <Pane layoutX="575.0" layoutY="399.0" prefHeight="150.0" prefWidth="200.0">
+         <children>
+            <GridPane prefHeight="150.0" prefWidth="200.0">
+              <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+              </rowConstraints>
+               <children>
+                  <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#insert" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="INSERTAR" textFill="WHITE" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="updateButton" mnemonicParsing="false" onAction="#update" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="ACTUALIZAR" textFill="WHITE" GridPane.columnIndex="1">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#delete" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="ELIMINAR" textFill="WHITE" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="findButton" mnemonicParsing="false" onAction="#find" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="BUSCAR" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+               </children>
+            </GridPane>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

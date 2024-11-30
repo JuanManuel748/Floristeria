@@ -3,7 +3,7 @@ package com.github.JuanManuel.view;
 import javafx.scene.control.Alert;
 
 public class Alerta {
-    protected static void showAlert(String type, String title, String content) {
+    public static void showAlert(String type, String title, String content) {
         Alert alert = new Alert(Alert.AlertType.NONE);
         switch (type) {
             case "ERROR":

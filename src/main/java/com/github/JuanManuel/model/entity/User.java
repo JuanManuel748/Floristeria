@@ -6,11 +6,20 @@ public class User {
     private String phone;
     private String name;
     private String password;
+    private boolean isAdmin;
 
     public User(String telefono, String name, String password) {
         this.phone = telefono;
         this.name = name;
         this.password = password;
+        this.isAdmin = false;
+    }
+
+    public User(String telefono, String name, String password, Boolean admin) {
+        this.phone = telefono;
+        this.name = name;
+        this.password = password;
+        this.isAdmin = admin;
     }
 
     public User() {}
@@ -33,6 +42,11 @@ public class User {
         return this.phone;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+
     // SETTERS
     public void setName(String name) {
         this.name = name;
@@ -46,6 +60,9 @@ public class User {
         this.phone = telefono;
     }
 
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
     // EQUALS
 
     @Override
@@ -70,6 +87,7 @@ public class User {
                 "phone='" + phone + '\'' +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
+                ", admin?='" + isAdmin + '\'' +
                 '}';
     }
 }

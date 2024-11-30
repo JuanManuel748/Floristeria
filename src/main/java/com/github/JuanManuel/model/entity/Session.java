@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.entity;
 
 import com.github.JuanManuel.model.DAO.pedidoDAO;
 import com.github.JuanManuel.model.DAO.userDAO;
+import com.github.JuanManuel.view.Alerta;
 import com.github.JuanManuel.view.ProductosController;
 
 import java.util.ArrayList;
@@ -56,16 +57,34 @@ public class Session {
     }
 
     public void addDetalle(Producto pro, int cant) {
-        Boolean exists = false;
+        Boolean found = false;
         for(Detalles det : detalles) {
             if (det.getPro().equals(pro)) {
                 det.setCantidad(det.getCantidad()+cant);
-                exists = true;
+                found = true;
                 break;
             }
         }
-        if (!exists) {
+        if (!found) {
             detalles.add(new Detalles(ped, pro, cant));
+        }
+    }
+
+    public void changeQuantity(Producto pro, int cant) {
+        for(Detalles det : detalles) {
+            if (det.getPro().equals(pro)) {
+                det.setCantidad(cant);
+                break;
+            }
+        }
+    }
+
+    public void delDetalle(Producto pro) {
+        for(Detalles det : detalles) {
+            if (det.getPro().equals(pro)) {
+                detalles.remove(det);
+                break;
+            }
         }
     }
 

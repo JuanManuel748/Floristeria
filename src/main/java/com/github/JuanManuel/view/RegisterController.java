@@ -53,7 +53,7 @@ public class RegisterController extends Controller implements Initializable {
     @FXML
     public void register(ActionEvent actionEvent) {
         String phone = phoneField.getText().trim();
-        String name = nameField.getText().trim();
+        String name = nameField.getText();
         String password = passwordField.getText().trim();
         String repass = repassField.getText().trim();
 
