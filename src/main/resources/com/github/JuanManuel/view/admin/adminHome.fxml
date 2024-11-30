@@ -14,31 +14,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #a8ffb2;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.JuanManuel.view.admin.AdminHomeController">
+<AnchorPane prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: #a8ffb2;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.JuanManuel.view.admin.AdminHomeController">
     <children>
-        <Pane prefHeight="80.0" prefWidth="800.0" style="-fx-background-color: #61e761;">
-            <children>
-                <Text fx:id="nametext" fill="#044004" layoutX="190.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ADMIN MENU" textAlignment="CENTER" wrappingWidth="420.0">
-                    <font>
-                        <Font name="System Bold" size="36.0" />
-                    </font>
-                </Text>
-                <Button fx:id="logoutButton" layoutX="610.0" layoutY="14.0" mnemonicParsing="false" onAction="#logout" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Cerrar Sesión" textAlignment="CENTER" textFill="WHITE" wrapText="true">
-                    <font>
-                        <Font name="System Bold" size="12.0" />
-                    </font>
-                </Button>
-                <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="14.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@../images/logoBlanco.png" />
-                    </image>
-                    <cursor>
-                        <Cursor fx:constant="HAND" />
-                    </cursor>
-                </ImageView>
-            </children>
-        </Pane>
-        <GridPane alignment="CENTER" layoutX="50.0" layoutY="110.0" prefHeight="450.0" prefWidth="700.0" vgap="50.0">
+        <GridPane alignment="CENTER" layoutX="50.0" layoutY="125.0" prefHeight="600.0" prefWidth="900.0" vgap="50.0">
             <columnConstraints>
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -51,12 +29,12 @@
             <children>
                 <VBox alignment="CENTER" prefHeight="186.0" prefWidth="300.0" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                     <children>
-                        <Label prefHeight="35.0" prefWidth="101.0" text="Usuarios" textFill="#044004">
+                        <Label text="Usuarios" textFill="#044004">
                             <font>
                                 <Font name="System Bold" size="24.0" />
                             </font>
                         </Label>
-                        <ImageView fitHeight="120.0" fitWidth="200.0" onMouseClicked="#goToUsers" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="170.0" fitWidth="170.0" onMouseClicked="#goToUsers" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="@../images/iconoUsers.png" />
                             </image>
@@ -65,12 +43,12 @@
                 </VBox>
             <VBox alignment="CENTER" prefHeight="186.0" prefWidth="300.0" GridPane.columnIndex="1">
                <children>
-                  <Label prefHeight="35.0" text="Pedidos" textFill="#044004">
+                  <Label text="Pedidos" textFill="#044004">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <ImageView fitHeight="120.0" fitWidth="200.0" onMouseClicked="#goToPedidos" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="170.0" fitWidth="170.0" onMouseClicked="#goToPedidos" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/iconoPedidos.png" />
                      </image>
@@ -79,12 +57,12 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="186.0" prefWidth="300.0" GridPane.rowIndex="1">
                <children>
-                  <Label prefHeight="35.0" text="Complementos" textFill="#044004">
+                  <Label text="Complementos" textFill="#044004">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <ImageView fitHeight="120.0" fitWidth="200.0" onMouseClicked="#goToComplementos" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="170.0" fitWidth="170.0" onMouseClicked="#goToComplementos" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/iconoProducto.png" />
                      </image>
@@ -93,12 +71,12 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="186.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
-                  <Label prefHeight="35.0" text="Flores" textFill="#044004">
+                  <Label text="Flores" textFill="#044004">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <ImageView fitHeight="120.0" fitWidth="200.0" onMouseClicked="#goToFlores" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="170.0" fitWidth="170.0" onMouseClicked="#goToFlores" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/iconoFlor.png" />
                      </image>
@@ -107,12 +85,12 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="186.0" prefWidth="300.0" GridPane.rowIndex="2">
                <children>
-                  <Label prefHeight="35.0" text="Ramos" textFill="#044004">
+                  <Label text="Ramos" textFill="#044004">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <ImageView fitHeight="120.0" fitWidth="200.0" onMouseClicked="#goToRamos" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="170.0" fitWidth="170.0" onMouseClicked="#goToRamos" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/iconoRamo.png" />
                      </image>
@@ -121,12 +99,12 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="186.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
-                  <Label prefHeight="35.0" text="Centros" textFill="#044004">
+                  <Label text="Centros" textFill="#044004">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
                   </Label>
-                  <ImageView fitHeight="120.0" fitWidth="200.0" onMouseClicked="#goToCentros" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="170.0" fitWidth="170.0" onMouseClicked="#goToCentros" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../images/iconoCentro.png" />
                      </image>
@@ -135,5 +113,27 @@
             </VBox>
             </children>
         </GridPane>
+      <Pane prefHeight="100.0" prefWidth="1000.0" style="-fx-background-color: #61e761;">
+         <children>
+            <ImageView fitHeight="70.0" fitWidth="90.0" layoutX="20.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/logoBlanco.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+            <Text fx:id="nametext" fill="#044004" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ADMIN HOME" textAlignment="CENTER" wrappingWidth="1000.0">
+               <font>
+                  <Font name="System Bold" size="44.0" />
+               </font>
+            </Text>
+            <Button fx:id="logoutButton" layoutX="800.0" layoutY="20.0" mnemonicParsing="false" onAction="#logout" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Cerrar Sesión" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Button>
+         </children>
+      </Pane>
     </children>
 </AnchorPane>

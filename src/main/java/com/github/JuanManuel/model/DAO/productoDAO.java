@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.DAO;
 
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.Producto;
+import com.github.JuanManuel.view.Alerta;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -19,7 +20,7 @@ public class productoDAO  implements DAO<Producto>{
     private static final String FIND_BY_PK = "SELECT * FROM Producto WHERE idProducto = ?";
     private static final String FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?";
     private static final String FIND_COMP_BY_NAME = "SELECT * FROM Producto WHERE LOWER(nombre) LIKE ? AND (tipo = ? OR tipo = ?)";
-
+    private static final String FIND_GROUPBY = "SELECT p.*, SUM(pp.cantidad) AS cantidadVendida FROM Producto p JOIN Pedido_Producto pp ON p.idProducto = pp.Producto_idProducto WHERE p.tipo = ? GROUP BY p.nombre HAVING cantidadVendida >= ?";
     private Connection con;
 
     public productoDAO() { con = MySQLConnection.getConnection();}
@@ -141,6 +142,33 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
+    public List<Producto> findGroupBy(int quantity, String type) {
+        List<Producto> result = new ArrayList<>();
+        //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
+        try (PreparedStatement ps = con.prepareStatement(FIND_GROUPBY)) {
+            ps.setString(1, type);
+            ps.setInt(2, quantity);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Producto p = new Producto();
+                    p.setIdProducto(rs.getInt("p.idProducto"));
+                    p.setNombre(rs.getString("p.nombre"));
+                    p.setPrecio(rs.getDouble("p.precio"));
+                    p.setStock(rs.getInt("p.stock"));
+                    p.setTipo(rs.getString("p.tipo"));
+                    p.setDescripcion(rs.getString("p.description"));
+                    p.setImg(rs.getBytes("p.imagen"));
+                    p.setCantidadVendida(rs.getInt("cantidadVendida"));
+                    result.add(p);
+                }
+            }
+        } catch (SQLException e) {
+            Alerta.showAlert("ERROR", "Ningún producto encontrado", "No se han encontrado ningun producto con cantidadVendidad >= " + quantity  + " de tipo " + type);
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
     public List<Producto> findByComplName(String name, String tipo1, String tipo2) {
         List<Producto> result = new ArrayList<>();
         //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
@@ -171,7 +199,7 @@ public class productoDAO  implements DAO<Producto>{
     public Producto delete(Producto entity) throws SQLException {
         if (entity != null) {
             try (PreparedStatement pst = con.prepareStatement(DELETE)) {
-                pst.setString(1, String.valueOf(entity.getIdProducto()));
+                pst.setInt(1, entity.getIdProducto());
                 pst.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();

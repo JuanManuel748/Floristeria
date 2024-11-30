@@ -1,5 +1,8 @@
 package com.github.JuanManuel.model.entity;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+
 import java.io.File;
 import java.util.Objects;
 
@@ -82,5 +85,9 @@ public class Flor extends Producto{
                 ", color='" + color + '\'' +
                 ", tipoFlor=" + tipoFlor +
                 '}';
+    }
+
+    public ObservableValue<Boolean> adminProperty() {
+        return new SimpleBooleanProperty(tipoFlor);
     }
 }
