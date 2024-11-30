@@ -21,17 +21,24 @@ public class App extends Application {
     public static Stage stage;
     public static AppController currentController;
 
-
     public static void main(String[] args) {
         launch();
     }
 
+    // Método para obtener el Stage principal de la aplicación
+    public static Stage getPrimaryStage() {
+        return stage;
+    }
+
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
+
         View view = AppController.loadFXML(Scenes.ROOT);
-        scene = new Scene(view.scene,  800, 600);
+        scene = new Scene(view.scene, 800, 600);
         currentController = (AppController) view.controller;
-        currentController.onOpen( null);
+        currentController.onOpen(null);
+
         stage.setScene(scene);
         stage.setTitle("Floristería Reyes");
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/com/github/JuanManuel/view/images/logoBlanco.png")));

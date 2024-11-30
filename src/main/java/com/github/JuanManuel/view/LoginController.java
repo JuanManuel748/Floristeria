@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import javax.swing.*;
 import java.net.URL;
@@ -40,7 +41,14 @@ public class LoginController extends Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        Stage stage = (Stage) App.getPrimaryStage();
+        if (stage != null) {
+            stage.setWidth(820);
+            stage.setHeight(640);
+            stage.centerOnScreen();
+        } else {
+            System.out.println("Stage no disponible.");
+        }
     }
 
 

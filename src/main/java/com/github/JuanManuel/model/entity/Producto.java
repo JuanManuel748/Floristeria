@@ -16,6 +16,7 @@ public class Producto {
     private String tipo;
     private String descripcion;
     private byte[] img;
+    private int cantidadVendida = 0;
 
     private static final File imgNull = new File("src/main/resources/com/github/JuanManuel/view/images/noPicture.jpg");
 
@@ -82,6 +83,10 @@ public class Producto {
         return img;
     }
 
+    public int getCantidadVendida() {
+        return cantidadVendida;
+    }
+
     // SETTERS
     public void setIdProducto(int idProducto) {
         this.idProducto = idProducto;
@@ -113,6 +118,9 @@ public class Producto {
         this.img = ImageToByte(img);
     }
 
+    public void setCantidadVendida(int cantidadVendida) {
+        this.cantidadVendida = cantidadVendida;
+    }
     // EQUALS
     @Override
     public boolean equals(Object o) {

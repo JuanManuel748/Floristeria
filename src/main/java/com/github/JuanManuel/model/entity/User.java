@@ -1,5 +1,8 @@
 package com.github.JuanManuel.model.entity;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+
 import java.util.Objects;
 
 public class User {
@@ -89,5 +92,9 @@ public class User {
                 ", password='" + password + '\'' +
                 ", admin?='" + isAdmin + '\'' +
                 '}';
+    }
+
+    public ObservableValue<Boolean> adminProperty() {
+        return new SimpleBooleanProperty(isAdmin);
     }
 }

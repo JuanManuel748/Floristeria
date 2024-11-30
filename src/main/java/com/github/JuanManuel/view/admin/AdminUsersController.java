@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -52,16 +53,15 @@ public class AdminUsersController extends Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Configurar las columnas de la tabla para que correspondan a los atributos de User
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password")); // Si "password" es byte[], asegúrate de mapearlo adecuadamente
-        adminColumn.setCellValueFactory(new PropertyValueFactory<>("admin"));
+        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
 
-        // Cargar usuarios en la tabla
+        adminColumn.setCellValueFactory(cellData -> cellData.getValue().adminProperty());
+        adminColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
+
         List<User> usuarios = userDAO.build().findAll();
         mostrarUsuarios(usuarios);
-
         usersTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 User selectedUser = usersTable.getSelectionModel().getSelectedItem();
@@ -71,6 +71,7 @@ public class AdminUsersController extends Controller implements Initializable {
             }
         });
     }
+
 
     public void setUser(User u) {
         phoneField.setText(u.getPhone());
@@ -160,7 +161,7 @@ public class AdminUsersController extends Controller implements Initializable {
             String password = HashPass.hashPassword(passwordField.getText().trim());
             Boolean isAdmin = adminCheck.isSelected();
             u = new User(telefono, nombre, password, isAdmin);
-            userDAO.build().save(u);
+            userDAO.build().insertUser(u);
 
             Alerta.showAlert("INFORMATION", "Usuario insertado", "El usuario ha sido insertado en la base de datos exitosamente");
 
@@ -170,6 +171,7 @@ public class AdminUsersController extends Controller implements Initializable {
 
             clearFields();
         } catch (Exception e) {
+            Alerta.showAlert("ERROR", "Usuario NO insertado", "El usuario NO ha sido insertado en la base de datos exitosamente.\nRevisa que el numero de telefono no este en uso");
             throw new RuntimeException(e);
         }
     }

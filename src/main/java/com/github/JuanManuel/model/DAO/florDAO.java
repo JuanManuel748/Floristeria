@@ -17,6 +17,7 @@ public class florDAO implements DAO<Flor>{
     private static final String FIND_ALL = "SELECT * FROM Flor";
     private static final String FIND_BY_PK = "SELECT * FROM Flor WHERE idFlor = ?";
     private static final String FIND_BY_TYPE = "SELECT * FROM Flor WHERE tipo = ?";
+    private static final String FIND_BY_NAME = "SELECT f.*, p.* FROM Flor f JOIN Producto p ON p.idProducto = f.idFlor WHERE LOWER(p.nombre) LIKE ?";
 
 
     private Connection con;
@@ -156,6 +157,36 @@ public class florDAO implements DAO<Flor>{
                     f.setIdFlor(rs.getInt("idFlor"));
                     f.setColor(rs.getString("color"));
                     f.setTipoFlor(rs.getBoolean("tipo"));
+                    result.add(f);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    public List<Flor> findByName(String name) {
+        List<Flor> result = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
+            ps.setString(1, "%" + name.toLowerCase() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Flor f = new Flor();
+                    // Atributos producto
+                    Producto pro = productoDAO.build().findByPK(new Producto(rs.getInt("f.idFlor")));
+                    f.setIdProducto(pro.getIdProducto());
+                    f.setNombre(pro.getNombre());
+                    f.setPrecio(pro.getPrecio());
+                    f.setStock(pro.getStock());
+                    f.setTipo(pro.getTipo());
+                    f.setDescripcion(pro.getDescripcion());
+                    f.setImg(pro.getImg());
+                    // Atributos flor
+                    f.setIdFlor(rs.getInt("f.idFlor"));
+                    f.setColor(rs.getString("f.color"));
+                    f.setTipoFlor(rs.getBoolean("f.tipo"));
                     result.add(f);
                 }
             }
