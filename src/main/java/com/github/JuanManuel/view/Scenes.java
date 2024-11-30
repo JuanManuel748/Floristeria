@@ -22,6 +22,15 @@ public enum Scenes {
     CARRITO("view/shoppingCart.fxml"), // PAGINA CON UNA VISTA PREVIA DE LOS PRODUCTOS QUE SE VAN A COMPRAR
 
     // PAGINAS ADMIN
+    ADMINHOME("view/admin/adminHome.fxml"),
+    ADMINUSERS("view/admin/adminUsers.fxml"),
+    ADMINPEDIDOS("view/admin/adminPedidos.fxml"),
+    ADMINPRODUCTOS("view/admin/adminProductos.fxml"),
+    ADMINRAMOS("view/admin/adminRamos.fxml"),
+    ADMINCENTROS("view/admin/adminCentros.fxml"),
+    ADMINFLORES("view/admin/adminFlores.fxml"),
+
+
 
     WELCOME("view/Welcome.fxml"); //ELEGIR ROL
 

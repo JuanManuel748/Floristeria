@@ -63,7 +63,7 @@ public class LoginController extends Controller implements Initializable {
                     if (hashedPassword.equals(currentUser.getPassword())) {
                         Session.getInstance().logIn(currentUser);
                         Alerta.showAlert("INFORMATION","", "Bienvenido, " + currentUser.getName());
-                        App.currentController.changeScene(Scenes.HOME, null);
+                        App.currentController.changeScene(Scenes.ADMINHOME, null);
                     } else {
                         Alerta.showAlert("ERROR", "Contraseña incorrecta", "La contraseña de esa cuenta no coincide con la contraseña introducida");
                     }

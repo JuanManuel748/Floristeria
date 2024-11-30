@@ -6,8 +6,10 @@ module com.github.JuanManuel {
     requires com.h2database;
 
     opens com.github.JuanManuel.view to javafx.fxml;
-    exports com.github.JuanManuel.view;
-    exports com.github.JuanManuel;
+    opens com.github.JuanManuel.view.admin to javafx.fxml;
     opens com.github.JuanManuel to javafx.fxml;
+
+    exports com.github.JuanManuel;
+    exports com.github.JuanManuel.view;
     exports com.github.JuanManuel.model.entity;
 }
