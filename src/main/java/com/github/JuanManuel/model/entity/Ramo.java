@@ -36,6 +36,15 @@ public class Ramo extends Producto{
         this.floresSecun = ar;
     }
 
+    public Ramo(int id, String nombre, Double precio, int stock, String description, byte[] img, Flor flPR, int cantidad, String color, List<Flor> floresSecun) {
+        super(id, nombre, precio, stock, "ramo", description, img);
+        this.idRamo = id;
+        this.florPr = flPR;
+        this.cantidadFlores = cantidad;
+        this.colorEnvol = color;
+        this.floresSecun = floresSecun;
+    }
+
     // GETTERS
     public int getIdRamo() {
         return idRamo;
