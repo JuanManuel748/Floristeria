@@ -21,10 +21,12 @@ public class ramoDAO implements DAO<Ramo>{
     private static final String UPDATE = "UPDATE Ramo SET florPrincipal = ?, cantidadFlores = ?, colorEnvoltorio = ? WHERE idRamo = ?";
     private static final String UPDATE_FLORES = "UPDATE RamoFlores SET Flor_idFlor = ? WHERE Ramo_idRamo = ?";
     private static final String DELETE = "DELETE FROM Ramo WHERE idRamo = ?";
+    private static final String DELETE_FLORES = "DELETE FROM RamoFlores WHERE Ramo_idRamo = ?";
     private static final String FIND_ALL = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor";
     private static final String FIND_BY_PK = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor WHERE idRamo = ?";
     private static final String FIND_BY_NAME = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE LOWER(p.nombre) LIKE ? AND LOWER(p.description) LIKE ?";
     private static final String FIND_BY_RANGE = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE p.precio >= ? AND p.precio <= ? AND LOWER(p.description) LIKE ?";
+    private static final String FIND_BY_TYPE = "SELECT r.*, rf.*, f.* FROM Ramo r JOIN RamoFlores rf ON r.idRamo = rf.Ramo_idRamo JOIN Flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE LOWER(p.description) LIKE ?";
 
 
     private Connection con;
@@ -85,6 +87,7 @@ public class ramoDAO implements DAO<Ramo>{
     }
 
     public void updateRamo(Ramo entity) {
+
         productoDAO.build().updateProducto(entity);
 
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
@@ -93,12 +96,15 @@ public class ramoDAO implements DAO<Ramo>{
             ps.setString(3, entity.getColorEnvol());
             ps.setInt(4, entity.getIdRamo());
             ps.executeUpdate();
-
             List<Flor> flores = entity.getFloresSecun();
+
+            PreparedStatement ps3 = con.prepareStatement(DELETE_FLORES);
+            ps3.setInt(1, entity.getIdRamo());
+            ps3.executeUpdate();
             for(Flor f: flores) {
-                try (PreparedStatement ps2 = con.prepareStatement(UPDATE_FLORES)) {
-                    ps2.setInt(2, entity.getIdRamo());
-                    ps2.setInt(1, f.getIdFlor());
+                try (PreparedStatement ps2 = con.prepareStatement(INSERT_FLORES)) {
+                    ps2.setInt(1, entity.getIdRamo());
+                    ps2.setInt(2, f.getIdFlor());
                     ps2.executeUpdate();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -151,16 +157,16 @@ public class ramoDAO implements DAO<Ramo>{
     @Override
     public List<Ramo> findAll() {
         List<Ramo> result = new ArrayList<>();
-        Map<Integer, Ramo> ramosMap = new HashMap<>(); // Map para evitar duplicados.
+        Map<Integer, Ramo> ramosMap = new HashMap<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int idRamo = rs.getInt("r.idRamo");
-                    Ramo ramo = ramosMap.get(idRamo); // Revisamos si ya existe el ramo.
+                    Ramo ramo = ramosMap.get(idRamo);
 
-                    if (ramo == null) { // Si no existe, lo creamos.
+                    if (ramo == null) {
                         ramo = new Ramo();
-                        // Atributos del producto
+                        // Atributos producto
                         Producto pro = productoDAO.build().findByPK(new Producto(idRamo));
                         ramo.setIdProducto(pro.getIdProducto());
                         ramo.setNombre(pro.getNombre());
@@ -176,8 +182,8 @@ public class ramoDAO implements DAO<Ramo>{
                         ramo.setCantidadFlores(rs.getInt("r.cantidadFlores"));
                         ramo.setColorEnvol(rs.getString("r.colorEnvoltorio"));
 
-                        ramo.setFloresSecun(new ArrayList<>()); // Inicializar lista de flores secundarias.
-                        ramosMap.put(idRamo, ramo); // Guardar el ramo en el mapa.
+                        ramo.setFloresSecun(new ArrayList<>());
+                        ramosMap.put(idRamo, ramo);
                     }
 
                     // Agregar flor secundaria
@@ -188,23 +194,23 @@ public class ramoDAO implements DAO<Ramo>{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        result.addAll(ramosMap.values()); // Pasar los valores del mapa a la lista final.
+        result.addAll(ramosMap.values());
         return result;
     }
 
 
     public List<Ramo> findByName(String name) {
         List<Ramo> result = new ArrayList<>();
-        Map<Integer, Ramo> ramosMap = new HashMap<>(); // Map para evitar duplicados.
+        Map<Integer, Ramo> ramosMap = new HashMap<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
             ps.setString(1, "%" + name.toLowerCase() + "%");
             ps.setString(2, "%prehecho%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int idRamo = rs.getInt("r.idRamo");
-                    Ramo ramo = ramosMap.get(idRamo); // Revisamos si ya existe el ramo.
+                    Ramo ramo = ramosMap.get(idRamo);
 
-                    if (ramo == null) { // Si no existe, lo creamos.
+                    if (ramo == null) {
                         ramo = new Ramo();
                         // Atributos del producto
                         Producto pro = productoDAO.build().findByPK(new Producto(idRamo));
@@ -222,11 +228,10 @@ public class ramoDAO implements DAO<Ramo>{
                         ramo.setCantidadFlores(rs.getInt("r.cantidadFlores"));
                         ramo.setColorEnvol(rs.getString("r.colorEnvoltorio"));
 
-                        ramo.setFloresSecun(new ArrayList<>()); // Inicializar lista de flores secundarias.
-                        ramosMap.put(idRamo, ramo); // Guardar el ramo en el mapa.
+                        ramo.setFloresSecun(new ArrayList<>());
+                        ramosMap.put(idRamo, ramo);
                     }
 
-                    // Agregar flor secundaria
                     Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("rf.Flor_idFlor")));
                     ramo.getFloresSecun().add(florSecundaria);
                 }
@@ -234,7 +239,7 @@ public class ramoDAO implements DAO<Ramo>{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        result.addAll(ramosMap.values()); // Pasar los valores del mapa a la lista final.
+        result.addAll(ramosMap.values());
         return result;
     }
 
@@ -281,6 +286,54 @@ public class ramoDAO implements DAO<Ramo>{
             throw new RuntimeException(e);
         }
         result.addAll(ramosMap.values()); // Pasar los valores del mapa a la lista final.
+        return result;
+    }
+
+    public List<Ramo> findByType(Boolean prehecho) {
+        List<Ramo> result = new ArrayList<>();
+        Map<Integer, Ramo> ramosMap = new HashMap<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
+            if (prehecho) {
+                ps.setString(1, "%prehecho%");
+            } else {
+                ps.setString(1, "%personalizado%");
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int idRamo = rs.getInt("r.idRamo");
+                    Ramo ramo = ramosMap.get(idRamo);
+
+                    if (ramo == null) {
+                        ramo = new Ramo();
+                        // Atributos del producto
+                        Producto pro = productoDAO.build().findByPK(new Producto(idRamo));
+                        ramo.setIdProducto(pro.getIdProducto());
+                        ramo.setNombre(pro.getNombre());
+                        ramo.setPrecio(pro.getPrecio());
+                        ramo.setStock(pro.getStock());
+                        ramo.setTipo(pro.getTipo());
+                        ramo.setDescripcion(pro.getDescripcion());
+                        ramo.setImg(pro.getImg());
+
+                        // Atributos del ramo
+                        ramo.setIdRamo(idRamo);
+                        ramo.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("r.florPrincipal"))));
+                        ramo.setCantidadFlores(rs.getInt("r.cantidadFlores"));
+                        ramo.setColorEnvol(rs.getString("r.colorEnvoltorio"));
+
+                        ramo.setFloresSecun(new ArrayList<>());
+                        ramosMap.put(idRamo, ramo);
+                    }
+
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("rf.Flor_idFlor")));
+                    ramo.getFloresSecun().add(florSecundaria);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        result.addAll(ramosMap.values());
         return result;
     }
 

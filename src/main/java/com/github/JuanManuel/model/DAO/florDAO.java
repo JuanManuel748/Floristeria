@@ -36,11 +36,8 @@ public class florDAO implements DAO<Flor>{
     }
 
     public void insertFlor(Flor entity) {
-        try {
-            productoDAO.build().insertProducto(entity);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+        productoDAO.build().insertProducto(entity);
         try (PreparedStatement ps = con.prepareStatement(INSERT)) {
             ps.setInt(1, entity.getIdFlor());
             ps.setString(2, entity.getColor());
@@ -54,7 +51,7 @@ public class florDAO implements DAO<Flor>{
     public void updateFlor(Flor entity) {
         productoDAO.build().updateProducto(entity);
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
-            ps.setString(1, entity.getNombre());
+            ps.setString(1, entity.getColor());
             ps.setBoolean(2, entity.getTipoFlor());
             ps.setInt(3, entity.getIdFlor());
             ps.executeUpdate();

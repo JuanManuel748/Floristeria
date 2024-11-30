@@ -42,7 +42,6 @@ public class productoDAO  implements DAO<Producto>{
 
     public void insertProducto(Producto entity){
         try (PreparedStatement ps = con.prepareStatement(INSERT)) {
-            //idProducto, nombre, precio, stock, tipo, description, imagen
             ps.setInt(1, entity.getIdProducto());
             ps.setString(2, entity.getNombre());
             ps.setDouble(3, entity.getPrecio());

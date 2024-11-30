@@ -94,7 +94,6 @@ public class PersonalizarController extends Controller implements Initializable 
         colorChoice.setOnAction(this::actualizarValores);
 
 
-        // Configurar el ComboBox principal
         initializaComboBoc(flPRChoice, florPrin);
         initializaComboBoc(flSecunChoice1, floresSecun);
         initializaComboBoc(flSecunChoice2, floresSecun);

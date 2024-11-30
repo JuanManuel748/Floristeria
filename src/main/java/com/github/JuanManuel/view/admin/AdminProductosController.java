@@ -35,6 +35,7 @@ public class AdminProductosController extends Controller implements Initializabl
     private static File img;
     private static Producto producto;
     private static final File imgNull = new File("src/main/resources/com/github/JuanManuel/view/images/noPicture.jpg");
+
     @FXML
     public TableView<Producto> productsTable;
     @FXML
@@ -66,39 +67,11 @@ public class AdminProductosController extends Controller implements Initializabl
     @FXML
     public TextField nameField;
     @FXML
-    public Spinner priceField;
+    public Spinner<Double> priceField;
     @FXML
-    public Spinner stockField;
+    public Spinner<Integer> stockField;
     @FXML
     public TextArea descriptionField;
-
-    public void goToHome(ActionEvent actionEvent) {
-        try {
-            App.currentController.changeScene(Scenes.ADMINHOME, null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void logout(ActionEvent actionEvent) {
-        try {
-            User u = Session.getInstance().getCurrentUser();
-            Session.getInstance().logOut(u);
-            App.currentController.changeScene(Scenes.LOGIN, null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void onOpen(Object input) throws Exception {
-
-    }
-
-    @Override
-    public void onClose(Object output) {
-
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -127,25 +100,29 @@ public class AdminProductosController extends Controller implements Initializabl
             }
         });
 
-        productsTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Producto selected = productsTable.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    setProducto(selected);
-                }
-            }
-        });
+        productsTable.setOnMouseClicked(event -> handleTableSelection(event));
+        setupSpinners();
 
+        List<Producto> productoList = productoDAO.build().findByType("complemento");
+        mostrarProductos(productoList);
+    }
+
+    private void setupSpinners() {
         priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
         priceField.getValueFactory().setConverter(new DoubleStringConverter());
         stockField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
         stockField.getValueFactory().setConverter(new IntegerStringConverter());
+    }
 
-
-
-
-        List<Producto> productoList = productoDAO.build().findByType("complemento");
-        mostrarProductos(productoList);
+    private void handleTableSelection(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            Producto selected = productsTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                setProducto(selected);
+            } else {
+                Alerta.showAlert("ERROR", "Ningún producto seleccionado", "Haz clic en un producto para seleccionarlo.");
+            }
+        }
     }
 
     public void setProducto(Producto p) {
@@ -163,11 +140,11 @@ public class AdminProductosController extends Controller implements Initializabl
         } else {
             uploadButton.setImage(defaultImage);
         }
-        validateFields();
+        producto = p;
     }
 
     public void mostrarProductos(List<Producto> array) {
-        ObservableList<Producto>productoObservableList = FXCollections.observableArrayList(array);
+        ObservableList<Producto> productoObservableList = FXCollections.observableArrayList(array);
         productsTable.setItems(productoObservableList);
         productsTable.refresh();
     }
@@ -188,182 +165,127 @@ public class AdminProductosController extends Controller implements Initializabl
         } catch (Exception e) {
             Alerta.showAlert("ERROR", "Error al cargar imagen predeterminada", "No se pudo cargar la imagen predeterminada.");
         }
-
         img = null;
         producto = null;
     }
 
-    public void uploadImage(MouseEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Imagen");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-        );
-
-        img = fileChooser.showOpenDialog(App.stage);
-
-        if (img != null) {
-            try {
-                if (producto == null) {
-                    producto = new Producto();
-                }
-                producto.setImg(img);
-
-                Image image = new Image(img.toURI().toString());
-                uploadButton.setImage(image);
-            } catch (Exception e) {
-                Alerta.showAlert("ERROR", "Error al cargar la imagen", "No se pudo cargar la imagen seleccionada.");
-            }
-        } else {
-            Alerta.showAlert("ERROR", "Imagen no seleccionada", "No se seleccionó ninguna imagen.");
-        }
-    }
-
-
-    public boolean confirm(String header, String content) {
-        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle("CONFIRMATION");
-        alerta.setHeaderText(header);
-        alerta.setContentText(content + ".\n¿Estas seguro?");
-        Optional<ButtonType> result = alerta.showAndWait();
-
-        if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public boolean validateFields() {
-        boolean result = false;
-        try {
-            int id = Integer.parseInt(idField.getText().trim());
-            String nombre = nameField.getText();
-            Double precio = (Double) priceField.getValue();
-            int stock = (int) stockField.getValue();
-            String tipo = "complemento";
-            String description = descriptionField.getText();
-            if (nombre.equals("")) {
-                if (!confirm("Nombre vacío", "No has puesto un nombre al producto")) {
-                    return result;
-                }
-            }
-            if (precio <= 0) {
-                Alerta.showAlert("ERROR", "Precio inválido", "El precio no puede ser menor o igual a 0.");
-                return result;
-            }
-            if (stock < 0) {
-                Alerta.showAlert("ERROR", "Stock negativo", "El stock no puede ser menor que 0.");
-                return result;
-            }
-            if (description.equals("")) {
-                if (!confirm("Descripción vacía", "No has puesto ninguna descripción.")) {
-                    return result;
-                }
-            }
-            producto.setIdProducto(id);
-            producto.setNombre(nombre);
-            producto.setPrecio(precio);
-            producto.setStock(stock);
-            producto.setTipo(tipo);
-            producto.setDescripcion(description);
-
-            result = true;
-        } catch (NumberFormatException nfe) {
-            Alerta.showAlert("ERROR", "Error de formato", "Los campos ID, precio o stock tienen formato incorrecto.");
-            nfe.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
     public void insert(ActionEvent actionEvent) {
         try {
-            if(!validateFields()) {
+            if (!validateFields()) {
                 return;
             }
             productoDAO.build().insertProducto(producto);
             Alerta.showAlert("INFORMATION", "Producto insertado", "El producto ha sido insertado en la base de datos exitosamente");
-
-            List<Producto> allProducts = productoDAO.build().findByType("complemento");
-            mostrarProductos(allProducts);
-
+            mostrarProductos(productoDAO.build().findByType("complemento"));
             clearFields();
         } catch (Exception e) {
-            Alerta.showAlert("ERROR", "Producto NO insertado", "El producto NO ha sido insertado en la base de datos exitosamente.\nRevisa que la id del producto no este en uso");
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Producto NO insertado", "Error al insertar el producto.");
         }
     }
 
     public void update(ActionEvent actionEvent) {
+
         try {
-            if(!validateFields()) {
+            if (!validateFields()) {
                 return;
             }
             productoDAO.build().save(producto);
-            Alerta.showAlert("INFORMATION", "Producto actualizado", "El producto ha sido actualizado en la base de datos exitosamente");
-
-            List<Producto> allProducts = productoDAO.build().findByType("complemento");
-            mostrarProductos(allProducts);
-
+            Alerta.showAlert("INFORMATION", "Producto actualizado", "El producto ha sido actualizado exitosamente");
+            mostrarProductos(productoDAO.build().findByType("complemento"));
             clearFields();
         } catch (Exception e) {
-            Alerta.showAlert("ERROR", "Producto NO actualizado", "El producto NO ha sido actualizado en la base de datos");
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Producto NO actualizado", "Error al actualizar el producto.");
         }
     }
 
     public void delete(ActionEvent actionEvent) {
         try {
             if (producto == null) {
-                Alerta.showAlert("ERROR", "Ningún producto seleccionado", "Por favor, selecciona un producto para eliminar.");
+                Alerta.showAlert("ERROR", "Ningún producto seleccionado", "Selecciona un producto para eliminar.");
                 return;
             }
             productoDAO.build().delete(producto);
-            Alerta.showAlert("INFORMATION", "Producto eliminado", "El producto ha sido eliminado de la base de datos exitosamente");
-
-            List<Producto> allProducts = productoDAO.build().findByType("complemento");
-            mostrarProductos(allProducts);
-
+            Alerta.showAlert("INFORMATION", "Producto eliminado", "El producto ha sido eliminado.");
+            mostrarProductos(productoDAO.build().findByType("complemento"));
             clearFields();
         } catch (Exception e) {
-            Alerta.showAlert("ERROR", "Producto NO eliminado", "El producto NO ha sido eliminado de la base de datos");
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Producto NO eliminado", "Error al eliminar el producto.");
         }
     }
 
-    // TERMINAR
     public void find(ActionEvent actionEvent) {
-
-        quantityColumn.setVisible(false);
         try {
             List<Producto> proList = new ArrayList<>();
-
             switch (selectAlert()) {
-                case 1: // ID
-                    proList.add(productoDAO.build().findByPK(producto));
+                case 1:
+                    int id = Integer.parseInt(idField.getText().trim());
+                    Producto producto = productoDAO.build().findByPK(new Producto(id));
+                    if (producto != null) {
+                        proList.add(producto);
+                    }
                     break;
-                case 2: // NOMBRE
-                    proList = productoDAO.build().findByComplName(nameField.getText(), "complemento", "complemento");
+                case 2:
+                    String name = nameField.getText().trim();
+                    proList = productoDAO.build().findByComplName(name, "complemento", "complemento");
                     break;
-                case 3: // GROUP BY
-
+                case 3:
                     quantityColumn.setVisible(true);
-                    proList = productoDAO.build().findGroupBy(insertQuantity(), "complemento");
+                    int quantity = insertQuantity();
+                    proList = productoDAO.build().findGroupBy(quantity, "complemento");
                     break;
-                case 4: // ALL
+                case 4:
                     proList = productoDAO.build().findByType("complemento");
                     break;
                 default:
                     return;
             }
             mostrarProductos(proList);
-
             clearFields();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Alerta.showAlert("ERROR", "Error de búsqueda", "Error al buscar productos.");
         }
+    }
+
+    private boolean validateFields() {
+        try {
+            if (nameField.getText().trim().isEmpty()) {
+                Alerta.showAlert("ERROR", "Nombre inválido", "El campo de nombre no puede estar vacío.");
+                return false;
+            }
+            if ((Double) priceField.getValue() <= 0) {
+                Alerta.showAlert("ERROR", "Precio inválido", "El precio debe ser mayor a 0.");
+                return false;
+            }
+            if ((Integer) stockField.getValue() < 0) {
+                Alerta.showAlert("ERROR", "Stock inválido", "El stock no puede ser negativo.");
+                return false;
+            }
+            if (descriptionField.getText().trim().isEmpty()) {
+                Alerta.showAlert("ERROR", "Descripción inválida", "El campo de descripción no puede estar vacío.");
+                return false;
+            }
+            producto = producto == null ? new Producto() : producto;
+            producto.setIdProducto(idField.getText().isEmpty() ? 0 : Integer.parseInt(idField.getText()));
+            producto.setNombre(nameField.getText().trim());
+            producto.setPrecio((Double) priceField.getValue());
+            producto.setStock((Integer) stockField.getValue());
+            producto.setDescripcion(descriptionField.getText().trim());
+            producto.setTipo("complemento");
+            return true;
+        } catch (Exception e) {
+            Alerta.showAlert("ERROR", "Validación fallida", "Error al validar los campos.");
+            return false;
+        }
+    }
+
+    @Override
+    public void onOpen(Object input) throws Exception {
+
+    }
+
+    @Override
+    public void onClose(Object output) {
+
     }
 
     private int insertQuantity() {
@@ -418,6 +340,55 @@ public class AdminProductosController extends Controller implements Initializabl
         }
 
     }
+
+    public void logout(ActionEvent action) {
+        try {
+            User u = Session.getInstance().getCurrentUser();
+            Session.getInstance().logOut(u);
+            App.currentController.changeScene(Scenes.LOGIN, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void goToHome(ActionEvent action) {
+        try {
+            App.currentController.changeScene(Scenes.ADMINHOME, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void uploadImage(MouseEvent mouseEvent) {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Seleccionar imagen");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Imágenes", "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif")
+            );
+
+            File selectedFile = fileChooser.showOpenDialog(null);
+
+            if (selectedFile != null) {
+                img = selectedFile;
+                Image image = new Image(selectedFile.toURI().toString());
+                uploadButton.setImage(image);
+
+                if (producto == null) {
+                    producto = new Producto();
+                }
+
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(selectedFile.toPath());
+                producto.setImg(imageBytes);
+            } else {
+                Alerta.showAlert("INFORMATION", "No se seleccionó ninguna imagen", "Por favor selecciona una imagen.");
+            }
+        } catch (Exception e) {
+            Alerta.showAlert("ERROR", "Error al cargar imagen", "No se pudo cargar la imagen seleccionada.");
+        }
+    }
+
+
 
 
 }
