@@ -46,7 +46,7 @@ public class RamosController extends Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        List<Ramo> pro = ramoDAO.build().findByName("");
+        List<Ramo> pro = ramoDAO.build().findByNames("");
         mostrarProductos(pro);
         initializeSpinner(minSpinner, 0, 999, 0);
         initializeSpinner(maxSpinner, 1, 1000, 50);

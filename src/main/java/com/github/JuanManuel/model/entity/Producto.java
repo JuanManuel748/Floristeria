@@ -1,11 +1,15 @@
 package com.github.JuanManuel.model.entity;
 
+import com.github.JuanManuel.model.DAO.pedidoDAO;
+import com.github.JuanManuel.model.DAO.productoDAO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 public class Producto {
@@ -163,5 +167,18 @@ public class Producto {
             throw new RuntimeException("Error al leer el archivo: " + img.getPath(), e);
         }
         return imageData;
+    }
+
+    public static int searchID() {
+        int result = 1;
+        List<Producto> p = productoDAO.build().findAll();
+        for (Producto temp:p) {
+            if (temp.getIdProducto() == result) {
+                result++;
+            } else {
+                break;
+            }
+        }
+        return result;
     }
 }

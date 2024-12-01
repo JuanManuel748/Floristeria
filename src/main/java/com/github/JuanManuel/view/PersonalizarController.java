@@ -11,8 +11,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
@@ -22,7 +20,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.observableHashMap;
 
 public class PersonalizarController extends Controller implements Initializable {
     @FXML
