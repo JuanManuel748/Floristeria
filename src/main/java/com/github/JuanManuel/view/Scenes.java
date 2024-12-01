@@ -20,17 +20,17 @@ public enum Scenes {
     PRODUCTOS("view/productos.fxml"), // PAGINA CON LOS PRODUCTOS
     PERSONALIZAR("view/personalizar.fxml"), // PAGINA PARA PERSONALIZAR UN CENTRO/RAMO
     CARRITO("view/shoppingCart.fxml"), // PAGINA CON UNA VISTA PREVIA DE LOS PRODUCTOS QUE SE VAN A COMPRAR
+    DETAILS("view/details.fxml"), // PAGINA CON LOS DETALLES DEL PRODUCTO SELECCIONADO EN EL CARRITO
 
     // PAGINAS ADMIN
-    ADMINHOME("view/admin/adminHome.fxml"),
-    ADMINUSERS("view/admin/adminUsers.fxml"),
-    ADMINPEDIDOS("view/admin/adminPedidos.fxml"),
-    ADMINPRODUCTOS("view/admin/adminProductos.fxml"),
-    ADMINRAMOS("view/admin/adminRamos.fxml"),
-    ADMINCENTROS("view/admin/adminCentros.fxml"),
-    ADMINFLORES("view/admin/adminFlores.fxml"),
-
-
+    ADMINHOME("view/admin/adminHome.fxml"), // PAGINA CON LAS DISTINTAS OPCIONES
+    ADMINUSERS("view/admin/adminUsers.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LOS USUARIOS
+    ADMINPEDIDOS("view/admin/adminPedidos.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LOS PEDIDOS
+    ADMINDETAILS("view/admin/adminDetails.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LOS DETALLES DE LOS PEDIDOS
+    ADMINPRODUCTOS("view/admin/adminProductos.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LOS PRODUCTOS
+    ADMINRAMOS("view/admin/adminRamos.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LOS RAMOS
+    ADMINCENTROS("view/admin/adminCentros.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LOS CENTROS
+    ADMINFLORES("view/admin/adminFlores.fxml"), // PAGINA DONDE SE PUEDEN EDITAR LAS FLORES
 
     WELCOME("view/Welcome.fxml"); //ELEGIR ROL
 

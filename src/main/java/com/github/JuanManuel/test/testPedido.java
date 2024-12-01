@@ -14,7 +14,7 @@ public class testPedido {
         detaller.add(new Detalles(ped, productoDAO.build().findByPK(new Producto(2)), 5));
         detaller.add(new Detalles(ped, productoDAO.build().findByPK(new Producto(3)), 5));
         detaller.add(new Detalles(ped, productoDAO.build().findByPK(new Producto(4)), 5));
-        ped = new Pedido(1, "hoy", "mañana",  10.20, "PAGADO", new User("1"), detaller);
+        ped = new Pedido(1, "01/01/2024", "07/01/2024",  10.20, "PAGADO", new User("666666666"), detaller);
         pedidoDAO.build().save(ped);
 
 

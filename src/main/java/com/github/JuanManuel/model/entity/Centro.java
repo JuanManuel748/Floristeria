@@ -11,10 +11,11 @@ public class Centro extends Producto{
     private String frase;
     private List<Flor> floresSecun;
 
-    public Centro() {}
+    public Centro() {this.setTipo("centro");}
     public Centro(int id) {
         super(id);
         this.idCentro = id;
+        this.setTipo("centro");
     }
 
     public Centro (int id, String nombre, Double precio, int stock, String descrip, File img, Flor pr, String size, String frase, List<Flor> flores) {
@@ -97,7 +98,7 @@ public class Centro extends Producto{
 
     @Override
     public String toString() {
-        return "Centro{" +
+        return super.toString() + "\nCentro{" +
                 "idCentro=" + idCentro +
                 ", FlorPr=" + FlorPr +
                 ", size='" + size + '\'' +

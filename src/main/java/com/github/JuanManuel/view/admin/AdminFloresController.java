@@ -179,7 +179,7 @@ public class AdminFloresController extends Controller implements Initializable {
     }
 
     private void clearFields() {
-        idField.setText("");
+        idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");
         descriptionField.setText("");
         if (priceField.getValueFactory() != null) {

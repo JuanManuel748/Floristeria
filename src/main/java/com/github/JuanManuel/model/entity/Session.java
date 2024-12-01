@@ -43,7 +43,7 @@ public class Session {
         ped.setUser(currentUser);
         detalles = new ArrayList<>();
     }
-    private int searchID() {
+    public int searchID() {
         int result = 1;
         List<Pedido> pedidoLS = pedidoDAO.build().findAll();
         for (Pedido p:pedidoLS) {

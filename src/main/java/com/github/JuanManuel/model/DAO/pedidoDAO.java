@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.DAO;
 
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.*;
+import com.github.JuanManuel.view.Alerta;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -9,19 +10,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class pedidoDAO implements DAO<Pedido>{
     private static final String INSERT = "INSERT INTO Pedido (idPedido, fechaPedido, fechaEntrega, total, estado, telefonoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String INSERT_DETALLES = "INSERT INTO Pedido_Producto (Pedido_idPedido, Producto_idProducto, cantidad, subtotal) VALUES (?,?,?,?)";
     private static final String UPDATE = "UPDATE Pedido SET fechaPedido = ?, fechaEntrega = ?, total = ?, estado = ?, telefonoUsuario = ? WHERE idPedido = ?";
-    private static final String UPDATE_DETALLES = "UPDATE Pedido_Producto SET Producto_idProducto = ?, cantidad = ?, subtotal = ? WHERE Pedido_idPedido = ?";
+    private static final String DELETE_DETALLES = "DELETE FROM Pedido_Producto WHERE Pedido_idPedido = ?";
     private static final String DELETE = "DELETE FROM Pedido WHERE idPedido = ?";
     private static final String FIND_ALL = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto";
     private static final String FIND_BY_PEDIDO = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto WHERE ped.idPedido = ?";
     private static final String FIND_BY_USER = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto WHERE ped.telefonoUsuario = ?";
-
+    private static final String FIND_STATS_MONTH = "SELECT MONTH(STR_TO_DATE(fechaPedido, '%d/%m/%Y')) AS mes, COUNT(idPedido) AS cantidadPedidos  FROM Pedido GROUP BY mes ORDER BY mes";
     private Connection con;
 
     public pedidoDAO() {con = MySQLConnection.getConnection();}
@@ -74,18 +77,28 @@ public class pedidoDAO implements DAO<Pedido>{
             ps.setInt(6, entity.getIdPedido());
             ps.executeUpdate();
 
+            try (PreparedStatement ps3 = con.prepareStatement(DELETE_DETALLES)) {
+                ps3.setInt(1, entity.getIdPedido());
+                ps3.executeUpdate();
+            }
             List<Detalles> detaller = entity.getDetalles();
             for (Detalles de : detaller) {
-                try (PreparedStatement ps2 = con.prepareStatement(UPDATE_DETALLES)) {
-                    ps2.setInt(1, de.getPro().getIdProducto());
-                    ps2.setInt(2, de.getCantidad());
-                    ps2.setDouble(3, de.getSubtotal());
-                    ps2.setInt(4, de.getPed().getIdPedido());
-                    ps2.executeUpdate();
+                int productoId = de.getPro().getIdProducto();
+
+                if (productoDAO.build().findByPK(new Producto(productoId)) != null) {
+                    try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
+                        ps2.setInt(1, de.getPed().getIdPedido());
+                        ps2.setInt(2, productoId);
+                        ps2.setInt(3, de.getCantidad());
+                        ps2.setDouble(4, de.getSubtotal());
+                        ps2.executeUpdate();
+                    }
+                } else {
+                    Alerta.showAlert("ERROR", "Producto no encontrado", "El producto que intentas insertar no se ha encontrado en la base de datos");
+                    return;
                 }
             }
         } catch (SQLException e) {
-            System.out.println("ERROR EN INSERT EN userDAO");
             e.printStackTrace();
         }
     }
@@ -217,4 +230,64 @@ public class pedidoDAO implements DAO<Pedido>{
         result.setEstado("PAGADO");
         updatePedido(result);
     }
+
+    public Map<String, Integer> FindStatsMonth() {
+        Map<String, Integer> result = new HashMap<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_STATS_MONTH)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String month = rs.getString("mes");
+                    switch (month) {
+                        case "1":
+                            month = "ENERO";
+                            break;
+                        case "2":
+                            month = "FEBRERO";
+                            break;
+                        case "3":
+                            month = "MARZO";
+                            break;
+                        case "4":
+                            month = "ABRIL";
+                            break;
+                        case "5":
+                            month = "MAYO";
+                            break;
+                        case "6":
+                            month = "JUNIO";
+                            break;
+                        case "7":
+                            month = "JULIO";
+                            break;
+                        case "8":
+                            month = "AGOSTO";
+                            break;
+                        case "9":
+                            month = "SEPTIEMBRE";
+                            break;
+                        case "10":
+                            month = "OCTUBRE";
+                            break;
+                        case "11":
+                            month = "NOVIEMBRE";
+                            break;
+                        case "12":
+                            month = "DICIEMBRE";
+                            break;
+                        default:
+                            month = "DESCONOCIDO";
+                            break;
+                    }
+
+                    int cantidad = rs.getInt("cantidadPedidos");
+
+                    result.put(month, cantidad);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
 }

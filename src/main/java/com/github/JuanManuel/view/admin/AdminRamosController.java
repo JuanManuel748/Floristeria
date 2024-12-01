@@ -2,9 +2,7 @@ package com.github.JuanManuel.view.admin;
 
 import com.github.JuanManuel.App;
 import com.github.JuanManuel.model.DAO.florDAO;
-import com.github.JuanManuel.model.DAO.productoDAO;
 import com.github.JuanManuel.model.DAO.ramoDAO;
-import com.github.JuanManuel.model.DAO.userDAO;
 import com.github.JuanManuel.model.entity.*;
 import com.github.JuanManuel.view.Alerta;
 import com.github.JuanManuel.view.Controller;
@@ -15,22 +13,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -254,9 +245,13 @@ public class AdminRamosController extends Controller implements Initializable {
             ramo.setFloresSecun(floresSecun);
             ramo.setTipo("ramo");
             if(predeterminatedCheck.isSelected()) {
-                ramo.setDescripcion(description + " prehecho");
+                if (!description.contains("prehecho")) {
+                    ramo.setDescripcion(description + " prehecho");
+                }
             } else {
-                ramo.setDescripcion(description + " personalizado");
+                if (!description.contains("personalizado")) {
+                    ramo.setDescripcion(description + " personalizado");
+                }
             }
             result = true;
         } catch (Exception e) {
@@ -304,7 +299,7 @@ public class AdminRamosController extends Controller implements Initializable {
     }
 
     public void clearFields() {
-        idField.setText("");
+        idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");
         descriptionField.setText("");
         if (priceField.getValueFactory() != null) {
@@ -320,9 +315,11 @@ public class AdminRamosController extends Controller implements Initializable {
             Alerta.showAlert("ERROR", "Error al cargar imagen predeterminada", "No se pudo cargar la imagen predeterminada.");
         }
 
+        quantitySpinner.setValue("3 Flores");
+        colorField.setValue("Transparente");
 
         img = null;
-        ramo = null;
+        ramo = new Ramo();
     }
 
     public void insert(ActionEvent actionEvent) {
@@ -371,8 +368,6 @@ public class AdminRamosController extends Controller implements Initializable {
     }
 
     public void find(ActionEvent actionEvent) {
-        //////////////////////////
-        // TERMINAR
         try {
             List<Ramo>findLS = new ArrayList<>();
             switch (selectAlert()) {

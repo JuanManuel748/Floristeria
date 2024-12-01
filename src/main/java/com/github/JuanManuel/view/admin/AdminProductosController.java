@@ -150,7 +150,7 @@ public class AdminProductosController extends Controller implements Initializabl
     }
 
     private void clearFields() {
-        idField.setText("");
+        idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");
         descriptionField.setText("");
         if (priceField.getValueFactory() != null) {
