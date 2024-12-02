@@ -115,7 +115,7 @@
                               <Font name="System Bold" size="24.0" />
                            </font>
                         </Label>
-                        <Label fx:id="phraseField" layoutX="256.0" layoutY="10.0" prefHeight="98.0" prefWidth="350.0" text="Frase:" textAlignment="RIGHT" textFill="#044004" wrapText="true">
+                        <Label fx:id="phraseField" layoutX="256.0" layoutY="10.0" prefHeight="98.0" text="Frase:" textAlignment="RIGHT" textFill="#044004" wrapText="true">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>

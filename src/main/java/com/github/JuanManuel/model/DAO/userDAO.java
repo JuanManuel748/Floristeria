@@ -141,7 +141,6 @@ public class userDAO implements DAO<User>{
                 }
             }
         } catch (SQLException e) {
-            System.out.println("ERROR EN FINDALL EN userDAO");
             e.printStackTrace();
         }
 
@@ -164,7 +163,6 @@ public class userDAO implements DAO<User>{
                 }
             }
         } catch (SQLException e) {
-            System.out.println("ERROR EN FINDALL EN userDAO");
             e.printStackTrace();
         }
 

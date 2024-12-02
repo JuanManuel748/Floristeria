@@ -43,6 +43,7 @@ public class Session {
         ped.setUser(currentUser);
         detalles = new ArrayList<>();
     }
+
     public int searchID() {
         int result = 1;
         List<Pedido> pedidoLS = pedidoDAO.build().findAll();
@@ -104,5 +105,13 @@ public class Session {
 
     public Pedido getPedido() {
         return ped;
+    }
+
+    public void setPedido(Pedido selected) {
+        if(selected != null) {
+            ped = selected;
+        } else {
+            Alerta.showAlert("ERROR", "ERROR EN EL PEDIDO", "No se ha podido realizar el pedido");
+        }
     }
 }

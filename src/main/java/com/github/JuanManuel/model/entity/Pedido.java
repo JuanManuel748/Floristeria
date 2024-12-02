@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.entity;
 
 import com.github.JuanManuel.model.DAO.pedidoDAO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,7 +83,7 @@ public class Pedido {
         this.estado = estado;
     }
 
-    public void setUser(com.github.JuanManuel.model.entity.User user) {
+    public void setUser(User user) {
         User = user;
     }
 
@@ -108,13 +109,13 @@ public class Pedido {
     @Override
     public String toString() {
         return "Pedido{" +
-                "idPedido=" + idPedido +
-                ", fechaPedido='" + fechaPedido + '\'' +
-                ", fechaEntrega='" + fechaEntrega + '\'' +
-                ", total=" + total +
-                ", estado='" + estado + '\'' +
-                ", User=" + User +
-                ", productos=" + detalles +
+                "idPedido=" + this.idPedido +
+                ", fechaPedido='" + this.fechaPedido + '\'' +
+                ", fechaEntrega='" + this.fechaEntrega + '\'' +
+                ", total=" + this.total +
+                ", estado='" + this.estado + '\'' +
+                ", User=" + this.User +
+                ", productos=" + this.detalles +
                 '}';
     }
 

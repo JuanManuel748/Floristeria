@@ -73,10 +73,10 @@ public class Detalles {
     @Override
     public String toString() {
         return "\nDetalles{" +
-                "ped=" + ped.getIdPedido() +
-                ", pro=" + pro +
-                ", cantidad=" + cantidad +
-                ", subtotal=" + subtotal +
+                "ped=" + this.ped.getIdPedido() +
+                ", pro=" + this.pro +
+                ", cantidad=" + this.cantidad +
+                ", subtotal=" + this.subtotal +
                 '}';
     }
 }

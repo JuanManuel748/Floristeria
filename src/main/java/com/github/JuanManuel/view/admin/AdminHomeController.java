@@ -3,6 +3,7 @@ package com.github.JuanManuel.view.admin;
 import com.github.JuanManuel.App;
 import com.github.JuanManuel.model.entity.Session;
 import com.github.JuanManuel.model.entity.User;
+import com.github.JuanManuel.view.Alerta;
 import com.github.JuanManuel.view.Controller;
 import com.github.JuanManuel.view.Scenes;
 import javafx.event.ActionEvent;
@@ -93,7 +94,7 @@ public class AdminHomeController extends Controller implements Initializable {
             stage.setHeight(840);
             stage.centerOnScreen();
         } else {
-            System.out.println("Stage no disponible.");
+            Alerta.showAlert("ERROR", "No se pudo iniciar el adminHome", "No se ha podido iniciar el admin Home por un error inesperado");
         }
     }
 }

@@ -119,6 +119,7 @@ public class AdminRamosController extends Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        secunController = 0;
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));

@@ -1,13 +1,7 @@
 package com.github.JuanManuel.view;
 
 public enum Scenes {
-    /*
-    Pantallas:
-        -WELCOME
-        -LOG IN
-        -REGISTER/SIGN IN
-        -HOME
-    */
+
     ROOT("view/layout.fxml"),//PAGINA PRINCIPAL
     //MAINPAGE("view/mainPage.fxml"), //PAGINA PRINCIPAL
     LOGIN("view/login.fxml"), // PAGINA LOGIN
