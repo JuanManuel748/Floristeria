@@ -469,14 +469,11 @@ public class AdminCentrosController extends Controller implements Initializable 
         } catch (Exception e) {
             Alerta.showAlert("ERROR", "Error al cargar imagen predeterminada", "No se pudo cargar la imagen predeterminada.");
         }
-
         phraseField.setText("");
         sizeChoice.setValue("Pequeño (20cm)");
-
 
         img = null;
         centro = new Centro();
     }
 
 }
-

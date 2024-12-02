@@ -205,7 +205,7 @@ public class ramoDAO implements DAO<Ramo>{
         Map<Integer, Ramo> ramosMap = new HashMap<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
             ps.setString(1, "%" + name.toLowerCase() + "%");
-            ps.setString(1, "%prehecho%");
+            ps.setString(2, "%prehecho%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int idRamo = rs.getInt("r.idRamo");

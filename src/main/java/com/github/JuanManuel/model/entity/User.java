@@ -87,10 +87,10 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "phone='" + phone + '\'' +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", admin?='" + isAdmin + '\'' +
+                "phone='" + this.phone + '\'' +
+                ", name='" + this.name + '\'' +
+                ", password='" + this.password + '\'' +
+                ", admin?='" + this.isAdmin + '\'' +
                 '}';
     }
 

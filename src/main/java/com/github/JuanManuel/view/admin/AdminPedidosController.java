@@ -273,7 +273,7 @@ public class AdminPedidosController extends Controller implements Initializable 
                     findList = pedidoDAO.build().findByUser(u);
                     break;
                 case 3:
-                    AdminDetailsController.setPedido(p);
+                    Session.getInstance().setPedido(p);
                     App.currentController.changeScene(Scenes.ADMINDETAILS, null);
                     break;
                 case 4:

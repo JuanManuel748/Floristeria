@@ -39,11 +39,17 @@
                <font>
                   <Font name="System Bold" size="20.0" />
                </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </Button>
             <Button fx:id="exitButton" layoutX="150.0" layoutY="25.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="volver" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
                   <Font name="System Bold" size="20.0" />
                </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </Button>
          </children>
       </Pane>
@@ -56,7 +62,7 @@
             <TableColumn fx:id="numColumn" minWidth="80.0" text="Cantidad" />
          </columns>
       </TableView>
-      <Pane layoutX="586.0" layoutY="140.0" prefHeight="400.0" prefWidth="400.0">
+      <Pane layoutX="590.0" layoutY="140.0" prefHeight="85.0" prefWidth="400.0">
          <children>
             <GridPane hgap="10.0" prefHeight="80.0" prefWidth="400.0" vgap="10.0">
                <columnConstraints>
@@ -74,7 +80,10 @@
                               <Font name="System Bold" size="16.0" />
                            </font>
                         </Label>
-                        <ComboBox fx:id="productChoice" prefWidth="150.0" />
+                        <ComboBox fx:id="productChoice" prefWidth="150.0">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></ComboBox>
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="90.0" prefWidth="246.0" GridPane.columnIndex="1">
@@ -84,47 +93,14 @@
                               <Font name="System Bold" size="16.0" />
                            </font>
                         </Label>
-                        <Spinner fx:id="quantitySpinner" editable="true" />
+                        <Spinner fx:id="quantitySpinner" editable="true">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Spinner>
                      </children>
                   </VBox>
                </children>
             </GridPane>
-            <Pane layoutY="90.0" prefHeight="200.0" prefWidth="400.0">
-               <children>
-                  <GridPane prefHeight="200.0" prefWidth="400.0">
-                     <columnConstraints>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                     </columnConstraints>
-                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
-                     </rowConstraints>
-                     <children>
-                        <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#insert" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="INSERTAR" textFill="WHITE" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="updateButton" mnemonicParsing="false" onAction="#update" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="ACTUALIZAR" textFill="WHITE" GridPane.columnIndex="1">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#delete" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="ELIMINAR" textFill="WHITE" GridPane.rowIndex="1">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="findButton" mnemonicParsing="false" onAction="#find" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="BUSCAR" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </GridPane>
-               </children>
-            </Pane>
          </children>
       </Pane>
       <VBox alignment="CENTER" layoutX="607.0" layoutY="426.0" prefHeight="360.0" prefWidth="357.0">
@@ -136,5 +112,30 @@
             </ImageView>
          </children>
       </VBox>
+      <Pane layoutX="386.0" layoutY="451.0" prefHeight="200.0" prefWidth="400.0" />
+      <Button fx:id="insertButton" alignment="CENTER" contentDisplay="CENTER" layoutX="640.0" layoutY="281.0" mnemonicParsing="false" onAction="#insert" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="INSERTAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="updateButton" layoutX="850.0" layoutY="281.0" mnemonicParsing="false" onAction="#update" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="ACTUALIZAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="deleteButton" layoutX="745.0" layoutY="341.0" mnemonicParsing="false" onAction="#delete" prefHeight="50.0" prefWidth="90.0" style="-fx-background-color: #044004;" text="ELIMINAR" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </AnchorPane>
