@@ -92,6 +92,10 @@ public class AdminCentrosController extends Controller implements Initializable 
     @FXML
     public ImageView uploadButton;
 
+    /**
+     * Inicializa la vista, configurando las columnas de la tabla, los spinners, y los ComboBox.
+     * Además, configura la acción al hacer clic en la tabla y carga todos los centros disponibles.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
@@ -131,6 +135,10 @@ public class AdminCentrosController extends Controller implements Initializable 
 
     }
 
+    /**
+     * Establece los valores en los campos del formulario con los datos del objeto `Centro` proporcionado.
+     * Esto incluye información como nombre, precio, stock, descripción, etc.
+     */
     public void setCentro(Centro p) {
         try {
             centro = p;
@@ -163,6 +171,11 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Valida los datos ingresados en los campos del formulario, asegurando que todos los campos
+     * tengan valores válidos antes de proceder con la inserción, actualización o eliminación.
+     * Si alguno de los campos no es válido, muestra una alerta y retorna `false`.
+     */
     public boolean validateFields() {
         boolean result = false;
         try {
@@ -236,7 +249,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         return result;
     }
 
-
+    /**
+     * Inserta un nuevo centro en la base de datos con los valores de los campos del formulario.
+     * Si la inserción es exitosa, muestra una alerta de confirmación y refresca la lista de productos.
+     */
     public void insert(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -252,6 +268,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Actualiza un centro existente en la base de datos con los valores de los campos del formulario.
+     * Si la actualización es exitosa, muestra una alerta de confirmación y refresca la lista de productos.
+     */
     public void update(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -267,6 +287,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Elimina un centro existente de la base de datos. Si la eliminación es exitosa,
+     * muestra una alerta de confirmación y refresca la lista de productos.
+     */
     public void delete(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -282,6 +306,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Realiza una búsqueda de centros basándose en los criterios seleccionados por el usuario.
+     * Los criterios pueden ser ID, nombre, tipo o todos los centros.
+     */
     public void find(ActionEvent actionEvent) {
         try {
             List<Centro> findLS = new ArrayList<>();
@@ -314,6 +342,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Muestra una ventana emergente para que el usuario seleccione un campo de búsqueda.
+     * Los campos disponibles son ID, nombre, tipo o todos.
+     */
     private int selectAlert() {
         Alert al = new Alert(Alert.AlertType.CONFIRMATION);
         al.setTitle("Elegir campo");
@@ -341,7 +373,10 @@ public class AdminCentrosController extends Controller implements Initializable 
 
     }
 
-
+    /**
+     * Permite al usuario cargar una imagen para el centro seleccionado.
+     * La imagen seleccionada se asigna al centro y se muestra en la interfaz.
+     */
     public void uploadImage(MouseEvent mouseEvent) {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -371,6 +406,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Configura los spinners para el precio y el stock, incluyendo los valores mínimos,
+     * máximos y el valor por defecto.
+     */
     private void setupSpinners() {
         priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
         priceField.getValueFactory().setConverter(new DoubleStringConverter());
@@ -378,6 +417,9 @@ public class AdminCentrosController extends Controller implements Initializable 
         stockField.getValueFactory().setConverter(new IntegerStringConverter());
     }
 
+    /**
+     * Cambia la vista a la pantalla de inicio de administrador.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.ADMINHOME, null);
@@ -386,6 +428,9 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual y redirige a la pantalla de inicio de sesión.
+     */
     public void logout(ActionEvent actionEvent) {
         try {
             User u = Session.getInstance().getCurrentUser();
@@ -396,16 +441,26 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Se ejecuta cuando se abre la vista. Este método está vacío por ahora.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
 
     }
 
+    /**
+     * Se ejecuta cuando se cierra la vista. Este método está vacío por ahora.
+     */
     @Override
     public void onClose(Object output) {
 
     }
 
+    /**
+     * Inicializa un ComboBox con una lista de flores, configurando cómo se muestran las flores
+     * en la lista y el valor seleccionado por defecto.
+     */
     public void initializaComboBoc(ComboBox c, List<Flor> flores) {
         c.setItems(observableArrayList(flores));
         c.setCellFactory(lv -> new ListCell<Flor>() {
@@ -436,6 +491,10 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Maneja la selección de un centro en la tabla. Si se hace doble clic, establece los valores
+     * del centro seleccionado en los campos del formulario.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Centro selected = centrosTable.getSelectionModel().getSelectedItem();
@@ -447,12 +506,18 @@ public class AdminCentrosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Muestra una lista de centros en la tabla, refrescando la vista con los datos proporcionados.
+     */
     public void mostrarProductos(List<Centro> array){
         ObservableList<Centro> observableList = FXCollections.observableArrayList(array);
         centrosTable.setItems(observableList);
         centrosTable.refresh();
     }
 
+    /**
+     * Limpia todos los campos del formulario, reiniciando los valores a su estado por defecto.
+     */
     public void clearFields() {
         idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");

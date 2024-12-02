@@ -22,7 +22,6 @@ import java.util.ResourceBundle;
 import static javafx.collections.FXCollections.observableArrayList;
 
 public class PersonalizarController extends Controller implements Initializable {
-    // Definición de los elementos de la interfaz de usuario (botones, combobox, etc.)
     @FXML
     public Button exitButton;
     @FXML
@@ -46,11 +45,9 @@ public class PersonalizarController extends Controller implements Initializable 
     @FXML
     public ImageView previewImage;
 
-    // Archivos de imágenes estáticas
     private static final File fileCentro = new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png");
     private static final File fileRamo = new File("src/main/resources/com/github/JuanManuel/view/images/iconoRamo.png");
 
-    // Variables estáticas que almacenan los datos del ramo o centro personalizado
     private static String tipo;
     private static Image iconoCentro = new Image(PersonalizarController.class.getResource("/com/github/JuanManuel/view/images/iconoCentro.png").toExternalForm());
     private static Image iconoRamo = new Image(PersonalizarController.class.getResource("/com/github/JuanManuel/view/images/iconoRamo.png").toExternalForm());
@@ -62,38 +59,21 @@ public class PersonalizarController extends Controller implements Initializable 
     private static String frase;
     private static Double precioTotal = 20.5;
 
-    @Override
-    public void onOpen(Object input) throws Exception {
-        // Al abrir la vista, inicializamos las variables
-        secunController = 0;
-        frase = "";
-    }
-
-    @Override
-    public void onClose(Object output) {
-        // Método vacío para manejar la lógica al cerrar la vista
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Inicializa los controles de la interfaz de usuario
-
-        // Obtener las listas de flores
         List<Flor> florPrin = florDAO.build().findByType(true);
         List<Flor> floresSecun = florDAO.build().findByType(false);
 
-        // Configurar el ChoiceBox de tipo (Centro o Ramo)
         typeChoice.setItems(observableArrayList("Centro", "Ramo"));
         typeChoice.setValue("Centro");
         actualizarTipo(null);
         typeChoice.setOnAction(this::actualizarTipo);
 
-        // Configurar las opciones de tamaño para el ramo
         sizeChoice.setItems(observableArrayList("Pequeño (20cm)", "Mediano (30cm)", "Grande (40cm)"));
         sizeChoice.setValue("Pequeño (20cm)");
         sizeChoice.setOnAction(this::actualizarValores);
 
-        // Configurar los colores disponibles en el ChoiceBox
         colorChoice.setItems(FXCollections.observableArrayList(
                 "Rojo", "Verde", "Azul", "Amarillo", "Negro", "Blanco", "Naranja", "Morado",
                 "Rosa", "Gris", "Cian", "Turquesa", "Marrón", "Violeta", "Fucsia", "Oliva",
@@ -102,25 +82,25 @@ public class PersonalizarController extends Controller implements Initializable 
         colorChoice.setValue("Transparente");
         colorChoice.setOnAction(this::actualizarValores);
 
-        // Inicializar los ComboBox para las flores principales y secundarias
         initializaComboBoc(flPRChoice, florPrin);
         initializaComboBoc(flSecunChoice1, floresSecun);
         initializaComboBoc(flSecunChoice2, floresSecun);
         initializaComboBoc(flSecunChoice3, floresSecun);
     }
 
+    /**
+     * Updates the flower selections and other options based on user input.
+     *
+     * @param event the event triggered by the user's interaction with the controls.
+     */
     private void actualizarValores(Event event) {
-        // Método que actualiza los valores cuando el usuario selecciona un tipo de flor o color
-
         try {
-            // Obtener las flores seleccionadas
             Flor flPR = (Flor) flPRChoice.getValue();
             List<Flor> floresSecun = new ArrayList<>();
             Flor fSecun_1 = (Flor) flSecunChoice1.getValue();
             Flor fSecun_2 = (Flor) flSecunChoice2.getValue();
             Flor fSecun_3 = (Flor) flSecunChoice3.getValue();
 
-            // Verificar que las flores secundarias no sean iguales
             if (fSecun_1.equals(fSecun_2) || fSecun_1.equals(fSecun_3) || fSecun_3.equals(fSecun_2)) {
                 Alerta.showAlert("ERROR", "Flores repetidas", "Las flores de relleno no pueden ser iguales, tienen que ser 3 distintas");
                 return;
@@ -130,7 +110,6 @@ public class PersonalizarController extends Controller implements Initializable 
                 floresSecun.add(fSecun_3);
             }
 
-            // Determinar el tamaño y color del ramo
             String size = "Pequeño";
             if (sizeChoice.getValue() != null) {
                 size = sizeChoice.getValue().toString();
@@ -141,11 +120,9 @@ public class PersonalizarController extends Controller implements Initializable 
                 numFlores = Integer.parseInt(size.substring(0, 2).trim());
             }
 
-            // Crear un objeto Ramo o Centro con los parámetros seleccionados
             ramo = new Ramo(searchID(), "ramo personalizado " + firstController + " " + Session.getInstance().getCurrentUser().getName(), precioTotal, 10, "Ramo personalizado de " + Session.getInstance().getCurrentUser().getName(), new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png"), flPR, numFlores, color, floresSecun);
             centro = new Centro(searchID(), "centro personalizado " + firstController + " " + Session.getInstance().getCurrentUser().getName(), precioTotal, 10, "Centro personalizado  de " + Session.getInstance().getCurrentUser().getName(), new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png"), flPR, size, frase, floresSecun);
 
-            // Establecer las imágenes del ramo y centro
             ramo.setImg(fileRamo);
             centro.setImg(fileCentro);
         } catch (Exception e) {
@@ -153,8 +130,13 @@ public class PersonalizarController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Initializes a ComboBox with a list of flowers.
+     *
+     * @param c the ComboBox to be initialized.
+     * @param flores the list of flowers to populate the ComboBox.
+     */
     public void initializaComboBoc(ComboBox c, List<Flor> flores) {
-        // Método para inicializar un ComboBox con una lista de flores
 
         c.setItems(observableArrayList(flores));
         c.setCellFactory(lv -> new ListCell<Flor>() {
@@ -164,50 +146,48 @@ public class PersonalizarController extends Controller implements Initializable 
             protected void updateItem(Flor flor, boolean empty) {
                 super.updateItem(flor, empty);
 
-                // Mostrar la imagen de la flor en el ComboBox
                 if (empty || flor == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
                     setText(flor.getNombre());
                     imageView.setImage(new Image(new ByteArrayInputStream(flor.getImg())));
-                    imageView.setFitHeight(20); // Ajusta el tamaño de la imagen
+                    imageView.setFitHeight(20);
                     imageView.setPreserveRatio(true);
                     setGraphic(imageView);
                 }
             }
         });
 
-        // Configurar el renderizado del elemento seleccionado
         c.setButtonCell((ListCell) c.getCellFactory().call(null));
 
-        // Seleccionar un valor inicial para el ComboBox
         if (!flores.isEmpty()) {
             c.setValue(flores.get(secunController));
             secunController++;
         }
 
-        // Actualizar los valores al seleccionar una opción
         c.setOnAction(this::actualizarValores);
     }
 
+
+    /**
+     * Handles the purchase action, saving the selected product and navigating to the cart.
+     *
+     * @param actionEvent the event triggered by clicking the "Buy" button.
+     */
     public void buy(ActionEvent actionEvent) {
-        // Método para procesar la compra del ramo o centro
 
         Flor fSecun_1 = (Flor) flSecunChoice1.getValue();
         Flor fSecun_2 = (Flor) flSecunChoice2.getValue();
         Flor fSecun_3 = (Flor) flSecunChoice3.getValue();
 
-        // Verificar que las flores secundarias no sean iguales
         if (fSecun_1.equals(fSecun_2) || fSecun_1.equals(fSecun_3) || fSecun_3.equals(fSecun_2)) {
             Alerta.showAlert("ERROR", "Flores repetidas", "Las flores de relleno no pueden ser iguales, tienen que ser 3 distintas");
             return;
         }
 
-        // Actualizar los valores y guardar el producto en el carrito
         actualizarValores(null);
 
-        // Guardar el ramo o centro según el tipo seleccionado
         switch (tipo) {
             case "Centro":
                 centro.setFrase(inputFrase());
@@ -222,22 +202,25 @@ public class PersonalizarController extends Controller implements Initializable 
                 break;
         }
 
-        // Incrementar el contador de productos y redirigir al carrito
         firstController++;
         goToCart(actionEvent);
     }
 
+    /**
+     * Updates the product type (Centro or Ramo) based on user selection.
+     *
+     * @param event the event triggered when the type selection changes.
+     */
     private void actualizarTipo(Event event) {
-        // Cambiar el tipo de producto (Centro o Ramo)
         tipo = typeChoice.getValue().toString();
         switch (tipo) {
             case "Centro":
-                previewImage.setImage(iconoCentro);  // Mostrar la imagen correspondiente
+                previewImage.setImage(iconoCentro);
                 sizeChoice.setValue("Pequeño (20cm)");
                 sizeChoice.setItems(observableArrayList("Pequeño (20cm)", "Mediano (30cm)", "Grande (40cm)"));
                 break;
             case "Ramo":
-                previewImage.setImage(iconoRamo);  // Mostrar la imagen correspondiente
+                previewImage.setImage(iconoRamo);
                 sizeChoice.setValue("3 Flores");
                 sizeChoice.setItems(observableArrayList("3 Flores", "5 Flores", "8 Flores", "10 Flores", "15 Flores"));
                 break;
@@ -246,8 +229,12 @@ public class PersonalizarController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Navigates to the home screen.
+     *
+     * @param actionEvent the event triggered when the user clicks the "Home" button.
+     */
     public void goToHome(ActionEvent actionEvent) {
-        // Redirigir a la pantalla de inicio
         try {
             App.currentController.changeScene(Scenes.HOME, null);
         } catch (Exception e) {
@@ -255,17 +242,51 @@ public class PersonalizarController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Navigates to the shopping cart screen.
+     *
+     * @param actionEvent the event triggered when the user clicks the "Cart" button.
+     */
     public void goToCart(ActionEvent actionEvent) {
-        // Redirigir al carrito de compras
         try {
             App.currentController.changeScene(Scenes.CARRITO, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+    /**
+     * Initializes the view by setting up the necessary variables and configurations.
+     *
+     * @param input the input object passed when opening the view.
+     */
+    @Override
+    public void onOpen(Object input) throws Exception {
+        secunController = 0;
+        frase = "";
+    }
 
+    /**
+     * Closes the view by setting up the necessary variables and configurations.
+     *
+     * @param output the output object passed when opening other view.
+     */
+    @Override
+    public void onClose(Object output) {
+    }
+
+    /**
+     * Initializes the user interface controls and their event handlers.
+     *
+     * @param url the URL used to load the FXML file.
+     * @param resourceBundle the resource bundle used for localization.
+     */
+
+    /**
+     * Prompts the user to input a custom dedication phrase.
+     *
+     * @return the user's input dedication phrase.
+     */
     public String inputFrase() {
-        // Mostrar un cuadro de diálogo para que el usuario ingrese una dedicatoria
         TextInputDialog tid = new TextInputDialog();
         tid.setTitle("Frase dedicatoria");
         tid.setHeaderText("Inserta una frase");
@@ -275,8 +296,12 @@ public class PersonalizarController extends Controller implements Initializable 
         return result;
     }
 
+    /**
+     * Searches for an available product ID.
+     *
+     * @return the first available product ID.
+     */
     private int searchID() {
-        // Buscar un ID disponible para el nuevo producto
         int result = 1;
         List<Producto> productos = productoDAO.build().findAll();
         for (Producto p:productos) {

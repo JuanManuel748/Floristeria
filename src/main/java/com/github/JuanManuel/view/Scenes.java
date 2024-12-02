@@ -1,7 +1,6 @@
 package com.github.JuanManuel.view;
 
 public enum Scenes {
-
     ROOT("view/layout.fxml"),//PAGINA PRINCIPAL
     //MAINPAGE("view/mainPage.fxml"), //PAGINA PRINCIPAL
     LOGIN("view/login.fxml"), // PAGINA LOGIN

@@ -51,6 +51,14 @@ public class AdminUsersController extends Controller implements Initializable {
     @FXML
     private Button findButton;
 
+    /**
+     * Inicializa el controlador configurando las columnas de la tabla,
+     * recuperando la lista de usuarios desde la base de datos, y definiendo
+     * eventos para la selección de filas en la tabla.
+     *
+     * @param url URL de ubicación usada para resolver recursos relacionados.
+     * @param resourceBundle Conjunto de recursos utilizados por la vista.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
@@ -72,7 +80,11 @@ public class AdminUsersController extends Controller implements Initializable {
         });
     }
 
-
+    /**
+     * Configura los campos del formulario con los datos del usuario seleccionado.
+     *
+     * @param u Usuario a configurar en el formulario.
+     */
     public void setUser(User u) {
         phoneField.setText(u.getPhone());
         nameField.setText(u.getName());
@@ -80,12 +92,22 @@ public class AdminUsersController extends Controller implements Initializable {
         adminCheck.setSelected(u.isAdmin());
     }
 
+    /**
+     * Muestra una lista de usuarios en la tabla.
+     *
+     * @param users Lista de usuarios a mostrar.
+     */
     public void mostrarUsuarios(List<User> users) {
         ObservableList<User> usersObservableList = FXCollections.observableArrayList(users);
         usersTable.setItems(usersObservableList);
         usersTable.refresh();
     }
 
+    /**
+     * Cambia la escena a la pantalla principal del administrador.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.ADMINHOME, null);
@@ -94,6 +116,11 @@ public class AdminUsersController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual y redirige a la pantalla de inicio de sesión.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void logout(ActionEvent actionEvent) {
         try {
             User u = Session.getInstance().getCurrentUser();
@@ -103,15 +130,34 @@ public class AdminUsersController extends Controller implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Método ejecutado al abrir la vista o inicializarla.
+     * Puede recibir datos de entrada para configurar la vista.
+     *
+     * @param input un objeto con los datos de entrada para inicializar la vista.
+     * @throws Exception si ocurre algún error durante la inicialización.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
+
     }
 
+    /**
+     * Método ejecutado al cerrar la vista.
+     * Puede manejar la salida o datos generados antes de cerrar.
+     *
+     * @param output un objeto con los datos de salida o resultado de la vista.
+     */
     @Override
     public void onClose(Object output) {
+
     }
 
+    /**
+     * Valida los campos del formulario para asegurarse de que los datos son correctos.
+     *
+     * @return true si los campos son válidos, false en caso contrario.
+     */
     public boolean validarFields() {
         boolean result = false;
         if (phoneField.getText().trim().equals("")) {
@@ -150,6 +196,11 @@ public class AdminUsersController extends Controller implements Initializable {
         return result;
     }
 
+    /**
+     * Inserta un nuevo usuario en la base de datos y actualiza la tabla.
+     *
+     * @param actionEvent Evento que dispara la acción.
+     */
     public void insert(ActionEvent actionEvent) {
         try {
             if (!validarFields()) {
@@ -176,6 +227,9 @@ public class AdminUsersController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Limpia los campos del formulario.
+     */
     public void clearFields() {
         phoneField.setText("");
         nameField.setText("");
@@ -183,6 +237,11 @@ public class AdminUsersController extends Controller implements Initializable {
         adminCheck.setSelected(false);
     }
 
+    /**
+     * Actualiza un usuario existente en la base de datos.
+     *
+     * @param actionEvent Evento que dispara la acción.
+     */
     public void update(ActionEvent actionEvent) {
         try {
             String telefono = phoneField.getText().trim();
@@ -215,7 +274,11 @@ public class AdminUsersController extends Controller implements Initializable {
         }
     }
 
-
+    /**
+     * Elimina un usuario de la base de datos.
+     *
+     * @param actionEvent Evento que dispara la acción.
+     */
     public void delete(ActionEvent actionEvent) {
         try {
             User u = new User();
@@ -239,6 +302,11 @@ public class AdminUsersController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Busca usuarios en la base de datos según el criterio seleccionado.
+     *
+     * @param actionEvent Evento que dispara la acción.
+     */
     public void find(ActionEvent actionEvent) {
         try {
             List<User> usrList = new ArrayList<>();
@@ -267,6 +335,11 @@ public class AdminUsersController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Muestra un cuadro de diálogo para seleccionar el criterio de búsqueda.
+     *
+     * @return Código del criterio seleccionado: 1 para teléfono, 2 para nombre, 3 para admin, 4 para todos, 0 para cancelar.
+     */
     private int selectAlert() {
         Alert al = new Alert(Alert.AlertType.CONFIRMATION);
         al.setTitle("Elegir campo");

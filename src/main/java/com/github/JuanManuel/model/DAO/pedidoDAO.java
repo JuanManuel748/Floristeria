@@ -21,9 +21,10 @@ public class pedidoDAO implements DAO<Pedido>{
     private static final String UPDATE = "UPDATE Pedido SET fechaPedido = ?, fechaEntrega = ?, total = ?, estado = ?, telefonoUsuario = ? WHERE idPedido = ?";
     private static final String DELETE_DETALLES = "DELETE FROM Pedido_Producto WHERE Pedido_idPedido = ?";
     private static final String DELETE = "DELETE FROM Pedido WHERE idPedido = ?";
-    private static final String FIND_ALL = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto";
-    private static final String FIND_BY_PEDIDO = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto WHERE ped.idPedido = ?";
-    private static final String FIND_BY_USER = "SELECT * FROM Pedido ped JOIN Pedido_Producto pp ON pp.Pedido_idPedido = ped.idPedido JOIN Producto pro ON pro.idProducto = pp.Producto_idProducto WHERE ped.telefonoUsuario = ?";
+    private static final String FIND_ALL = "SELECT * FROM Pedido";
+    private static final String FIND_BY_PK = "SELECT * FROM Pedido WHERE idPedido = ?";
+    private static final String FIND_BY_USER = "SELECT * FROM Pedido WHERE telefonoUsuario = ?";
+    private static final String FIND_DETAILS = "SELECT * FROM Pedido_Producto WHERE Pedido_idPedido = ?";
     private static final String FIND_STATS_MONTH = "SELECT MONTH(STR_TO_DATE(fechaPedido, '%d/%m/%Y')) AS mes, COUNT(idPedido) AS cantidadPedidos  FROM Pedido GROUP BY mes ORDER BY mes";
     private Connection con;
 
@@ -52,13 +53,15 @@ public class pedidoDAO implements DAO<Pedido>{
             ps.setString(6, entity.getUser().getPhone());
             ps.executeUpdate();
             List<Detalles> detaller = entity.getDetalles();
-            for (Detalles de : detaller) {
-                try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
-                    ps2.setInt(1, entity.getIdPedido());
-                    ps2.setInt(2, de.getPro().getIdProducto());
-                    ps2.setInt(3, de.getCantidad());
-                    ps2.setDouble(4, de.getSubtotal());
-                    ps2.executeUpdate();
+            if (detaller != null && detaller.size() > 0) {
+                for (Detalles de : detaller) {
+                    try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
+                        ps2.setInt(1, entity.getIdPedido());
+                        ps2.setInt(2, de.getPro().getIdProducto());
+                        ps2.setInt(3, de.getCantidad());
+                        ps2.setDouble(4, de.getSubtotal());
+                        ps2.executeUpdate();
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -76,25 +79,28 @@ public class pedidoDAO implements DAO<Pedido>{
             ps.setInt(6, entity.getIdPedido());
             ps.executeUpdate();
 
-            try (PreparedStatement ps3 = con.prepareStatement(DELETE_DETALLES)) {
-                ps3.setInt(1, entity.getIdPedido());
-                ps3.executeUpdate();
-            }
-            List<Detalles> detaller = entity.getDetalles();
-            for (Detalles de : detaller) {
-                int productoId = de.getPro().getIdProducto();
 
-                if (productoDAO.build().findByPK(new Producto(productoId)) != null) {
-                    try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
-                        ps2.setInt(1, entity.getIdPedido());
-                        ps2.setInt(2, productoId);
-                        ps2.setInt(3, de.getCantidad());
-                        ps2.setDouble(4, de.getSubtotal());
-                        ps2.executeUpdate();
+            List<Detalles> detaller = entity.getDetalles();
+            if (detaller != null && detaller.size() > 0) {
+                try (PreparedStatement ps3 = con.prepareStatement(DELETE_DETALLES)) {
+                    ps3.setInt(1, entity.getIdPedido());
+                    ps3.executeUpdate();
+                }
+                for (Detalles de : detaller) {
+                    int productoId = de.getPro().getIdProducto();
+
+                    if (productoDAO.build().findByPK(new Producto(productoId)) != null) {
+                        try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
+                            ps2.setInt(1, entity.getIdPedido());
+                            ps2.setInt(2, productoId);
+                            ps2.setInt(3, de.getCantidad());
+                            ps2.setDouble(4, de.getSubtotal());
+                            ps2.executeUpdate();
+                        }
+                    } else {
+                        Alerta.showAlert("ERROR", "Producto no encontrado", "El producto que intentas insertar no se ha encontrado en la base de datos");
+                        return;
                     }
-                } else {
-                    Alerta.showAlert("ERROR", "Producto no encontrado", "El producto que intentas insertar no se ha encontrado en la base de datos");
-                    return;
                 }
             }
         } catch (SQLException e) {
@@ -105,100 +111,125 @@ public class pedidoDAO implements DAO<Pedido>{
     @Override
     public Pedido findByPK(Pedido pk) {
         Pedido pedido = null;
-        Map<Integer, Pedido> pedidosMap = new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PEDIDO)) {
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
             ps.setInt(1, pk.getIdPedido());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idPedido = rs.getInt("ped.idPedido");
-                    if (!pedidosMap.containsKey(idPedido)) {
-                        // Crear el pedido si no existe en el mapa
-                        Pedido p = new Pedido();
-                        p.setIdPedido(idPedido);
-                        p.setFechaPedido(rs.getString("ped.fechaPedido"));
-                        p.setFechaEntrega(rs.getString("ped.fechaEntrega"));
-                        p.setTotal(rs.getDouble("ped.total"));
-                        p.setEstado(rs.getString("ped.estado"));
-                        p.setUser(userDAO.build().findByPK(new User(rs.getString("ped.telefonoUsuario"))));
-                        p.setDetalles(new ArrayList<>()); // Inicializar detalles
-                        pedidosMap.put(idPedido, p);
+                    int idPedido = rs.getInt("idPedido");
+                    Pedido p = new Pedido();
+                    p.setIdPedido(idPedido);
+                    p.setFechaPedido(rs.getString("fechaPedido"));
+                    p.setFechaEntrega(rs.getString("fechaEntrega"));
+                    p.setTotal(rs.getDouble("total"));
+                    p.setEstado(rs.getString("estado"));
+                    p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
+                    p.setDetalles(new ArrayList<>());
+
+                    try (PreparedStatement ps2 = con.prepareStatement(FIND_DETAILS)) {
+                        List<Detalles> detallesList = new ArrayList<>();
+                        ps2.setInt(1, p.getIdPedido());
+                        try (ResultSet rs2 = ps2.executeQuery()) {
+                            while(rs2.next()) {
+                                Detalles d = new Detalles();
+                                d.setPed(p);
+                                Producto producto = productoDAO.build().findByPK(new Producto(rs2.getInt("Producto_idProducto")));
+                                d.setPro(producto);
+                                d.setCantidad(rs2.getInt("cantidad"));
+                                d.setSubtotal(rs2.getDouble("subtotal"));
+                                detallesList.add(d);
+                            }
+                        }
+                        p.setDetalles(detallesList);
                     }
-                    // Añadir detalles al pedido correspondiente
-                    Pedido p = pedidosMap.get(idPedido);
-                    Producto producto = productoDAO.build().findByPK(new Producto(rs.getInt("pro.idProducto")));
-                    Detalles detalle = new Detalles(p, producto, rs.getInt("pp.cantidad"));
-                    p.getDetalles().add(detalle);
+                    pedido = p;
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error al buscar el pedido por PK: " + e.getMessage(), e);
         }
-        // Solo hay un pedido esperado para este método
-        return pedidosMap.isEmpty() ? null : pedidosMap.values().iterator().next();
+        return pedido;
     }
 
     @Override
     public List<Pedido> findAll() {
-        Map<Integer, Pedido> pedidosMap = new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
+        List<Pedido> allLS = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)){
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idPedido = rs.getInt("ped.idPedido");
-                    if (!pedidosMap.containsKey(idPedido)) {
-                        // Crear el pedido si no existe en el mapa
-                        Pedido p = new Pedido();
-                        p.setIdPedido(idPedido);
-                        p.setFechaPedido(rs.getString("ped.fechaPedido"));
-                        p.setFechaEntrega(rs.getString("ped.fechaEntrega"));
-                        p.setTotal(rs.getDouble("ped.total"));
-                        p.setEstado(rs.getString("ped.estado"));
-                        p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
-                        p.setDetalles(new ArrayList<>()); // Inicializar detalles
-                        pedidosMap.put(idPedido, p);
+                    int idPedido = rs.getInt("idPedido");
+                    Pedido p = new Pedido();
+                    p.setIdPedido(idPedido);
+                    p.setFechaPedido(rs.getString("fechaPedido"));
+                    p.setFechaEntrega(rs.getString("fechaEntrega"));
+                    p.setTotal(rs.getDouble("total"));
+                    p.setEstado(rs.getString("estado"));
+                    p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
+                    p.setDetalles(new ArrayList<>());
+
+                    try (PreparedStatement ps2 = con.prepareStatement(FIND_DETAILS)) {
+                        List<Detalles> detallesList = new ArrayList<>();
+                        ps2.setInt(1, p.getIdPedido());
+                        try (ResultSet rs2 = ps2.executeQuery()) {
+                            while(rs2.next()) {
+                                Detalles d = new Detalles();
+                                d.setPed(p);
+                                Producto producto = productoDAO.build().findByPK(new Producto(rs2.getInt("Producto_idProducto")));
+                                d.setPro(producto);
+                                d.setCantidad(rs2.getInt("cantidad"));
+                                d.setSubtotal(rs2.getDouble("subtotal"));
+                                detallesList.add(d);
+                            }
+                        }
+                        p.setDetalles(detallesList);
                     }
-                    // Añadir detalles al pedido correspondiente
-                    Pedido p = pedidosMap.get(idPedido);
-                    Producto producto = productoDAO.build().findByPK(new Producto(rs.getInt("pro.idProducto")));
-                    Detalles detalle = new Detalles(p, producto, rs.getInt("pp.cantidad"));
-                    p.getDetalles().add(detalle);
+                    allLS.add(p);
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error al obtener todos los pedidos: " + e.getMessage(), e);
         }
-        return new ArrayList<>(pedidosMap.values());
+        return allLS;
     }
 
     public List<Pedido> findByUser(User u) {
-        Map<Integer, Pedido> pedidosMap = new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_USER)) {
+        List<Pedido> byUserLS = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(FIND_BY_USER)){
             ps.setString(1, u.getPhone());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idPedido = rs.getInt("ped.idPedido");
-                    if (!pedidosMap.containsKey(idPedido)) {
-                        // Crear el pedido si no existe en el mapa
-                        Pedido p = new Pedido();
-                        p.setIdPedido(idPedido);
-                        p.setFechaPedido(rs.getString("ped.fechaPedido"));
-                        p.setFechaEntrega(rs.getString("ped.fechaEntrega"));
-                        p.setTotal(rs.getDouble("ped.total"));
-                        p.setEstado(rs.getString("ped.estado"));
-                        p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
-                        p.setDetalles(new ArrayList<>()); // Inicializar detalles
-                        pedidosMap.put(idPedido, p);
+                    int idPedido = rs.getInt("idPedido");
+                    Pedido p = new Pedido();
+                    p.setIdPedido(idPedido);
+                    p.setFechaPedido(rs.getString("fechaPedido"));
+                    p.setFechaEntrega(rs.getString("fechaEntrega"));
+                    p.setTotal(rs.getDouble("total"));
+                    p.setEstado(rs.getString("estado"));
+                    p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
+                    p.setDetalles(new ArrayList<>());
+
+                    try (PreparedStatement ps2 = con.prepareStatement(FIND_DETAILS)) {
+                        List<Detalles> detallesList = new ArrayList<>();
+                        ps2.setInt(1, p.getIdPedido());
+                        try (ResultSet rs2 = ps2.executeQuery()) {
+                            while(rs2.next()) {
+                                Detalles d = new Detalles();
+                                d.setPed(p);
+                                Producto producto = productoDAO.build().findByPK(new Producto(rs2.getInt("Producto_idProducto")));
+                                d.setPro(producto);
+                                d.setCantidad(rs2.getInt("cantidad"));
+                                d.setSubtotal(rs2.getDouble("subtotal"));
+                                detallesList.add(d);
+                            }
+                        }
+                        p.setDetalles(detallesList);
                     }
-                    // Añadir detalles al pedido correspondiente
-                    Pedido p = pedidosMap.get(idPedido);
-                    Producto producto = productoDAO.build().findByPK(new Producto(rs.getInt("pro.idProducto")));
-                    Detalles detalle = new Detalles(p, producto, rs.getInt("pp.cantidad"));
-                    p.getDetalles().add(detalle);
+                    byUserLS.add(p);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar pedidos por usuario: " + e.getMessage(), e);
+            throw new RuntimeException("Error al obtener todos los pedidos: " + e.getMessage(), e);
         }
-        return new ArrayList<>(pedidosMap.values());
+        return byUserLS;
     }
 
 

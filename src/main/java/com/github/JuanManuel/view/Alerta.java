@@ -2,11 +2,6 @@ package com.github.JuanManuel.view;
 
 import javafx.scene.control.Alert;
 
-/**
- * The Alerta class provides a utility method to display alerts of various types.
- * This class simplifies the process of creating and showing different types of alert dialogs
- * in the JavaFX application.
- */
 public class Alerta {
 
     /**
@@ -17,10 +12,8 @@ public class Alerta {
      * @param content The message to be displayed in the alert dialog.
      */
     public static void showAlert(String type, String title, String content) {
-        // Create an Alert instance with a default type of NONE
         Alert alert = new Alert(Alert.AlertType.NONE);
 
-        // Determine the alert type based on the input parameter
         switch (type) {
             case "ERROR":
                 alert.setAlertType(Alert.AlertType.ERROR);
@@ -37,15 +30,10 @@ public class Alerta {
             default:
                 break;
         }
-
-        // Set the title of the alert dialog
         alert.setTitle(title);
-        // Remove the default header text
         alert.setHeaderText(null);
-        // Set the main content/message of the alert dialog
         alert.setContentText(content);
 
-        // Display the alert dialog and wait for the user's response
         alert.showAndWait();
     }
 }

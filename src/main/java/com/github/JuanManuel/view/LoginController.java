@@ -13,46 +13,34 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * The LoginController class manages the login functionality for the application.
- * It initializes the login view, handles user interactions like logging in and
- * navigating to the registration screen, and interacts with the DAO layer to verify credentials.
- */
 public class LoginController extends Controller implements Initializable {
-
-    // UI components
     @FXML
-    private AnchorPane anchorPane; // Root container for the login view
+    private AnchorPane anchorPane;
     @FXML
-    private Button loginButton; // Button to initiate login
+    private Button loginButton;
     @FXML
-    private Button goToRegisterButton; // Button to navigate to the registration screen
+    private Button goToRegisterButton;
     @FXML
-    private TextField phoneField; // Input field for the user's phone number
+    private TextField phoneField;
     @FXML
-    private TextField passwordField; // Input field for the user's password
+    private TextField passwordField;
 
     /**
      * Method called when the controller's view is opened.
      * Currently, this method has no implemented functionality.
      */
     @Override
-    public void onOpen(Object input) throws Exception {
-        // No specific functionality for now
-    }
+    public void onOpen(Object input) throws Exception {}
 
     /**
      * Method called when the controller's view is closed.
      * Currently, this method has no implemented functionality.
      */
     @Override
-    public void onClose(Object output) {
-        // No specific functionality for now
-    }
+    public void onClose(Object output) {}
 
     /**
      * Initializes the login view. Sets the stage dimensions and centers the window on the screen.
@@ -62,11 +50,11 @@ public class LoginController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Stage stage = (Stage) App.getPrimaryStage();
         if (stage != null) {
-            stage.setWidth(820); // Set window width
-            stage.setHeight(640); // Set window height
-            stage.centerOnScreen(); // Center the window on the screen
+            stage.setWidth(820);
+            stage.setHeight(640);
+            stage.centerOnScreen();
         } else {
-            System.out.println("Stage no disponible."); // Log error if stage is null
+            System.out.println("Stage no disponible.");
         }
     }
 
@@ -79,44 +67,33 @@ public class LoginController extends Controller implements Initializable {
     @FXML
     public void onLogin(ActionEvent actionEvent) {
         try {
-            String phonenumber = phoneField.getText().trim(); // Get phone number input
-            String hashedPassword = HashPass.hashPassword(passwordField.getText().trim()); // Hash the entered password
+            String phonenumber = phoneField.getText().trim();
+            String hashedPassword = HashPass.hashPassword(passwordField.getText().trim());
 
-            // Validate input fields
             if (phonenumber.isEmpty() || hashedPassword.isEmpty()) {
                 Alerta.showAlert("ERROR", "Campos vacíos", "El numero de telefono y la contraseña no pueden estar vacíos");
             } else {
-                // Initialize login status
                 boolean logged = false;
-
-                // Retrieve user data from the database
                 User currentUser = userDAO.build().findByPK(new User(phonenumber));
 
                 if (currentUser != null) {
-                    // Check if the hashed password matches the stored password
                     if (hashedPassword.equals(currentUser.getPassword())) {
-                        // Log in the user and show a welcome message
                         Session.getInstance().logIn(currentUser);
                         Alerta.showAlert("INFORMATION", "", "Bienvenido, " + currentUser.getName());
-
-                        // Navigate to the appropriate home screen based on user role
                         if (currentUser.isAdmin()) {
                             App.currentController.changeScene(Scenes.ADMINHOME, null);
                         } else {
                             App.currentController.changeScene(Scenes.HOME, null);
                         }
                     } else {
-                        // Handle incorrect password
                         Alerta.showAlert("ERROR", "Contraseña incorrecta", "La contraseña de esa cuenta no coincide con la contraseña introducida");
                     }
                 } else {
-                    // Handle account not found
                     Alerta.showAlert("ERROR", "Cuenta no encontrada", "La cuenta con ese numero de telefono no existe en nuestra base de datos");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // Show alert for unexpected errors
             Alerta.showAlert("ERROR", "ERROR AL LOGEAR", "Hubo un error al encontrar tu cuenta");
         }
     }
@@ -128,9 +105,9 @@ public class LoginController extends Controller implements Initializable {
      */
     public void goToRegister(ActionEvent actionEvent) {
         try {
-            App.currentController.changeScene(Scenes.REGISTER, null); // Change scene to registration view
+            App.currentController.changeScene(Scenes.REGISTER, null);
         } catch (Exception e) {
-            throw new RuntimeException(e); // Handle exceptions by throwing a runtime exception
+            throw new RuntimeException(e);
         }
     }
 }

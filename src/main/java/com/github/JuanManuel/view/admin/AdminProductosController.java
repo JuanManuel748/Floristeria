@@ -73,6 +73,10 @@ public class AdminProductosController extends Controller implements Initializabl
     @FXML
     public TextArea descriptionField;
 
+    /**
+     * Método llamado automáticamente al cargar la vista.
+     * Configura las columnas de la tabla, los spinners y carga los productos iniciales.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
@@ -107,6 +111,9 @@ public class AdminProductosController extends Controller implements Initializabl
         mostrarProductos(productoList);
     }
 
+    /**
+     * Configura los spinners de precio y stock con valores predeterminados.
+     */
     private void setupSpinners() {
         priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
         priceField.getValueFactory().setConverter(new DoubleStringConverter());
@@ -114,6 +121,10 @@ public class AdminProductosController extends Controller implements Initializabl
         stockField.getValueFactory().setConverter(new IntegerStringConverter());
     }
 
+    /**
+     * Maneja la selección de filas en la tabla al hacer doble clic.
+     * @param event Evento del mouse.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Producto selected = productsTable.getSelectionModel().getSelectedItem();
@@ -125,6 +136,10 @@ public class AdminProductosController extends Controller implements Initializabl
         }
     }
 
+    /**
+     * Establece los datos de un producto en los campos de la interfaz.
+     * @param p Producto a mostrar.
+     */
     public void setProducto(Producto p) {
         idField.setText(String.valueOf(p.getIdProducto()));
         nameField.setText(p.getNombre());
@@ -143,12 +158,19 @@ public class AdminProductosController extends Controller implements Initializabl
         producto = p;
     }
 
+    /**
+     * Muestra una lista de productos en la tabla.
+     * @param array Lista de productos.
+     */
     public void mostrarProductos(List<Producto> array) {
         ObservableList<Producto> productoObservableList = FXCollections.observableArrayList(array);
         productsTable.setItems(productoObservableList);
         productsTable.refresh();
     }
 
+    /**
+     * Limpia los campos de entrada de la interfaz, restableciendo valores por defecto.
+     */
     private void clearFields() {
         idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");
@@ -169,6 +191,10 @@ public class AdminProductosController extends Controller implements Initializabl
         producto = null;
     }
 
+    /**
+     * Inserta un nuevo producto en la base de datos.
+     * @param actionEvent Evento generado por el botón de insertar.
+     */
     public void insert(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -183,6 +209,10 @@ public class AdminProductosController extends Controller implements Initializabl
         }
     }
 
+    /**
+     * Actualiza un producto existente en la base de datos.
+     * @param actionEvent Evento generado por el botón de actualizar.
+     */
     public void update(ActionEvent actionEvent) {
 
         try {
@@ -198,6 +228,10 @@ public class AdminProductosController extends Controller implements Initializabl
         }
     }
 
+    /**
+     * Elimina el producto seleccionado de la base de datos.
+     * @param actionEvent Evento generado por el botón de eliminar.
+     */
     public void delete(ActionEvent actionEvent) {
         try {
             if (producto == null) {
@@ -213,6 +247,10 @@ public class AdminProductosController extends Controller implements Initializabl
         }
     }
 
+    /**
+     * Busca productos según criterios especificados por el usuario.
+     * @param actionEvent Evento generado por el botón de buscar.
+     */
     public void find(ActionEvent actionEvent) {
         try {
             List<Producto> proList = new ArrayList<>();
@@ -246,6 +284,10 @@ public class AdminProductosController extends Controller implements Initializabl
         }
     }
 
+    /**
+     * Valida los campos de entrada antes de realizar operaciones de base de datos.
+     * @return true si los campos son válidos; false de lo contrario.
+     */
     private boolean validateFields() {
         try {
             if (nameField.getText().trim().isEmpty()) {
@@ -278,16 +320,33 @@ public class AdminProductosController extends Controller implements Initializabl
         }
     }
 
+    /**
+     * Método ejecutado al abrir la vista o inicializarla.
+     * Puede recibir datos de entrada para configurar la vista.
+     *
+     * @param input un objeto con los datos de entrada para inicializar la vista.
+     * @throws Exception si ocurre algún error durante la inicialización.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
 
     }
 
+    /**
+     * Método ejecutado al cerrar la vista.
+     * Puede manejar la salida o datos generados antes de cerrar.
+     *
+     * @param output un objeto con los datos de salida o resultado de la vista.
+     */
     @Override
     public void onClose(Object output) {
 
     }
 
+    /**
+     * Muestra un cuadro de diálogo para que el usuario introduzca una cantidad.
+     * @return La cantidad introducida por el usuario.
+     */
     private int insertQuantity() {
         int result = 0;
 
@@ -314,6 +373,10 @@ public class AdminProductosController extends Controller implements Initializabl
         return result;
     }
 
+    /**
+     * Muestra una alerta para seleccionar un criterio de búsqueda.
+     * @return El número correspondiente a la opción seleccionada (1: ID, 2: Nombre, 3: Agrupar por cantidad, 4: Todos).
+     */
     private int selectAlert() {
         Alert al = new Alert(Alert.AlertType.CONFIRMATION);
         al.setTitle("Elegir campo");
@@ -341,6 +404,10 @@ public class AdminProductosController extends Controller implements Initializabl
 
     }
 
+    /**
+     * Maneja la acción de cerrar sesión y regresar a la pantalla de inicio de sesión.
+     * @param action Evento generado por el botón de logout.
+     */
     public void logout(ActionEvent action) {
         try {
             User u = Session.getInstance().getCurrentUser();
@@ -350,7 +417,10 @@ public class AdminProductosController extends Controller implements Initializabl
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Navega a la pantalla principal del administrador.
+     * @param action Evento generado por el botón de ir a inicio.
+     */
     public void goToHome(ActionEvent action) {
         try {
             App.currentController.changeScene(Scenes.ADMINHOME, null);
@@ -358,7 +428,10 @@ public class AdminProductosController extends Controller implements Initializabl
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Permite al usuario cargar una imagen para el producto.
+     * @param mouseEvent Evento generado al hacer clic en el botón de cargar imagen.
+     */
     public void uploadImage(MouseEvent mouseEvent) {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -387,8 +460,5 @@ public class AdminProductosController extends Controller implements Initializabl
             Alerta.showAlert("ERROR", "Error al cargar imagen", "No se pudo cargar la imagen seleccionada.");
         }
     }
-
-
-
 
 }
