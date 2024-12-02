@@ -23,11 +23,21 @@ public class userDAO implements DAO<User>{
 
     private Connection con;
 
+    /**
+     * Constructor that initializes the database connection.
+     */
     public userDAO() {
         con = MySQLConnection.getConnection();
     }
 
-
+    /**
+     * Saves a User entity to the database.
+     * If the user already exists (based on the primary key), updates the existing user.
+     * Otherwise, inserts a new user.
+     *
+     * @param entity The User entity to be saved.
+     * @return The saved or updated User entity.
+     */
     @Override
     public User save(User entity) {
         if (entity == null) {
@@ -41,6 +51,12 @@ public class userDAO implements DAO<User>{
         return entity;
     }
 
+    /**
+     * Finds a User by its primary key (phone number).
+     *
+     * @param pk The User entity with the phone number to search for.
+     * @return The User entity if found, or null if not found.
+     */
     @Override
     public User findByPK(User pk) {
         User result = null;
@@ -62,6 +78,11 @@ public class userDAO implements DAO<User>{
         return result;
     }
 
+    /**
+     * Finds all users in the database.
+     *
+     * @return A list of all User entities.
+     */
     @Override
     public List<User> findAll() {
         List<User> list = new ArrayList<>();
@@ -84,6 +105,13 @@ public class userDAO implements DAO<User>{
         return list;
     }
 
+    /**
+     * Deletes a User entity from the database.
+     *
+     * @param entity The User entity to be deleted.
+     * @return The deleted User entity, or null if deletion failed.
+     * @throws SQLException If an error occurs during the deletion process.
+     */
     @Override
     public User delete(User entity) throws SQLException {
         if (entity != null) {
@@ -98,6 +126,11 @@ public class userDAO implements DAO<User>{
         return entity;
     }
 
+    /**
+     * Inserts a new User entity into the database.
+     *
+     * @param entity The User entity to be inserted.
+     */
     public void insertUser(User entity) {
         try (PreparedStatement ps = con.prepareStatement(INSERT)) {
             ps.setString(1, entity.getPhone());
@@ -110,6 +143,11 @@ public class userDAO implements DAO<User>{
         }
     }
 
+    /**
+     * Updates an existing User entity in the database.
+     *
+     * @param entity The User entity to be updated.
+     */
     public void updateUser(User entity) {
         // UPDATE Usuario SET nombre = ?, contraseña = ?, isAdmin = ? WHERE telefono = ?
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
@@ -125,6 +163,12 @@ public class userDAO implements DAO<User>{
         }
     }
 
+    /**
+     * Finds users who have a specific admin status.
+     *
+     * @param admin The admin status to search for.
+     * @return A list of User entities with the specified admin status.
+     */
     public List<User> findAdmins(boolean admin) {
         List<User> list = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_ADMINS)) {
@@ -147,6 +191,12 @@ public class userDAO implements DAO<User>{
         return list;
     }
 
+    /**
+     * Finds users whose names match the given search string.
+     *
+     * @param name The name (or partial name) to search for.
+     * @return A list of User entities whose names match the specified search string.
+     */
     public List<User> findByName(String name) {
         List<User> list = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
@@ -169,12 +219,21 @@ public class userDAO implements DAO<User>{
         return list;
     }
 
-
+    /**
+     * Closes the DAO resources. This method is not yet implemented.
+     *
+     * @throws IOException If there is an issue with closing resources.
+     */
     @Override
     public void close() throws IOException {
 
     }
 
+    /**
+     * Builds an instance of userDAO.
+     *
+     * @return A new instance of userDAO.
+     */
     public static userDAO build() {
         return new userDAO();
     }

@@ -21,7 +21,17 @@ public class florDAO implements DAO<Flor>{
 
 
     private Connection con;
+    /**
+     * Constructor that initializes the database connection.
+     */
     public florDAO() {con = MySQLConnection.getConnection();}
+
+    /**
+     * Saves a Flor entity. Inserts it if it does not exist; updates it otherwise.
+     *
+     * @param entity the Flor entity to save
+     * @return the saved Flor entity
+     */
     @Override
     public Flor save(Flor entity) {
         if (entity == null) {
@@ -35,6 +45,11 @@ public class florDAO implements DAO<Flor>{
         return entity;
     }
 
+    /**
+     * Inserts a new Flor entity into the database.
+     *
+     * @param entity the Flor entity to insert
+     */
     public void insertFlor(Flor entity) {
 
         productoDAO.build().insertProducto(entity);
@@ -48,6 +63,11 @@ public class florDAO implements DAO<Flor>{
         }
     }
 
+    /**
+     * Updates an existing Flor entity in the database.
+     *
+     * @param entity the Flor entity to update
+     */
     public void updateFlor(Flor entity) {
         productoDAO.build().updateProducto(entity);
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
@@ -60,6 +80,13 @@ public class florDAO implements DAO<Flor>{
         }
     }
 
+    /**
+     * Deletes a Flor entity from the database.
+     *
+     * @param entity the Flor entity to delete
+     * @return the deleted Flor entity, or null if an error occurred
+     * @throws SQLException if a database error occurs
+     */
     @Override
     public Flor delete(Flor entity) throws SQLException {
         if (entity != null) {
@@ -75,6 +102,12 @@ public class florDAO implements DAO<Flor>{
         return entity;
     }
 
+    /**
+     * Finds a Flor entity by its primary key (id).
+     *
+     * @param pk the Flor entity containing the primary key to search for
+     * @return the found Flor entity, or null if not found
+     */
     @Override
     public Flor findByPK(Flor pk) {
         Producto pro = productoDAO.build().findByPK(pk);
@@ -105,6 +138,11 @@ public class florDAO implements DAO<Flor>{
         return result;
     }
 
+    /**
+     * Retrieves all Flor entities from the database.
+     *
+     * @return a list of all Flor entities
+     */
     @Override
     public List<Flor> findAll() {
         List<Flor> result = new ArrayList<>();
@@ -134,6 +172,12 @@ public class florDAO implements DAO<Flor>{
         return result;
     }
 
+    /**
+     * Finds Flor entities by their type (true/false).
+     *
+     * @param tipo the type of Flor to search for
+     * @return a list of Flor entities matching the type
+     */
     public List<Flor> findByType(boolean tipo) {
         List<Flor> result = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
@@ -163,7 +207,12 @@ public class florDAO implements DAO<Flor>{
         return result;
     }
 
-
+    /**
+     * Finds Flor entities by their associated product name.
+     *
+     * @param name the partial name to search for
+     * @return a list of Flor entities matching the name
+     */
     public List<Flor> findByName(String name) {
         List<Flor> result = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
@@ -193,11 +242,17 @@ public class florDAO implements DAO<Flor>{
         return result;
     }
 
+    /**
+     * Closes any open resources. Currently, no resources to close.
+     */
     @Override
-    public void close() throws IOException {
+    public void close() throws IOException {}
 
-    }
-
+    /**
+     * Factory method to create a new florDAO instance.
+     *
+     * @return a new florDAO instance
+     */
     public static florDAO build() {
         return new florDAO();
     }

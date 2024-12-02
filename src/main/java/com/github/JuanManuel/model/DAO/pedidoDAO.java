@@ -26,10 +26,21 @@ public class pedidoDAO implements DAO<Pedido>{
     private static final String FIND_BY_USER = "SELECT * FROM Pedido WHERE telefonoUsuario = ?";
     private static final String FIND_DETAILS = "SELECT * FROM Pedido_Producto WHERE Pedido_idPedido = ?";
     private static final String FIND_STATS_MONTH = "SELECT MONTH(STR_TO_DATE(fechaPedido, '%d/%m/%Y')) AS mes, COUNT(idPedido) AS cantidadPedidos  FROM Pedido GROUP BY mes ORDER BY mes";
+
     private Connection con;
 
+    /**
+     * Constructor that initializes the connection to the database.
+     */
     public pedidoDAO() {con = MySQLConnection.getConnection();}
 
+    /**
+     * Saves a Pedido (order) entity to the database.
+     * If the order doesn't exist, it will be inserted; otherwise, it will be updated.
+     *
+     * @param entity The Pedido object to be saved.
+     * @return The saved Pedido entity.
+     */
     @Override
     public Pedido save(Pedido entity) {
         if (entity == null) {
@@ -43,6 +54,12 @@ public class pedidoDAO implements DAO<Pedido>{
         return entity;
     }
 
+    /**
+     * Inserts a new Pedido (order) into the database.
+     * Also inserts the associated Pedido_Producto details.
+     *
+     * @param entity The Pedido object to be inserted.
+     */
     public void insertPedido(Pedido entity) {
         try (PreparedStatement ps = con.prepareStatement(INSERT)) {
             ps.setInt(1, entity.getIdPedido());
@@ -69,6 +86,12 @@ public class pedidoDAO implements DAO<Pedido>{
         }
     }
 
+    /**
+     * Updates an existing Pedido (order) in the database.
+     * Also updates the associated Pedido_Producto details.
+     *
+     * @param entity The Pedido object to be updated.
+     */
     public void updatePedido(Pedido entity) {
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
             ps.setString(1, entity.getFechaPedido());
@@ -108,6 +131,12 @@ public class pedidoDAO implements DAO<Pedido>{
         }
     }
 
+    /**
+     * Finds a Pedido by its primary key (idPedido).
+     *
+     * @param pk The Pedido object containing the idPedido to search for.
+     * @return The found Pedido entity, or null if not found.
+     */
     @Override
     public Pedido findByPK(Pedido pk) {
         Pedido pedido = null;
@@ -150,6 +179,11 @@ public class pedidoDAO implements DAO<Pedido>{
         return pedido;
     }
 
+    /**
+     * Finds all Pedidos in the database.
+     *
+     * @return A list of all Pedido entities.
+     */
     @Override
     public List<Pedido> findAll() {
         List<Pedido> allLS = new ArrayList<>();
@@ -191,6 +225,12 @@ public class pedidoDAO implements DAO<Pedido>{
         return allLS;
     }
 
+    /**
+     * Retrieves a list of orders (Pedidos) placed by a specific user.
+     *
+     * @param u The user whose orders are being retrieved.
+     * @return A list of Pedido objects associated with the provided user.
+     */
     public List<Pedido> findByUser(User u) {
         List<Pedido> byUserLS = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_BY_USER)){
@@ -232,7 +272,13 @@ public class pedidoDAO implements DAO<Pedido>{
         return byUserLS;
     }
 
-
+    /**
+     * Deletes a given Pedido from the database.
+     *
+     * @param entity The Pedido to be deleted.
+     * @return The deleted Pedido, or null if an error occurred during the deletion.
+     * @throws SQLException If there is an issue executing the delete statement.
+     */
     @Override
     public Pedido delete(Pedido entity) throws SQLException {
         if (entity != null) {
@@ -247,21 +293,41 @@ public class pedidoDAO implements DAO<Pedido>{
         return entity;
     }
 
+    /**
+     * Closes any resources used by the DAO. Currently, does nothing, but can be expanded if needed.
+     *
+     * @throws IOException If there is an issue closing resources (not implemented in this case).
+     */
     @Override
     public void close() throws IOException {
 
     }
 
+    /**
+     * Static method to create a new instance of the pedidoDAO.
+     *
+     * @return A new instance of pedidoDAO.
+     */
     public static pedidoDAO build() {
         return new pedidoDAO();
     }
 
+    /**
+     * Updates the state of the specified Pedido to "PAGADO" (Paid) and performs the necessary database update.
+     *
+     * @param p The Pedido to be marked as paid.
+     */
     public void setPagado(Pedido p) {
         Pedido result = findByPK(p);
         result.setEstado("PAGADO");
         updatePedido(result);
     }
 
+    /**
+     * Retrieves the monthly statistics of orders, including the count of orders placed in each month.
+     *
+     * @return A map where the key is the month name and the value is the number of orders placed in that month.
+     */
     public Map<String, Integer> FindStatsMonth() {
         Map<String, Integer> result = new HashMap<>();
         try (PreparedStatement ps = con.prepareStatement(FIND_STATS_MONTH)) {

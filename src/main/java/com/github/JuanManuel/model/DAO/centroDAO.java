@@ -28,8 +28,19 @@ public class centroDAO implements DAO<Centro>{
     private static final String FIND_BY_TYPE = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.description) LIKE ?";
 
     private Connection con;
+
+    /**
+     * Constructs a new `centroDAO` instance and initializes the database connection.
+     */
     public centroDAO() {con = MySQLConnection.getConnection();}
 
+    /**
+     * Saves a `Centro` entity to the database.
+     * Inserts if not found, updates otherwise.
+     *
+     * @param entity The `Centro` entity to save.
+     * @return The saved `Centro` entity.
+     */
     @Override
     public Centro save(Centro entity) {
         if (entity == null) {
@@ -43,6 +54,11 @@ public class centroDAO implements DAO<Centro>{
         return entity;
     }
 
+    /**
+     * Inserts a new `Centro` record along with associated secondary flowers into the database.
+     *
+     * @param entity The `Centro` object to be inserted.
+     */
     public void insertCentro(Centro entity) {
         productoDAO.build().insertProducto(entity);
         try (PreparedStatement ps = con.prepareStatement(INSERT)) {
@@ -64,6 +80,11 @@ public class centroDAO implements DAO<Centro>{
         }
     }
 
+    /**
+     * Updates an existing `Centro` record and its associated secondary flowers.
+     *
+     * @param entity The `Centro` object to be updated.
+     */
     public void updateCentro(Centro entity) {
         productoDAO.build().updateProducto(entity);
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
@@ -90,6 +111,13 @@ public class centroDAO implements DAO<Centro>{
         }
     }
 
+    /**
+     * Deletes a `Centro` entity from the database.
+     *
+     * @param entity The `Centro` entity to delete.
+     * @return The deleted `Centro` entity, or null if an error occurs.
+     * @throws SQLException If a database access error occurs.
+     */
     @Override
     public Centro delete(Centro entity) throws SQLException {
         if (entity != null) {
@@ -105,6 +133,12 @@ public class centroDAO implements DAO<Centro>{
         return entity;
     }
 
+    /**
+     * Finds a `Centro` entity by its primary key.
+     *
+     * @param pk The primary key to search for.
+     * @return The found `Centro` entity, or null if not found.
+     */
     @Override
     public Centro findByPK(Centro pk) {
         Centro result = null;
@@ -143,6 +177,11 @@ public class centroDAO implements DAO<Centro>{
         return result;
     }
 
+    /**
+     * Finds all `Centro` entities in the database.
+     *
+     * @return A list of all `Centro` entities.
+     */
     @Override
     public List<Centro> findAll() {
         List<Centro> result = new ArrayList<>();
@@ -184,7 +223,13 @@ public class centroDAO implements DAO<Centro>{
         return result;
     }
 
-
+    /**
+     * Finds and retrieves a list of Centro objects whose name or description
+     * contains the given string (case-insensitive) and are marked as "prehecho".
+     *
+     * @param name the partial name to search for
+     * @return a list of Centro objects matching the criteria
+     */
     public List<Centro> findByName(String name) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
@@ -227,6 +272,12 @@ public class centroDAO implements DAO<Centro>{
         return result;
     }
 
+    /**
+     * Finds and retrieves a list of Centro objects based on a partial name match.
+     *
+     * @param name the partial name to search for
+     * @return a list of Centro objects matching the criteria
+     */
     public List<Centro> findByNames(String name) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
@@ -268,6 +319,14 @@ public class centroDAO implements DAO<Centro>{
         return result;
     }
 
+    /**
+     * Retrieves a list of Centro objects that fall within the specified price range
+     * and are marked as "prehecho".
+     *
+     * @param min the minimum price
+     * @param max the maximum price
+     * @return a list of Centro objects within the price range
+     */
     public List<Centro> findByRange(int min, int max) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
@@ -311,7 +370,12 @@ public class centroDAO implements DAO<Centro>{
         return result;
     }
 
-
+    /**
+     * Retrieves a list of Centro objects based on their type (prehecho or personalizado).
+     *
+     * @param prehecho true to filter "prehecho" type, false for "personalizado"
+     * @return a list of Centro objects matching the specified type
+     */
     public List<Centro> findByType(Boolean prehecho) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
@@ -357,11 +421,19 @@ public class centroDAO implements DAO<Centro>{
         return result;
     }
 
+    /**
+     * Closes resources if necessary. Currently, no specific resources are managed.
+     */
     @Override
     public void close() throws IOException {
 
     }
 
+    /**
+     * Static factory method to create a new instance of centroDAO.
+     *
+     * @return a new instance of centroDAO
+     */
     public static centroDAO build() {
         return new centroDAO();
     }
