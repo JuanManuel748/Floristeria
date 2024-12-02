@@ -1,4 +1,4 @@
-﻿# [OffLineChat](https://github.com/JuanManuel748/Floristeria)
+﻿# [Floristeria](https://github.com/JuanManuel748/Floristeria)
 
 ___
 
@@ -24,4 +24,4 @@ ___
 
 ## Wiki 📖
 ___
-Puedes ver y descargar en nuestro proyecto [IlloChat](https://github.com/JuanManuel748/Floristeria).
+Puedes ver y descargar en nuestro proyecto [Floristeria](https://github.com/JuanManuel748/Floristeria).

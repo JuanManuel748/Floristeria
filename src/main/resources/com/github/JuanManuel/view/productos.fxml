@@ -45,9 +45,11 @@
             </ImageView>
          </children>
       </Pane>
-      <ScrollPane layoutX="50.0" layoutY="141.0" prefHeight="425.0" prefWidth="700.0" style="-fx-background-color: #a8ffb2;" vbarPolicy="ALWAYS">
+      <ScrollPane layoutX="50.0" layoutY="141.0" prefHeight="425.0" prefWidth="700.0"
+                  style="-fx-background: #a8ffb2; -fx-background-color: transparent;" vbarPolicy="ALWAYS">
          <content>
-            <GridPane fx:id="boxGrid" hgap="20.0" style="-fx-background-color: #a8ffb2;" vgap="20.0"> <!-- Agregamos fx:id -->
+            <GridPane fx:id="boxGrid" hgap="20.0" vgap="20.0"
+                      style="-fx-background: #a8ffb2; -fx-background-color: #a8ffb2;">
                <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
@@ -57,6 +59,7 @@
             </GridPane>
          </content>
       </ScrollPane>
+
       <ChoiceBox fx:id="FilterBox" layoutX="600.0" layoutY="104.0" prefWidth="150.0" />
       <Label layoutX="491.0" layoutY="103.0" text="Filtrar por:" textFill="#044004">
          <font>
