@@ -91,6 +91,11 @@ public class AdminRamosController extends Controller implements Initializable {
     @FXML
     public ComboBox quantitySpinner;
 
+    /**
+     * Cambia la escena a la pantalla principal del administrador.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.ADMINHOME, null);
@@ -99,6 +104,11 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual y redirige a la pantalla de inicio de sesión.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void logout(ActionEvent actionEvent) {
         try {
             User u = Session.getInstance().getCurrentUser();
@@ -108,15 +118,34 @@ public class AdminRamosController extends Controller implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Método ejecutado al abrir la vista o inicializarla.
+     * Puede recibir datos de entrada para configurar la vista.
+     *
+     * @param input un objeto con los datos de entrada para inicializar la vista.
+     * @throws Exception si ocurre algún error durante la inicialización.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
 
     }
 
+    /**
+     * Método ejecutado al cerrar la vista.
+     * Puede manejar la salida o datos generados antes de cerrar.
+     *
+     * @param output un objeto con los datos de salida o resultado de la vista.
+     */
     @Override
-    public void onClose(Object output) {}
+    public void onClose(Object output) {
 
+    }
+
+    /**
+     * Inicializa los componentes de la vista.
+     * @param url URL de inicialización.
+     * @param resourceBundle Bundle de recursos.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         secunController = 0;
@@ -157,7 +186,11 @@ public class AdminRamosController extends Controller implements Initializable {
         mostrarProductos(ramoDAO.build().findAll());
     }
 
-
+    /**
+     * Configura un ComboBox con una lista de flores.
+     * @param c ComboBox a inicializar.
+     * @param flores Lista de flores a agregar al ComboBox.
+     */
     public void initializaComboBoc(ComboBox c, List<Flor> flores) {
         c.setItems(observableArrayList(flores));
         c.setCellFactory(lv -> new ListCell<Flor>() {
@@ -188,6 +221,10 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Valida los campos de entrada del formulario y construye un objeto Ramo.
+     * @return true si todos los campos son válidos, false en caso contrario.
+     */
     public boolean validateFields() {
         boolean result = false;
         try {
@@ -261,6 +298,10 @@ public class AdminRamosController extends Controller implements Initializable {
         return result;
     }
 
+    /**
+     * Configura un ramo en el formulario para ser actualizado o eliminado.
+     * @param p Objeto Ramo a configurar en el formulario.
+     */
     public void setRamo(Ramo p) {
         try {
             ramo = p;
@@ -293,12 +334,19 @@ public class AdminRamosController extends Controller implements Initializable {
 
     }
 
+    /**
+     * Muestra en la tabla todos los productos de tipo Ramo proporcionados en una lista.
+     * @param array Lista de ramos a mostrar en la tabla.
+     */
     public void mostrarProductos(List<Ramo> array){
         ObservableList<Ramo> observableList = FXCollections.observableArrayList(array);
         ramosTable.setItems(observableList);
         ramosTable.refresh();
     }
 
+    /**
+     * Limpia todos los campos del formulario y reinicia la selección.
+     */
     public void clearFields() {
         idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");
@@ -323,6 +371,10 @@ public class AdminRamosController extends Controller implements Initializable {
         ramo = new Ramo();
     }
 
+    /**
+     * Inserta un nuevo ramo en la base de datos.
+     * @param actionEvent Evento que dispara la acción de inserción.
+     */
     public void insert(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -338,6 +390,10 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Actualiza un ramo existente en la base de datos.
+     * @param actionEvent Evento que dispara la acción de actualización.
+     */
     public void update(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -353,6 +409,10 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Elimina un ramo de la base de datos.
+     * @param actionEvent Evento que dispara la acción de eliminación.
+     */
     public void delete(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -368,6 +428,10 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Busca ramos en la base de datos según los criterios seleccionados.
+     * @param actionEvent Evento que dispara la acción de búsqueda.
+     */
     public void find(ActionEvent actionEvent) {
         try {
             List<Ramo>findLS = new ArrayList<>();
@@ -400,7 +464,10 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
-
+    /**
+     * Muestra un cuadro de diálogo para seleccionar el criterio de búsqueda.
+     * @return Entero que indica el criterio de búsqueda seleccionado.
+     */
     private int selectAlert() {
         Alert al = new Alert(Alert.AlertType.CONFIRMATION);
         al.setTitle("Elegir campo");
@@ -428,6 +495,10 @@ public class AdminRamosController extends Controller implements Initializable {
 
     }
 
+    /**
+     * Permite al usuario cargar una imagen desde su sistema de archivos.
+     * @param mouseEvent Evento que dispara la carga de la imagen.
+     */
     public void uploadImage(MouseEvent mouseEvent) {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -457,6 +528,9 @@ public class AdminRamosController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Configura los spinners de precio y stock con valores y restricciones predeterminadas.
+     */
     private void setupSpinners() {
         priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
         priceField.getValueFactory().setConverter(new DoubleStringConverter());
@@ -464,6 +538,10 @@ public class AdminRamosController extends Controller implements Initializable {
         stockField.getValueFactory().setConverter(new IntegerStringConverter());
     }
 
+    /**
+     * Maneja la selección de un ramo en la tabla al hacer doble clic.
+     * @param event Evento del clic en la tabla.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Ramo selected = ramosTable.getSelectionModel().getSelectedItem();

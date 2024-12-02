@@ -24,61 +24,93 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ShoppingCartController extends Controller implements Initializable {
+    @FXML
+    public Button purchaseButton;
+    @FXML
+    public Label totalText;
+    @FXML
+    public DatePicker dateSelecter;
+    @FXML
+    public TableView detailsTable;
+    @FXML
+    public TableColumn<Detalles, String> nameColumn;
+    @FXML
+    public TableColumn<Detalles, Integer> quantityColumn;
+    @FXML
+    public TableColumn<Detalles, Double> subtotalColumn;
+    @FXML
+    public Button productButton;
+    @FXML
+    public Spinner quantitySpinner;
 
-    // Elementos de la interfaz gráfica
-    @FXML
-    public Button purchaseButton;  // Botón para realizar la compra
-    @FXML
-    public Label totalText;  // Etiqueta que muestra el total de la compra
-    @FXML
-    public DatePicker dateSelecter;  // Selector de fecha para elegir la fecha de entrega
-    @FXML
-    public TableView detailsTable;  // Tabla que muestra los detalles de los productos en el carrito
-    @FXML
-    public TableColumn<Detalles, String> nameColumn;  // Columna para mostrar el nombre del producto
-    @FXML
-    public TableColumn<Detalles, Integer> quantityColumn;  // Columna para mostrar la cantidad de producto
-    @FXML
-    public TableColumn<Detalles, Double> subtotalColumn;  // Columna para mostrar el subtotal del producto
-    @FXML
-    public Button productButton;  // Botón para ver más detalles de un producto
-    @FXML
-    public Spinner quantitySpinner;  // Selector para modificar la cantidad de un producto
+    private double total;
+    private Producto pro;
 
-    private double total;  // Variable que almacena el total de la compra
-    private Producto pro;  // Producto seleccionado
-
-    // Método llamado cuando se abre la vista
+    /**
+     * Initializes the view by setting up the necessary variables and configurations.
+     *
+     * @param input the input object passed when opening the view.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
-        mostrarDetalles();  // Muestra los detalles del carrito de compras
+        mostrarDetalles();
     }
 
-    // Método llamado al cerrar la vista (no se utiliza aquí)
+    /**
+     * Closes the view by setting up the necessary variables and configurations.
+     *
+     * @param output the output object passed when opening other view.
+     */
     @Override
-    public void onClose(Object output) {
+    public void onClose(Object output) {}
 
-    }
-
-    // Método de inicialización de la vista
+    /**
+     * Initializes the controller and sets up the DatePicker, Spinner, and event handlers.
+     *
+     * @param url the URL used to load the FXML file.
+     * @param resourceBundle the resource bundle used for localization.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        dateSelecter.setValue(LocalDate.now());  // Inicializa el selector de fecha con la fecha actual
-        quantitySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));  // Configura el spinner de cantidad
-        quantitySpinner.getValueFactory().setConverter(new IntegerStringConverter());  // Convierte los valores del spinner en enteros
-        detailsTable.setOnMouseClicked(event -> handleTableSelection(event));  // Maneja la selección de productos en la tabla
+        dateSelecter.setValue(LocalDate.now());
+        quantitySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+        quantitySpinner.getValueFactory().setConverter(new IntegerStringConverter());
+        quantitySpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateQuantity();
+        });
+        detailsTable.setOnMouseClicked(event -> handleTableSelection(event));
     }
 
-    // Método para redirigir al usuario a la pantalla de inicio
+    private void updateQuantity() {
+        if (pro != null) {
+            try {
+                int cantidad = (int) quantitySpinner.getValue();
+                Session.getInstance().changeQuantity(pro, cantidad);
+                mostrarDetalles();
+                detailsTable.refresh();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Navigates to the home screen.
+     *
+     * @param actionEvent the event triggered when the user clicks the "Home" button.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.HOME, null);
         } catch (Exception e) {
-            throw new RuntimeException(e);  // Maneja cualquier error al cambiar de escena
+            throw new RuntimeException(e);
         }
     }
 
-    // Método que muestra los detalles del carrito de compras en la tabla
+    /**
+     * Displays the details of the products in the shopping cart.
+     * It retrieves the cart details from the current session and updates the table and total.
+     */
     public void mostrarDetalles() {
         // Obtiene los detalles del carrito de compras desde la sesión actual
         List<Detalles> detaller = Session.getInstance().getDetalles();
@@ -91,7 +123,6 @@ public class ShoppingCartController extends Controller implements Initializable 
         subtotalColumn.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
 
         detailsTable.setItems(detallesObservableList);  // Asocia los datos a la tabla
-
         total = 0;  // Inicializa el total
         // Recorre los detalles del carrito y calcula el total
         List<Detalles> detallesList = Session.getInstance().getDetalles();
@@ -100,32 +131,45 @@ public class ShoppingCartController extends Controller implements Initializable 
         }
 
         totalText.setText("TOTAL: " + total + "€");  // Actualiza el total en la interfaz
+        detailsTable.refresh();
     }
 
-    // Establece el producto seleccionado en el spinner de cantidad
+    /**
+     * Sets the selected product details in the quantity spinner.
+     *
+     * @param selected the selected Detalles object from the table.
+     */
     private void setProducto(Detalles selected) {
         pro = selected.getPro();
         quantitySpinner.getValueFactory().setValue(selected.getCantidad());  // Establece la cantidad del producto
     }
 
-    // Maneja la selección de productos en la tabla (doble clic)
+    /**
+     * Handles the table row selection event. If a product is double-clicked, it is selected and set in the quantity spinner.
+     *
+     * @param event the mouse event triggered when a table row is clicked.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Detalles selected = (Detalles) detailsTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                setProducto(selected);  // Establece el producto seleccionado
+                setProducto(selected);
             } else {
                 Alerta.showAlert("ERROR", "Ningún producto seleccionado", "Haz clic en un producto para seleccionarlo.");
             }
         }
     }
 
-    // Método que maneja la acción de realizar la compra
+    /**
+     * Finalizes the purchase process. It checks the selected delivery date and confirms the order if valid.
+     *
+     * @param actionEvent the event triggered when the user clicks the "Purchase" button.
+     */
     public void purchase(ActionEvent actionEvent) {
-        LocalDate now = LocalDate.now();  // Fecha actual
-        LocalDate delivery = dateSelecter.getValue();  // Fecha seleccionada para la entrega
+        LocalDate now = LocalDate.now();
+        LocalDate delivery = dateSelecter.getValue();
 
-        // Verifica si la fecha de entrega es válida
+
         if (delivery == null) {
             Alerta.showAlert("ERROR", "Error en la fecha de entrega", "La fecha de entrega es nula");
             return;
@@ -135,13 +179,13 @@ public class ShoppingCartController extends Controller implements Initializable 
             return;
         }
 
-        // Verifica que la fecha de entrega esté al menos 2 días después de la fecha actual
+
         if (ChronoUnit.DAYS.between(now, delivery) < 2) {
             Alerta.showAlert("INFORMATION", "Fecha demasiado temprana", "La fecha de entrega debe ser como mínimo 2 días después del día que se realiza el pedido");
             return;
         }
 
-        // Registra el pedido en la sesión
+
         String dateNow ="";
         if (now.getDayOfMonth() < 10) {
             dateNow = "0" + now.getDayOfMonth() + "/" + now.getMonthValue() + "/" + now.getYear();
@@ -154,23 +198,32 @@ public class ShoppingCartController extends Controller implements Initializable 
         } else {
             dateDelivery = delivery.getDayOfMonth() + "/" + delivery.getMonthValue() + "/" + delivery.getYear();
         }
-        Session.getInstance().madePed(dateNow, dateDelivery, total);  // Realiza el pedido
+        Session.getInstance().madePed(dateNow, dateDelivery, total);
 
         Alerta.showAlert("INFORMATION", "Pedido realizado", "Pedido realizado con éxito");
+        try {
+            App.currentController.changeScene(Scenes.HOME, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    // Método que maneja la visualización de más detalles de un producto seleccionado
+    /**
+     * Navigates to the product details screen.
+     *
+     * @param actionEvent the event triggered when the user clicks the "See Product" button.
+     */
     public void seeProduct(ActionEvent actionEvent) {
         try {
             if (pro != null) {
-                pro = productoDAO.build().findByPK(pro);  // Obtiene el producto completo desde la base de datos
-                DetailsController.setProducto(pro);  // Establece el producto en el controlador de detalles
-                App.currentController.changeScene(Scenes.DETAILS, null);  // Cambia a la pantalla de detalles del producto
+                pro = productoDAO.build().findByPK(pro);
+                DetailsController.setProducto(pro);
+                App.currentController.changeScene(Scenes.DETAILS, null);
             } else {
                 Alerta.showAlert("INFORMATION", "Falta producto", "Debes seleccionar un producto de la tabla");
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);  // Maneja cualquier error al ver los detalles del producto
+            throw new RuntimeException(e);
         }
     }
 }

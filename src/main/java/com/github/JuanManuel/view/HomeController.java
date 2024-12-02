@@ -14,29 +14,23 @@ import javax.swing.text.html.ImageView;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * This controller manages the home screen of the application.
- * It handles user actions such as logging out, navigating to different product categories, and accessing the shopping cart.
- */
 public class HomeController extends Controller implements Initializable {
-
-    // UI elements bound to the FXML
     @FXML
-    private AnchorPane anchorPane;       // The root layout pane for the home screen
+    private AnchorPane anchorPane;
     @FXML
-    private Button exitButton;           // Button for exiting/logging out
+    private Button exitButton;
     @FXML
-    private ImageView homeImage;         // Image for the home screen
+    private ImageView homeImage;
     @FXML
-    private Button cartButton;           // Button for navigating to the shopping cart
+    private Button cartButton;
     @FXML
-    private ImageView centrosImage;      // Image for the centros section
+    private ImageView centrosImage;
     @FXML
-    private ImageView ramosImage;        // Image for the ramos section
+    private ImageView ramosImage;
     @FXML
-    private ImageView productosImage;    // Image for the productos section
+    private ImageView productosImage;
     @FXML
-    private ImageView personalizarImage; // Image for the personalizar section
+    private ImageView personalizarImage;
 
     /**
      * This method is called when the view is opened.
@@ -46,9 +40,7 @@ public class HomeController extends Controller implements Initializable {
      * @throws Exception If there is an error
      */
     @Override
-    public void onOpen(Object input) throws Exception {
-        // No specific behavior needed for this context
-    }
+    public void onOpen(Object input) throws Exception {}
 
     /**
      * This method is called when the view is closed.
@@ -57,9 +49,7 @@ public class HomeController extends Controller implements Initializable {
      * @param output The output data when closing the view
      */
     @Override
-    public void onClose(Object output) {
-        // No specific behavior needed for this context
-    }
+    public void onClose(Object output) {}
 
     /**
      * This method initializes the view and is called automatically after the FXML is loaded.
@@ -69,9 +59,7 @@ public class HomeController extends Controller implements Initializable {
      * @param resourceBundle The resource bundle for localization (not used here)
      */
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialization logic (currently empty)
-    }
+    public void initialize(URL url, ResourceBundle resourceBundle) {}
 
     /**
      * This method is called when the logout button is clicked.
@@ -82,11 +70,8 @@ public class HomeController extends Controller implements Initializable {
     @FXML
     public void logout(ActionEvent actionEvent) {
         try {
-            // Get the current user from the session and log them out
             User u = Session.getInstance().getCurrentUser();
             Session.getInstance().logOut(u);
-
-            // Change the scene to the login screen
             App.currentController.changeScene(Scenes.LOGIN, null);
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,9 +85,7 @@ public class HomeController extends Controller implements Initializable {
      * @param mouseEvent The mouse event triggered by the click
      */
     @FXML
-    public void goToHome(MouseEvent mouseEvent) {
-        // No specific behavior here
-    }
+    public void goToHome(MouseEvent mouseEvent) { }
 
     /**
      * This method is called when the user clicks the "Ramos" image or button.
@@ -113,7 +96,6 @@ public class HomeController extends Controller implements Initializable {
     @FXML
     public void goToRamos(MouseEvent mouseEvent) {
         try {
-            // Change the scene to the "Ramos" screen
             App.currentController.changeScene(Scenes.RAMOS, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -129,7 +111,6 @@ public class HomeController extends Controller implements Initializable {
     @FXML
     public void goToCentros(MouseEvent mouseEvent) {
         try {
-            // Change the scene to the "Centros" screen
             App.currentController.changeScene(Scenes.CENTROS, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -145,7 +126,6 @@ public class HomeController extends Controller implements Initializable {
     @FXML
     public void goToProductos(MouseEvent mouseEvent) {
         try {
-            // Change the scene to the "Productos" screen
             App.currentController.changeScene(Scenes.PRODUCTOS, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -161,7 +141,6 @@ public class HomeController extends Controller implements Initializable {
     @FXML
     public void goToPersonalizar(MouseEvent mouseEvent) {
         try {
-            // Change the scene to the "Personalizar" screen
             App.currentController.changeScene(Scenes.PERSONALIZAR, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -176,7 +155,6 @@ public class HomeController extends Controller implements Initializable {
      */
     public void goToCart(ActionEvent actionEvent) {
         try {
-            // Change the scene to the "Cart" screen
             App.currentController.changeScene(Scenes.CARRITO, null);
         } catch (Exception e) {
             throw new RuntimeException(e);

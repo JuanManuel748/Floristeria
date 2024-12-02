@@ -67,6 +67,11 @@ public class AdminDetailsController extends Controller implements Initializable{
     private static Detalles det;
     private static List<Producto> productoList = productoDAO.build().findAll();
 
+    /**
+     * Inicializa los componentes del controlador.
+     * Se configura la tabla de productos, el ComboBox de productos, y el Spinner de cantidad.
+     * Además, se carga la información del pedido actual y se muestra en la tabla.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -114,6 +119,12 @@ public class AdminDetailsController extends Controller implements Initializable{
         }
     }
 
+    /**
+     * Configura los campos del formulario con los detalles del producto seleccionado.
+     * Se actualiza la imagen de vista previa y los valores del producto y la cantidad.
+     *
+     * @param selected El detalle del producto seleccionado a mostrar.
+     */
     public void setDetalle(Detalles selected) {
         det = selected;
         productChoice.setValue(selected.getPro());
@@ -129,11 +140,21 @@ public class AdminDetailsController extends Controller implements Initializable{
         }
     }
 
+    /**
+     * Limpia los campos del formulario, restableciendo el ComboBox y el Spinner.
+     */
     public void clearFields() {
         productChoice.setValue(productoList.get(0));
         quantitySpinner.getValueFactory().setValue(1);
     }
 
+    /**
+     * Inicializa el ComboBox de productos con una lista de productos.
+     * También se configura el renderizado para mostrar el nombre y la imagen del producto.
+     *
+     * @param c El ComboBox a inicializar.
+     * @param array La lista de productos para cargar en el ComboBox.
+     */
     public void initializaComboBoc(ComboBox c, List<Producto> array) {
         c.setItems(observableArrayList(array));
         c.setCellFactory(lv -> new ListCell<Producto>() {
@@ -170,6 +191,11 @@ public class AdminDetailsController extends Controller implements Initializable{
         c.setOnAction(this::setProducto);
     }
 
+    /**
+     * Actualiza la vista previa de la imagen cuando se selecciona un producto en el ComboBox.
+     *
+     * @param event El evento de acción que dispara la actualización de la imagen.
+     */
     private void setProducto(Event event) {
         Producto select = (Producto) productChoice.getValue();
         byte[] byteImage = select.getImg();
@@ -183,12 +209,23 @@ public class AdminDetailsController extends Controller implements Initializable{
         }
     }
 
+    /**
+     * Muestra los detalles de un pedido en la tabla de productos.
+     *
+     * @param pedido El pedido cuyos detalles se deben mostrar.
+     */
     public void mostrarDetalles(Pedido pedido) {
         List<Detalles> detallesList = pedido.getDetalles();
         productsTable.getItems().setAll(detallesList);
         productsTable.refresh();
     }
 
+    /**
+     * Valida los campos del formulario antes de realizar una operación.
+     * Verifica que se haya seleccionado un producto y que la cantidad sea válida.
+     *
+     * @return true si los campos son válidos, false si no lo son.
+     */
     public boolean validateFields() {
         det = new Detalles(ped);
         boolean result = false;
@@ -215,7 +252,12 @@ public class AdminDetailsController extends Controller implements Initializable{
 
     }
 
-
+    /**
+     * Inserta un nuevo detalle en el pedido, verificando si el producto ya existe.
+     * Si el producto ya está en el pedido, muestra una alerta informando del error.
+     *
+     * @param actionEvent El evento que dispara la acción de inserción.
+     */
     public void insert(ActionEvent actionEvent) {
         List<Detalles> detailsList = ped.getDetalles();
         try {
@@ -261,7 +303,12 @@ public class AdminDetailsController extends Controller implements Initializable{
         }
     }
 
-
+    /**
+     * Actualiza un detalle en el pedido, cambiando la cantidad y subtotal del producto.
+     * Si el producto no se encuentra en el pedido, muestra una alerta.
+     *
+     * @param actionEvent El evento que dispara la acción de actualización.
+     */
     public void update(ActionEvent actionEvent) {
 
         List<Detalles> detailsList = ped.getDetalles();
@@ -295,25 +342,35 @@ public class AdminDetailsController extends Controller implements Initializable{
         }
     }
 
+    /**
+     * Elimina un producto del pedido.
+     * Primero valida si el producto está en el pedido, y si es así, lo elimina. Si no, muestra una alerta.
+     * Luego, actualiza la lista de detalles en el pedido y guarda los cambios.
+     *
+     * @param actionEvent El evento que dispara la acción de eliminación.
+     */
     public void delete(ActionEvent actionEvent) {
-        ///////////////////////////////////////////
-        // TERMINAR
         List<Detalles> detailsList = ped.getDetalles();
         try {
-            if(!validateFields()) {
+            // Validar los campos antes de continuar
+            if (!validateFields()) {
                 return;
             }
 
-            Boolean find = false;
-            for(Detalles detail: detailsList) {
+            boolean find = false;
+            // Buscar si el producto existe en los detalles del pedido
+            for (Detalles detail : detailsList) {
                 if (detail.getPro().equals(det.getPro())) {
-                    find= true;
+                    find = true;
                     break;
                 }
             }
+
+            // Si el producto no está en la lista, mostrar un mensaje de error
             if (!find) {
-                Alerta.showAlert("ERROR", "Producto no encontrado en el pedido", "El producto seleccionado no esta en el pedido, prueba a insertarlo");
+                Alerta.showAlert("ERROR", "Producto no encontrado en el pedido", "El producto seleccionado no está en el pedido, prueba a insertarlo");
             } else {
+                // Eliminar el producto de la lista de detalles
                 detailsList.remove(det);
                 Alerta.showAlert("INFORMATION", "Producto eliminado del pedido", "El producto ha sido eliminado del pedido");
             }
@@ -322,6 +379,7 @@ public class AdminDetailsController extends Controller implements Initializable{
             Alerta.showAlert("ERROR", "ERROR EN DELETE", "Ha habido un error al intentar borrar el producto");
             throw new RuntimeException(e);
         } finally {
+            // Guardar los cambios en la base de datos y actualizar la vista
             ped.setDetalles(detailsList);
             pedidoDAO.build().save(ped);
             Pedido temp = ped;
@@ -331,40 +389,74 @@ public class AdminDetailsController extends Controller implements Initializable{
         }
     }
 
+    /**
+     * Método que se ejecuta cuando se abre la vista o el controlador.
+     * En este caso no tiene ninguna implementación específica.
+     *
+     * @param input Parámetro de entrada, si se proporciona, pero no se utiliza.
+     * @throws Exception Si ocurre un error al abrir la vista.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
-
+        // Este método está vacío, no realiza ninguna acción específica
     }
 
+    /**
+     * Redirige a la pantalla de inicio de administración de pedidos.
+     *
+     * @param actionEvent El evento que dispara la acción de cambio de escena.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
+            // Cambiar a la escena de administración de pedidos
             App.currentController.changeScene(Scenes.ADMINPEDIDOS, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual y redirige a la pantalla de login.
+     *
+     * @param actionEvent El evento que dispara la acción de cierre de sesión.
+     */
     public void logout(ActionEvent actionEvent) {
         try {
             User u = Session.getInstance().getCurrentUser();
             Session.getInstance().logOut(u);
+            // Cambiar a la escena de login
             App.currentController.changeScene(Scenes.LOGIN, null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Método que se ejecuta cuando se cierra la vista o el controlador.
+     * En este caso no tiene ninguna implementación específica.
+     *
+     * @param output Parámetro de salida, si se proporciona, pero no se utiliza.
+     */
     @Override
     public void onClose(Object output) {
-
+        // Este método está vacío, no realiza ninguna acción específica
     }
 
+    /**
+     * Maneja la selección de una fila en la tabla de productos.
+     * Si se hace doble clic en un producto, se muestra su detalle en los campos correspondientes.
+     *
+     * @param event El evento de clic en la tabla.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
+            // Obtener el detalle del producto seleccionado
             Detalles selected = productsTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
+                // Si un producto fue seleccionado, mostrar sus detalles
                 setDetalle(selected);
             } else {
+                // Si no hay producto seleccionado, mostrar una alerta
                 Alerta.showAlert("ERROR", "Ningún producto seleccionado", "Haz clic en un producto para seleccionarlo.");
             }
         }

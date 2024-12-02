@@ -81,6 +81,11 @@ public class AdminFloresController extends Controller implements Initializable {
     @FXML
     public CheckBox prCheck;
 
+    /**
+     * Cambia la vista a la pantalla de inicio de administración.
+     *
+     * @param actionEvent El evento que activa la acción de cambiar de escena.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.ADMINHOME, null);
@@ -89,6 +94,11 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual y redirige a la pantalla de login.
+     *
+     * @param actionEvent El evento que activa la acción de cierre de sesión.
+     */
     public void logout(ActionEvent actionEvent) {
         try {
             User u = Session.getInstance().getCurrentUser();
@@ -99,6 +109,14 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Inicializa la vista con las configuraciones necesarias, incluyendo
+     * la configuración de las columnas de la tabla, los controles de spinner
+     * y la carga de los productos de flores desde la base de datos.
+     *
+     * @param url La URL de la vista FXML.
+     * @param resourceBundle El recurso que contiene las configuraciones de idioma.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("idProducto"));
@@ -134,6 +152,10 @@ public class AdminFloresController extends Controller implements Initializable {
         mostrarProductos(ls);
     }
 
+    /**
+     * Configura los spinners para los campos de precio y stock con valores válidos
+     * y sus convertidores adecuados.
+     */
     private void setupSpinners() {
         priceField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.00, Double.MAX_VALUE, 0.00, 0.10));
         priceField.getValueFactory().setConverter(new DoubleStringConverter());
@@ -141,6 +163,12 @@ public class AdminFloresController extends Controller implements Initializable {
         stockField.getValueFactory().setConverter(new IntegerStringConverter());
     }
 
+    /**
+     * Maneja la selección de una fila en la tabla de flores. Si se hace doble clic
+     * en una fila, se cargan los datos del producto seleccionado en los campos correspondientes.
+     *
+     * @param event El evento de clic en la tabla.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Flor selected = florTable.getSelectionModel().getSelectedItem();
@@ -152,6 +180,11 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Establece los datos del producto en los campos correspondientes de la vista.
+     *
+     * @param p El objeto Flor con los datos a cargar.
+     */
     public void setFlor(Flor p) {
         idField.setText(String.valueOf(p.getIdProducto()));
         nameField.setText(p.getNombre());
@@ -172,12 +205,21 @@ public class AdminFloresController extends Controller implements Initializable {
         flor = p;
     }
 
+    /**
+     * Muestra una lista de productos en la tabla.
+     *
+     * @param array La lista de flores a mostrar.
+     */
     public void mostrarProductos(List<Flor> array) {
         ObservableList<Flor> ObservableList = FXCollections.observableArrayList(array);
         florTable.setItems(ObservableList);
         florTable.refresh();
     }
 
+    /**
+     * Limpia los campos de entrada en la vista, incluyendo los campos de texto,
+     * los spinners y la imagen de la flor.
+     */
     private void clearFields() {
         idField.setText(String.valueOf(Producto.searchID()));
         nameField.setText("");
@@ -200,6 +242,12 @@ public class AdminFloresController extends Controller implements Initializable {
         flor = null;
     }
 
+    /**
+     * Inserta un nuevo producto en la base de datos, mostrando una alerta
+     * si la inserción es exitosa o si ocurre algún error.
+     *
+     * @param actionEvent El evento que activa la acción de inserción.
+     */
     public void insert(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -215,6 +263,12 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Actualiza los datos de un producto en la base de datos y muestra una alerta
+     * si la actualización es exitosa o si ocurre algún error.
+     *
+     * @param actionEvent El evento que activa la acción de actualización.
+     */
     public void update(ActionEvent actionEvent) {
 
         try {
@@ -230,6 +284,12 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Elimina el producto actualmente seleccionado de la base de datos y
+     * muestra una alerta con el resultado de la acción.
+     *
+     * @param actionEvent El evento que activa la acción de eliminación.
+     */
     public void delete(ActionEvent actionEvent) {
         try {
             if (flor == null) {
@@ -245,6 +305,12 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Realiza una búsqueda de productos según el criterio seleccionado
+     * en un cuadro de diálogo. Los productos encontrados se muestran en la tabla.
+     *
+     * @param actionEvent El evento que activa la acción de búsqueda.
+     */
     public void find(ActionEvent actionEvent) {
         try {
             List<Flor> findList = new ArrayList<>();
@@ -276,6 +342,11 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Valida los campos de entrada antes de realizar una acción como insertar o actualizar.
+     *
+     * @return true si todos los campos son válidos, false en caso contrario.
+     */
     private boolean validateFields() {
         try {
             if (nameField.getText().trim().isEmpty()) {
@@ -312,17 +383,27 @@ public class AdminFloresController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Se ejecuta cuando se abre la vista. Este método está vacío por ahora.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
 
     }
 
+    /**
+     * Se ejecuta cuando se cierra la vista. Este método está vacío por ahora.
+     */
     @Override
     public void onClose(Object output) {
 
     }
 
-
+    /**
+     * Muestra una alerta con las opciones para seleccionar un criterio de búsqueda.
+     *
+     * @return El número de la opción seleccionada.
+     */
     private int selectAlert() {
         Alert al = new Alert(Alert.AlertType.CONFIRMATION);
         al.setTitle("Elegir campo");
@@ -350,6 +431,10 @@ public class AdminFloresController extends Controller implements Initializable {
 
     }
 
+    /**
+     * Permite al usuario cargar una imagen para el centro seleccionado.
+     * La imagen seleccionada se asigna al centro y se muestra en la interfaz.
+     */
     public void uploadImage(MouseEvent mouseEvent) {
         try {
             FileChooser fileChooser = new FileChooser();

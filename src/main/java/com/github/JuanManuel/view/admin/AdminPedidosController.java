@@ -83,6 +83,13 @@ public class AdminPedidosController extends Controller implements Initializable 
     private static Detalles d;
     private static List<User> userList = userDAO.build().findAll();
 
+    /**
+     * Inicializa las columnas y elementos de la interfaz de la vista de administración de pedidos.
+     * Establece el comportamiento de la tabla, las listas desplegables, y los eventos de selección.
+     *
+     * @param url La URL de la vista FXML.
+     * @param resourceBundle El recurso que contiene las configuraciones de idioma.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         p = new Pedido();
@@ -97,7 +104,7 @@ public class AdminPedidosController extends Controller implements Initializable 
         priceField.getValueFactory().setConverter(new DoubleStringConverter());
         estateChoice.setItems(observableArrayList("PENDIENTE", "PAGADO", "ENTREGADO"));
         estateChoice.setValue("PENDIENTE");
-        ObservableList<User> userObservableList = FXCollections.observableArrayList(userDAO.build().findAll());
+        ObservableList<User> userObservableList = observableArrayList(userDAO.build().findAll());
         usrChoice.setItems(userObservableList);
 
         pedsTable.setOnMouseClicked(event -> handleTableSelection(event));
@@ -112,6 +119,11 @@ public class AdminPedidosController extends Controller implements Initializable 
 
     }
 
+    /**
+     * Establece los valores del formulario de pedido basado en el pedido seleccionado.
+     *
+     * @param selected El pedido seleccionado.
+     */
     private void setPedido(Pedido selected) {
         try {
             p = selected;
@@ -126,21 +138,31 @@ public class AdminPedidosController extends Controller implements Initializable 
             purDateSelecter.setValue(purDate);
             priceField.getValueFactory().setValue(selected.getTotal());
             estateChoice.setValue(selected.getEstado());
+            Session.getInstance().setPedido(selected);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
     }
 
+    /**
+     * Limpia los campos del formulario y establece valores predeterminados.
+     */
     public void clearFields() {
         idField.setText(String.valueOf(Session.getInstance().searchID()));
         inicializaComboBox(usrChoice, userList);
-        deliDateSelecter.setValue(LocalDate.now());
-        purDateSelecter.setValue(LocalDate.now().plusDays(7));
+        purDateSelecter.setValue(LocalDate.now());
+        deliDateSelecter.setValue(LocalDate.now().plusDays(7));
         priceField.getValueFactory().setValue(0.00);
         estateChoice.setValue("PENDIENTE");
     }
 
+    /**
+     * Inicializa el ComboBox de usuarios con una lista de usuarios y establece su formato de visualización.
+     *
+     * @param c El ComboBox a inicializar.
+     * @param list La lista de usuarios para llenar el ComboBox.
+     */
     public void inicializaComboBox(ComboBox<User> c, List<User> list) {
         c.setConverter(new StringConverter<User>() {
             @Override
@@ -160,6 +182,11 @@ public class AdminPedidosController extends Controller implements Initializable 
         c.getItems().setAll(list);
     }
 
+    /**
+     * Valida los campos del formulario de pedidos para asegurar que no haya datos vacíos o incorrectos.
+     *
+     * @return true si todos los campos son válidos, false en caso contrario.
+     */
     public boolean validateFields() {
         boolean result = false;
         try {
@@ -211,6 +238,11 @@ public class AdminPedidosController extends Controller implements Initializable 
         return result;
     }
 
+    /**
+     * Inserta un nuevo pedido en la base de datos si los campos son válidos.
+     *
+     * @param actionEvent El evento de acción para el botón de insertar.
+     */
     public void insert(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -226,6 +258,11 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Actualiza un pedido en la base de datos si los campos son válidos.
+     *
+     * @param actionEvent El evento de acción para el botón de actualizar.
+     */
     public void update(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -241,6 +278,11 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Elimina un pedido de la base de datos y actualiza la tabla de pedidos.
+     *
+     * @param actionEvent El evento de acción para el botón de eliminar.
+     */
     public void delete(ActionEvent actionEvent) {
         try {
             if (!validateFields()) {
@@ -256,6 +298,13 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Realiza una búsqueda basada en el criterio seleccionado en un cuadro de diálogo.
+     * Dependiendo del campo elegido, busca un pedido por ID, usuario, detalles, o devuelve todos los pedidos.
+     * Los resultados se muestran mediante `mostrarPedidos`.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void find(ActionEvent actionEvent) {
         try {
             List<Pedido> findList = new ArrayList<>();
@@ -289,6 +338,13 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Muestra un cuadro de diálogo para seleccionar el criterio de búsqueda.
+     * Las opciones incluyen buscar por ID, usuario, detalles, o todos los registros.
+     *
+     * @return un entero que representa la opción seleccionada:
+     *         1 para ID, 2 para Usuario, 3 para Detalles, 4 para Todos, 0 para cancelar.
+     */
     private int selectAlert() {
         Alert al = new Alert(Alert.AlertType.CONFIRMATION);
         al.setTitle("Elegir campo");
@@ -316,7 +372,11 @@ public class AdminPedidosController extends Controller implements Initializable 
 
     }
 
-
+    /**
+     * Cambia la escena a la pantalla principal del administrador.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void goToHome(ActionEvent actionEvent) {
         try {
             App.currentController.changeScene(Scenes.ADMINHOME, null);
@@ -325,6 +385,11 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Cierra la sesión del usuario actual y redirige a la pantalla de inicio de sesión.
+     *
+     * @param actionEvent el evento de acción disparado al llamar a este método.
+     */
     public void logout(ActionEvent actionEvent) {
         try {
             User u = Session.getInstance().getCurrentUser();
@@ -335,16 +400,34 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Método ejecutado al abrir la vista o inicializarla.
+     * Puede recibir datos de entrada para configurar la vista.
+     *
+     * @param input un objeto con los datos de entrada para inicializar la vista.
+     * @throws Exception si ocurre algún error durante la inicialización.
+     */
     @Override
     public void onOpen(Object input) throws Exception {
 
     }
 
+    /**
+     * Método ejecutado al cerrar la vista.
+     * Puede manejar la salida o datos generados antes de cerrar.
+     *
+     * @param output un objeto con los datos de salida o resultado de la vista.
+     */
     @Override
     public void onClose(Object output) {
 
     }
 
+    /**
+     * Maneja la selección de un pedido en la tabla.
+     *
+     * @param event El evento de clic en la tabla.
+     */
     private void handleTableSelection(MouseEvent event) {
         if (event.getClickCount() == 2) {
             Pedido selected = pedsTable.getSelectionModel().getSelectedItem();
@@ -356,13 +439,18 @@ public class AdminPedidosController extends Controller implements Initializable 
         }
     }
 
+    /**
+     * Muestra los pedidos en la tabla de la interfaz de usuario.
+     *
+     * @param array La lista de pedidos a mostrar.
+     */
     public void mostrarPedidos(List<Pedido> array) {
-        ObservableList<Pedido> pedidosObservableList = FXCollections.observableArrayList(array);
+        ObservableList<Pedido> pedidosObservableList = observableArrayList(array);
         pedsTable.setItems(pedidosObservableList);
         pedsTable.refresh();
 
         Map<String, Integer> map = pedidoDAO.build().FindStatsMonth();
-        ObservableList<Map.Entry<String, Integer>> statsObservableList = FXCollections.observableArrayList(map.entrySet());
+        ObservableList<Map.Entry<String, Integer>> statsObservableList = observableArrayList(map.entrySet());
         statsTable.setItems(statsObservableList);
         statsTable.refresh();
     }

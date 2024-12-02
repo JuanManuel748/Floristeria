@@ -9,8 +9,6 @@ import javafx.scene.control.Alert;
  * It defines common functionality and provides methods for opening and closing the views.
  */
 public abstract class Controller {
-
-    // Reference to the main application instance
     App app;
 
     /**
