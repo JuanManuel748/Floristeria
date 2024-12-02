@@ -31,9 +31,20 @@ public class ramoDAO implements DAO<Ramo>{
 
     private Connection con;
 
+    /**
+     * Constructor that initializes the connection to the database.
+     */
     public ramoDAO() {
         con = MySQLConnection.getConnection();
     }
+
+    /**
+     * Saves a Ramo entity to the database.
+     * If the Ramo entity doesn't exist, it inserts it, otherwise updates the existing one.
+     *
+     * @param entity The Ramo entity to be saved.
+     * @return The saved Ramo entity.
+     */
     @Override
     public Ramo save(Ramo entity) {
         if (entity == null) {
@@ -47,6 +58,14 @@ public class ramoDAO implements DAO<Ramo>{
         return entity;
     }
 
+    /**
+     * Deletes a Ramo entity from the database.
+     * Also deletes associated RamoFlores records and Producto entity.
+     *
+     * @param entity The Ramo entity to be deleted.
+     * @return The deleted Ramo entity or null if not found.
+     * @throws SQLException If an SQL error occurs.
+     */
     @Override
     public Ramo delete(Ramo entity) throws SQLException {
         if(entity != null) {
@@ -62,6 +81,12 @@ public class ramoDAO implements DAO<Ramo>{
         return entity;
     }
 
+    /**
+     * Inserts a new Ramo entity into the database.
+     * Inserts RamoFlores associations and Producto entity.
+     *
+     * @param entity The Ramo entity to be inserted.
+     */
     public void insertRamo(Ramo entity) {
         productoDAO.build().insertProducto(entity);
 
@@ -86,6 +111,12 @@ public class ramoDAO implements DAO<Ramo>{
         }
     }
 
+    /**
+     * Updates an existing Ramo entity in the database.
+     * Updates associated RamoFlores and Producto entities.
+     *
+     * @param entity The Ramo entity to be updated.
+     */
     public void updateRamo(Ramo entity) {
 
         productoDAO.build().updateProducto(entity);
@@ -116,6 +147,12 @@ public class ramoDAO implements DAO<Ramo>{
         }
     }
 
+    /**
+     * Retrieves a Ramo entity by its primary key.
+     *
+     * @param pk The Ramo entity's primary key.
+     * @return The Ramo entity corresponding to the primary key, or null if not found.
+     */
     @Override
     public Ramo findByPK(Ramo pk) {
         Ramo result = null;
@@ -155,6 +192,11 @@ public class ramoDAO implements DAO<Ramo>{
         return result;
     }
 
+    /**
+     * Retrieves all Ramo entities from the database.
+     *
+     * @return A list of all Ramo entities.
+     */
     @Override
     public List<Ramo> findAll() {
         List<Ramo> result = new ArrayList<>();
@@ -199,7 +241,15 @@ public class ramoDAO implements DAO<Ramo>{
         return result;
     }
 
-
+    /**
+     * Finds Ramo entities based on a partial name match.
+     *
+     * This method performs a case-insensitive search for Ramo entities by matching the product's name.
+     * It also ensures that only products with descriptions containing "prehecho" (pre-made) are included.
+     *
+     * @param name The partial name to search for.
+     * @return A list of Ramo entities matching the specified name.
+     */
     public List<Ramo> findByName(String name) {
         List<Ramo> result = new ArrayList<>();
         Map<Integer, Ramo> ramosMap = new HashMap<>();
@@ -244,6 +294,15 @@ public class ramoDAO implements DAO<Ramo>{
         return result;
     }
 
+    /**
+     * Finds Ramo entities based on a partial name match, similar to findByName but with a different SQL query.
+     *
+     * This method also performs a case-insensitive search for Ramo entities based on the product's name. The query logic may differ slightly
+     * depending on the implementation of the SQL query identified by `FIND_BY_NAMES`.
+     *
+     * @param name The partial name to search for.
+     * @return A list of Ramo entities matching the specified name.
+     */
     public List<Ramo> findByNames(String name) {
         List<Ramo> result = new ArrayList<>();
         Map<Integer, Ramo> ramosMap = new HashMap<>();
@@ -287,6 +346,16 @@ public class ramoDAO implements DAO<Ramo>{
         return result;
     }
 
+    /**
+     * Finds Ramo entities based on the price range of associated products.
+     *
+     * This method filters Ramo entities by the price range specified by the `min` and `max` parameters.
+     * It also filters by description, only including products that contain "prehecho" (pre-made).
+     *
+     * @param min The minimum price of the products.
+     * @param max The maximum price of the products.
+     * @return A list of Ramo entities that fall within the specified price range.
+     */
     public List<Ramo> findByRange(int min, int max) {
         List<Ramo> result = new ArrayList<>();
         Map<Integer, Ramo> ramosMap = new HashMap<>(); // Map para evitar duplicados.
@@ -333,6 +402,14 @@ public class ramoDAO implements DAO<Ramo>{
         return result;
     }
 
+    /**
+     * Finds Ramo entities based on whether they are pre-made or custom-made.
+     *
+     * This method filters Ramo entities by their type, which can either be pre-made or custom-made, depending on the boolean value of the `prehecho` parameter.
+     *
+     * @param prehecho If true, retrieves "prehecho" (pre-made) Ramo entities; if false, retrieves "personalizado" (custom-made) Ramo entities.
+     * @return A list of Ramo entities of the specified type.
+     */
     public List<Ramo> findByType(Boolean prehecho) {
         List<Ramo> result = new ArrayList<>();
         Map<Integer, Ramo> ramosMap = new HashMap<>();
@@ -381,11 +458,21 @@ public class ramoDAO implements DAO<Ramo>{
         return result;
     }
 
+    /**
+     * Closes the DAO resources.
+     *
+     * This method is part of the AutoCloseable interface implementation but is not yet implemented for this DAO.
+     */
     @Override
     public void close() throws IOException {
 
     }
 
+    /**
+     * Builds an instance of ramoDAO.
+     *
+     * @return A new instance of ramoDAO.
+     */
     public static ramoDAO build() {
         return new ramoDAO();
     }

@@ -21,10 +21,20 @@ public class productoDAO  implements DAO<Producto>{
     private static final String FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?";
     private static final String FIND_COMP_BY_NAME = "SELECT * FROM Producto WHERE LOWER(nombre) LIKE ? AND (tipo = ? OR tipo = ?)";
     private static final String FIND_GROUPBY = "SELECT p.*, SUM(pp.cantidad) AS cantidadVendida FROM Producto p JOIN Pedido_Producto pp ON p.idProducto = pp.Producto_idProducto WHERE p.tipo = ? GROUP BY p.nombre HAVING cantidadVendida >= ?";
+
     private Connection con;
 
+    /**
+     * Constructor that initializes the connection to the database.
+     */
     public productoDAO() { con = MySQLConnection.getConnection();}
 
+    /**
+     * Saves a Producto entity to the database. If the product exists, it is updated, otherwise it is inserted.
+     *
+     * @param entity The Producto to be saved.
+     * @return The saved Producto entity.
+     */
     @Override
     public Producto save(Producto entity) {
         if (entity == null) {
@@ -38,8 +48,11 @@ public class productoDAO  implements DAO<Producto>{
         return entity;
     }
 
-
-
+    /**
+     * Inserts a new Producto into the database.
+     *
+     * @param entity The Producto entity to be inserted.
+     */
     public void insertProducto(Producto entity){
         try (PreparedStatement ps = con.prepareStatement(INSERT)) {
             ps.setInt(1, entity.getIdProducto());
@@ -55,6 +68,11 @@ public class productoDAO  implements DAO<Producto>{
         }
     }
 
+    /**
+     * Updates an existing Producto in the database.
+     *
+     * @param entity The Producto entity to be updated.
+     */
     public void updateProducto(Producto entity){
         try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
             ps.setString(1, entity.getNombre());
@@ -70,6 +88,12 @@ public class productoDAO  implements DAO<Producto>{
         }
     }
 
+    /**
+     * Finds a Producto by its primary key (idProducto).
+     *
+     * @param pk The Producto entity with the idProducto to search for.
+     * @return The Producto with the specified idProducto, or null if not found.
+     */
     @Override
     public Producto findByPK(Producto pk) {
         Producto result = null;
@@ -94,6 +118,11 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
+    /**
+     * Retrieves all Producto entities from the database.
+     *
+     * @return A list of all Producto entities.
+     */
     @Override
     public List<Producto> findAll() {
         List <Producto> result = new ArrayList<>();
@@ -117,6 +146,12 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
+    /**
+     * Finds Producto entities by their type.
+     *
+     * @param type The type of the Producto to search for.
+     * @return A list of Producto entities with the specified type.
+     */
     public List<Producto> findByType(String type) {
         List<Producto> result = new ArrayList<>();
         //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
@@ -141,6 +176,13 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
+    /**
+     * Finds Producto entities with a sales quantity greater than or equal to a specified number, grouped by their type.
+     *
+     * @param quantity The minimum quantity of products sold.
+     * @param type The type of the Producto to search for.
+     * @return A list of Producto entities matching the criteria.
+     */
     public List<Producto> findGroupBy(int quantity, String type) {
         List<Producto> result = new ArrayList<>();
         //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
@@ -168,6 +210,14 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
+    /**
+     * Finds Producto entities based on a partial name match and type.
+     *
+     * @param name The partial name to search for.
+     * @param tipo1 The first type to search for.
+     * @param tipo2 The second type to search for.
+     * @return A list of Producto entities that match the name and types.
+     */
     public List<Producto> findByComplName(String name, String tipo1, String tipo2) {
         List<Producto> result = new ArrayList<>();
         //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
@@ -194,6 +244,13 @@ public class productoDAO  implements DAO<Producto>{
         return result;
     }
 
+    /**
+     * Deletes a Producto entity from the database.
+     *
+     * @param entity The Producto to be deleted.
+     * @return The deleted Producto entity, or null if not found.
+     * @throws SQLException If an SQL error occurs.
+     */
     @Override
     public Producto delete(Producto entity) throws SQLException {
         if (entity != null) {
@@ -208,11 +265,21 @@ public class productoDAO  implements DAO<Producto>{
         return entity;
     }
 
+    /**
+     * Closes the DAO, releasing any resources.
+     *
+     * @throws IOException If an error occurs while closing the connection.
+     */
     @Override
     public void close() throws IOException {
 
     }
 
+    /**
+     * Builds and returns a new instance of productoDAO.
+     *
+     * @return A new instance of productoDAO.
+     */
     public static productoDAO build() {
         return new productoDAO();
     }
