@@ -171,13 +171,13 @@ public class Producto {
 
     public static int searchID() {
         int result = 1;
-        List<Producto> p = productoDAO.build().findAll();
-        for (Producto temp:p) {
-            if (temp.getIdProducto() == result) {
-                result++;
-            } else {
-                break;
-            }
+        try {
+            List<Producto> p = productoDAO.build().findAll();
+            Producto temp = p.get(p.size()-1);
+            result = temp.getIdProducto();
+            result++;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return result;
     }

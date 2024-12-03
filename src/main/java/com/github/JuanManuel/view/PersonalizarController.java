@@ -54,7 +54,7 @@ public class PersonalizarController extends Controller implements Initializable 
 
     private static Ramo ramo = new Ramo();
     private static Centro centro = new Centro();
-    private static int firstController;
+    private static int firstController = 1;
     private static int secunController;
     private static String frase;
     private static Double precioTotal = 20.5;
@@ -86,6 +86,8 @@ public class PersonalizarController extends Controller implements Initializable 
         initializaComboBoc(flSecunChoice1, floresSecun);
         initializaComboBoc(flSecunChoice2, floresSecun);
         initializaComboBoc(flSecunChoice3, floresSecun);
+
+        actualizarValores(null);
     }
 
     /**
@@ -120,8 +122,8 @@ public class PersonalizarController extends Controller implements Initializable 
                 numFlores = Integer.parseInt(size.substring(0, 2).trim());
             }
 
-            ramo = new Ramo(searchID(), "ramo personalizado " + firstController + " " + Session.getInstance().getCurrentUser().getName(), precioTotal, 10, "Ramo personalizado de " + Session.getInstance().getCurrentUser().getName(), new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png"), flPR, numFlores, color, floresSecun);
-            centro = new Centro(searchID(), "centro personalizado " + firstController + " " + Session.getInstance().getCurrentUser().getName(), precioTotal, 10, "Centro personalizado  de " + Session.getInstance().getCurrentUser().getName(), new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png"), flPR, size, frase, floresSecun);
+            ramo = new Ramo(Producto.searchID(), "ramo personalizado " + firstController + " " + Session.getInstance().getCurrentUser().getName(), precioTotal, 30, "Ramo personalizado de " + Session.getInstance().getCurrentUser().getName(), new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png"), flPR, numFlores, color, floresSecun);
+            centro = new Centro(Producto.searchID(), "centro personalizado " + firstController + " " + Session.getInstance().getCurrentUser().getName(), precioTotal, 30, "Centro personalizado  de " + Session.getInstance().getCurrentUser().getName(), new File("src/main/resources/com/github/JuanManuel/view/images/iconoCentro.png"), flPR, size, frase, floresSecun);
 
             ramo.setImg(fileRamo);
             centro.setImg(fileCentro);
