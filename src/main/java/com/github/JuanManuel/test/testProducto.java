@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 public class testProducto {
     public static void main(String[] args) {
+        /*
         Scanner s = new Scanner(System.in);
         List<Producto> productos = new ArrayList<>();
         String filtro = s.nextLine();
@@ -27,6 +28,23 @@ public class testProducto {
         for(Producto p: productos) {
             System.out.println(p);
         }
+        */
+
+        int result = 2;
+        try {
+            List<Producto> p = productoDAO.build().findAll();
+            Producto temp = p.get(p.size()-1);
+
+            System.out.println(temp);
+            result = temp.getIdProducto();
+            result++;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(result);
+
+
+
 
     }
 }

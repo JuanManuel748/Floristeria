@@ -462,6 +462,7 @@ public class AdminCentrosController extends Controller implements Initializable 
      * en la lista y el valor seleccionado por defecto.
      */
     public void initializaComboBoc(ComboBox c, List<Flor> flores) {
+        secunController = 0;
         c.setItems(observableArrayList(flores));
         c.setCellFactory(lv -> new ListCell<Flor>() {
             private final ImageView imageView = new ImageView();
