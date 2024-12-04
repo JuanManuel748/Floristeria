@@ -1,12 +1,16 @@
 package com.github.JuanManuel.view;
 
 import com.github.JuanManuel.App;
+import com.github.JuanManuel.model.connection.H2Connection;
+import com.github.JuanManuel.model.connection.MySQLConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.sql.Connection;
 import java.util.ResourceBundle;
 
 public class WelcomeController extends Controller implements Initializable {
@@ -15,6 +19,11 @@ public class WelcomeController extends Controller implements Initializable {
 
     @FXML
     private Button adminWayButton;
+    @FXML
+    public CheckBox connectionChoice;
+
+    public static Connection mainCon = null;
+    public static boolean isSQL = false;
 
     /**
      * Called when the view is opened. This method is intended for any setup or initialization
@@ -34,15 +43,7 @@ public class WelcomeController extends Controller implements Initializable {
     @Override
     public void onClose(Object output) {}
 
-    /**
-     * Initializes the controller. This method is part of the Initializable interface and
-     * is called when the controller is initialized. In this case, it's empty.
-     *
-     * @param location the location used to load the FXML file.
-     * @param resources the resources used for localization.
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {}
+
 
     /**
      * This method is called when the "adminWayButton" is clicked. It navigates the user to
@@ -52,5 +53,29 @@ public class WelcomeController extends Controller implements Initializable {
      */
     public void setAdminWayButton() throws Exception {
         App.currentController.changeScene(Scenes.LOGIN, null);
+    }
+
+    /**
+     * Initializes the controller. This method is part of the Initializable interface and
+     * is called when the controller is initialized.
+     *
+     * @param location the location used to load the FXML file.
+     * @param resources the resources used for localization.
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        mainCon = H2Connection.getTEMPConnection();
+        connectionChoice.setOnAction(actionEvent -> updateConnection());
+    }
+
+    private void updateConnection() {
+        Boolean select = connectionChoice.isSelected();
+        if (select) {
+            mainCon = MySQLConnection.getConnection();
+            isSQL = true;
+        } else {
+            mainCon = H2Connection.getTEMPConnection();
+            isSQL = false;
+        }
     }
 }

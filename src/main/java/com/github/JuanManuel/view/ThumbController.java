@@ -4,15 +4,12 @@ import com.github.JuanManuel.model.entity.Producto;
 import com.github.JuanManuel.model.entity.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
-import java.awt.event.ActionEvent;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Optional;

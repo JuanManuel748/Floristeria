@@ -33,12 +33,6 @@ import java.util.ResourceBundle;
 import static javafx.collections.FXCollections.observableArrayList;
 
 public class AdminCentrosController extends Controller implements Initializable {
-    private static File img;
-    private static Centro centro;
-    private static int secunController;
-    private static List<Flor> floresPrimarias = florDAO.build().findByType(true);
-    private static List<Flor> floresSecundarias = florDAO.build().findByType(false);
-    private static final File imgNull = new File("src/main/resources/com/github/JuanManuel/view/images/noPicture.jpg");
     @FXML
     public TableView<Centro> centrosTable;
     @FXML
@@ -91,6 +85,14 @@ public class AdminCentrosController extends Controller implements Initializable 
     public ComboBox flSecunChoice3;
     @FXML
     public ImageView uploadButton;
+
+    private static File img;
+    private static Centro centro;
+    private static int secunController;
+    private static List<Flor> floresPrimarias = florDAO.build().findByType(true);
+    private static List<Flor> floresSecundarias = florDAO.build().findByType(false);
+    private static final File imgNull = new File("src/main/resources/com/github/JuanManuel/view/images/noPicture.jpg");
+
 
     /**
      * Inicializa la vista, configurando las columnas de la tabla, los spinners, y los ComboBox.
@@ -221,6 +223,19 @@ public class AdminCentrosController extends Controller implements Initializable 
 
             if (centro == null) {
                 centro = new Centro();
+            }
+
+            if (centro.getImg() == null) {
+                img = imgNull;
+                Image image = new Image(img.toURI().toString());
+                uploadButton.setImage(image);
+
+                if (centro == null) {
+                    centro = new Centro();
+                }
+
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(img.toPath());
+                centro.setImg(imageBytes);
             }
             centro.setIdCentro(id);
             centro.setIdProducto(id);

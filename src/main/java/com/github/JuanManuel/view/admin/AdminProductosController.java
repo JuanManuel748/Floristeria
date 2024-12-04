@@ -3,6 +3,7 @@ package com.github.JuanManuel.view.admin;
 import com.github.JuanManuel.App;
 import com.github.JuanManuel.model.DAO.productoDAO;
 import com.github.JuanManuel.model.DAO.userDAO;
+import com.github.JuanManuel.model.entity.Centro;
 import com.github.JuanManuel.model.entity.Producto;
 import com.github.JuanManuel.model.entity.Session;
 import com.github.JuanManuel.model.entity.User;
@@ -306,7 +307,20 @@ public class AdminProductosController extends Controller implements Initializabl
                 Alerta.showAlert("ERROR", "Descripción inválida", "El campo de descripción no puede estar vacío.");
                 return false;
             }
+
             producto = producto == null ? new Producto() : producto;
+            if (producto.getImg() == null) {
+                img = imgNull;
+                Image image = new Image(img.toURI().toString());
+                uploadButton.setImage(image);
+
+                if (producto == null) {
+                    producto = new Producto();
+                }
+
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(img.toPath());
+                producto.setImg(imageBytes);
+            }
             producto.setIdProducto(idField.getText().isEmpty() ? 0 : Integer.parseInt(idField.getText()));
             producto.setNombre(nameField.getText().trim());
             producto.setPrecio((Double) priceField.getValue());

@@ -1,34 +1,25 @@
 package com.github.JuanManuel.view.admin;
 
 import com.github.JuanManuel.App;
-import com.github.JuanManuel.model.DAO.florDAO;
 import com.github.JuanManuel.model.DAO.pedidoDAO;
-import com.github.JuanManuel.model.DAO.productoDAO;
 import com.github.JuanManuel.model.DAO.userDAO;
 import com.github.JuanManuel.model.entity.*;
 import com.github.JuanManuel.view.Alerta;
 import com.github.JuanManuel.view.Controller;
 import com.github.JuanManuel.view.Scenes;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
-import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;

@@ -28,6 +28,7 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -368,6 +369,18 @@ public class AdminFloresController extends Controller implements Initializable {
             if (flor == null) {
                 flor = new Flor();
             }
+            if (flor.getImg() == null) {
+                img = imgNull;
+                Image image = new Image(img.toURI().toString());
+                uploadButton.setImage(image);
+
+                if (flor == null) {
+                    flor = new Flor();
+                }
+
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(img.toPath());
+                flor.setImg(imageBytes);
+            }
             flor.setIdProducto(Integer.parseInt(idField.getText().trim()));
             flor.setIdFlor(flor.getIdProducto());
             flor.setNombre(nameField.getText().trim());
@@ -378,7 +391,7 @@ public class AdminFloresController extends Controller implements Initializable {
             flor.setColor(colorField.getText());
             flor.setTipoFlor(prCheck.isSelected());
             return true;
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -51,7 +51,7 @@
       </ImageView>
       <Pane layoutX="350.0" layoutY="100.0" prefHeight="240.0" prefWidth="430.0">
          <children>
-            <Label fx:id="nameField" text="Nombre:" textFill="#044004">
+            <Label fx:id="nameField" maxWidth="430.0" text="Nombre:" textFill="#044004" wrapText="true">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>

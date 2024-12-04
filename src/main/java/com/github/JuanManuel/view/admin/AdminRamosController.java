@@ -271,6 +271,18 @@ public class AdminRamosController extends Controller implements Initializable {
             if (ramo == null) {
                 ramo = new Ramo();
             }
+            if (ramo.getImg() == null) {
+                img = imgNull;
+                Image image = new Image(img.toURI().toString());
+                uploadButton.setImage(image);
+
+                if (ramo == null) {
+                    ramo = new Ramo();
+                }
+
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(img.toPath());
+                ramo.setImg(imageBytes);
+            }
             ramo.setIdRamo(id);
             ramo.setIdProducto(id);
             ramo.setNombre(nombre);

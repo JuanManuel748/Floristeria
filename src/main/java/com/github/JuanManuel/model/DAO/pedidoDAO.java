@@ -3,6 +3,7 @@ package com.github.JuanManuel.model.DAO;
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.*;
 import com.github.JuanManuel.view.Alerta;
+import com.github.JuanManuel.view.WelcomeController;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,23 +17,38 @@ import java.util.Map;
 
 
 public class pedidoDAO implements DAO<Pedido>{
-    private static final String INSERT = "INSERT INTO Pedido (idPedido, fechaPedido, fechaEntrega, total, estado, telefonoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String INSERT_DETALLES = "INSERT INTO Pedido_Producto (Pedido_idPedido, Producto_idProducto, cantidad, subtotal) VALUES (?,?,?,?)";
-    private static final String UPDATE = "UPDATE Pedido SET fechaPedido = ?, fechaEntrega = ?, total = ?, estado = ?, telefonoUsuario = ? WHERE idPedido = ?";
-    private static final String DELETE_DETALLES = "DELETE FROM Pedido_Producto WHERE Pedido_idPedido = ?";
-    private static final String DELETE = "DELETE FROM Pedido WHERE idPedido = ?";
-    private static final String FIND_ALL = "SELECT * FROM Pedido";
-    private static final String FIND_BY_PK = "SELECT * FROM Pedido WHERE idPedido = ?";
-    private static final String FIND_BY_USER = "SELECT * FROM Pedido WHERE telefonoUsuario = ?";
-    private static final String FIND_DETAILS = "SELECT * FROM Pedido_Producto WHERE Pedido_idPedido = ?";
-    private static final String FIND_STATS_MONTH = "SELECT MONTH(STR_TO_DATE(fechaPedido, '%d/%m/%Y')) AS mes, COUNT(idPedido) AS cantidadPedidos  FROM Pedido GROUP BY mes ORDER BY mes";
+    private static final String SQL_INSERT = "INSERT INTO pedido (idPedido, fechaPedido, fechaEntrega, total, estado, telefonoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_DETALLES = "INSERT INTO pedido_producto (Pedido_idPedido, Producto_idProducto, cantidad, subtotal) VALUES (?,?,?,?)";
+    private static final String SQL_UPDATE = "UPDATE pedido SET fechaPedido = ?, fechaEntrega = ?, total = ?, estado = ?, telefonoUsuario = ? WHERE idPedido = ?";
+    private static final String SQL_DELETE_DETALLES = "DELETE FROM pedido_producto WHERE Pedido_idPedido = ?";
+    private static final String SQL_DELETE = "DELETE FROM pedido WHERE idPedido = ?";
+    private static final String SQL_FIND_ALL = "SELECT * FROM pedido";
+    private static final String SQL_FIND_BY_PK = "SELECT * FROM pedido WHERE idPedido = ?";
+    private static final String SQL_FIND_BY_USER = "SELECT * FROM pedido WHERE telefonoUsuario = ?";
+    private static final String SQL_FIND_DETAILS = "SELECT * FROM pedido_producto WHERE Pedido_idPedido = ?";
+    private static final String SQL_FIND_STATS_MONTH = "SELECT MONTH(STR_TO_DATE(fechaPedido, '%d/%m/%Y')) AS mes, COUNT(idPedido) AS cantidadPedidos  FROM pedido GROUP BY mes ORDER BY mes";
+    // ===============
+    private static final String H2_INSERT = "INSERT INTO \"pedido\" (\"idPedido\", \"fechaPedido\", \"fechaEntrega\", \"total\", \"estado\", \"telefonoUsuario\") VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String H2_INSERT_DETALLES = "INSERT INTO \"pedido_producto\" (\"Pedido_idPedido\", \"Producto_idProducto\", \"cantidad\", \"subtotal\") VALUES (?,?,?,?)";
+    private static final String H2_UPDATE = "UPDATE \"pedido\" SET \"fechaPedido\" = ?, \"fechaEntrega\" = ?, \"total\" = ?, \"estado\" = ?, \"telefonoUsuario\" = ? WHERE \"idPedido\" = ?";
+    private static final String H2_DELETE_DETALLES = "DELETE FROM \"pedido_producto\" WHERE \"Pedido_idPedido\" = ?";
+    private static final String H2_DELETE = "DELETE FROM \"pedido\" WHERE \"idPedido\" = ?";
+    private static final String H2_FIND_ALL = "SELECT * FROM \"pedido\"";
+    private static final String H2_FIND_BY_PK = "SELECT * FROM \"pedido\" WHERE \"idPedido\" = ?";
+    private static final String H2_FIND_BY_USER = "SELECT * FROM \"pedido\" WHERE \"telefonoUsuario\" = ?";
+    private static final String H2_FIND_DETAILS = "SELECT * FROM \"pedido_producto\" WHERE \"Pedido_idPedido\" = ?";
+    private static final String H2_FIND_STATS_MONTH = "SELECT MONTH(PARSEDATETIME(\"fechaPedido\", 'dd/MM/yyyy')) AS \"mes\", COUNT(\"idPedido\") AS \"cantidadPedidos\" FROM \"pedido\" GROUP BY \"mes\" ORDER BY \"mes\"";
 
     private Connection con;
+    private boolean sql;
 
     /**
      * Constructor that initializes the connection to the database.
      */
-    public pedidoDAO() {con = MySQLConnection.getConnection();}
+    public pedidoDAO() {
+        con = WelcomeController.mainCon;
+        sql = WelcomeController.isSQL;
+    }
 
     /**
      * Saves a Pedido (order) entity to the database.
@@ -61,7 +77,13 @@ public class pedidoDAO implements DAO<Pedido>{
      * @param entity The Pedido object to be inserted.
      */
     public void insertPedido(Pedido entity) {
-        try (PreparedStatement ps = con.prepareStatement(INSERT)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_INSERT);
+            } else {
+                ps = con.prepareStatement(H2_INSERT);
+            }
             ps.setInt(1, entity.getIdPedido());
             ps.setString(2, entity.getFechaPedido());
             ps.setString(3, entity.getFechaEntrega());
@@ -72,12 +94,20 @@ public class pedidoDAO implements DAO<Pedido>{
             List<Detalles> detaller = entity.getDetalles();
             if (detaller != null && detaller.size() > 0) {
                 for (Detalles de : detaller) {
-                    try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
+                    try {
+                        PreparedStatement ps2;
+                        if (sql) {
+                            ps2 = con.prepareStatement(SQL_INSERT_DETALLES);
+                        } else {
+                            ps2 = con.prepareStatement(H2_INSERT_DETALLES);
+                        }
                         ps2.setInt(1, entity.getIdPedido());
                         ps2.setInt(2, de.getPro().getIdProducto());
                         ps2.setInt(3, de.getCantidad());
                         ps2.setDouble(4, de.getSubtotal());
                         ps2.executeUpdate();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -93,7 +123,13 @@ public class pedidoDAO implements DAO<Pedido>{
      * @param entity The Pedido object to be updated.
      */
     public void updatePedido(Pedido entity) {
-        try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_UPDATE);
+            } else {
+                ps = con.prepareStatement(H2_UPDATE);
+            }
             ps.setString(1, entity.getFechaPedido());
             ps.setString(2, entity.getFechaEntrega());
             ps.setDouble(3, entity.getTotal());
@@ -105,20 +141,36 @@ public class pedidoDAO implements DAO<Pedido>{
 
             List<Detalles> detaller = entity.getDetalles();
             if (detaller != null && detaller.size() > 0) {
-                try (PreparedStatement ps3 = con.prepareStatement(DELETE_DETALLES)) {
+                try {
+                    PreparedStatement ps3;
+                    if (sql) {
+                        ps3 = con.prepareStatement(SQL_DELETE_DETALLES);
+                    } else {
+                        ps3 = con.prepareStatement(H2_DELETE_DETALLES);
+                    }
                     ps3.setInt(1, entity.getIdPedido());
                     ps3.executeUpdate();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
                 for (Detalles de : detaller) {
                     int productoId = de.getPro().getIdProducto();
 
                     if (productoDAO.build().findByPK(new Producto(productoId)) != null) {
-                        try (PreparedStatement ps2 = con.prepareStatement(INSERT_DETALLES)) {
+                        try {
+                            PreparedStatement ps2;
+                            if (sql) {
+                                ps2 = con.prepareStatement(SQL_INSERT_DETALLES);
+                            } else {
+                                ps2 = con.prepareStatement(H2_INSERT_DETALLES);
+                            }
                             ps2.setInt(1, entity.getIdPedido());
                             ps2.setInt(2, productoId);
                             ps2.setInt(3, de.getCantidad());
                             ps2.setDouble(4, de.getSubtotal());
                             ps2.executeUpdate();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
                         }
                     } else {
                         Alerta.showAlert("ERROR", "Producto no encontrado", "El producto que intentas insertar no se ha encontrado en la base de datos");
@@ -140,7 +192,13 @@ public class pedidoDAO implements DAO<Pedido>{
     @Override
     public Pedido findByPK(Pedido pk) {
         Pedido pedido = null;
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_PK);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_PK);
+            }
             ps.setInt(1, pk.getIdPedido());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -154,7 +212,13 @@ public class pedidoDAO implements DAO<Pedido>{
                     p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
                     p.setDetalles(new ArrayList<>());
 
-                    try (PreparedStatement ps2 = con.prepareStatement(FIND_DETAILS)) {
+                    try {
+                        PreparedStatement ps2;
+                        if (sql) {
+                            ps2 = con.prepareStatement(SQL_FIND_DETAILS);
+                        } else {
+                            ps2 = con.prepareStatement(H2_FIND_DETAILS);
+                        }
                         List<Detalles> detallesList = new ArrayList<>();
                         ps2.setInt(1, p.getIdPedido());
                         try (ResultSet rs2 = ps2.executeQuery()) {
@@ -169,6 +233,8 @@ public class pedidoDAO implements DAO<Pedido>{
                             }
                         }
                         p.setDetalles(detallesList);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                     pedido = p;
                 }
@@ -187,7 +253,13 @@ public class pedidoDAO implements DAO<Pedido>{
     @Override
     public List<Pedido> findAll() {
         List<Pedido> allLS = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)){
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_ALL);
+            } else {
+                ps = con.prepareStatement(H2_FIND_ALL);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int idPedido = rs.getInt("idPedido");
@@ -200,7 +272,13 @@ public class pedidoDAO implements DAO<Pedido>{
                     p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
                     p.setDetalles(new ArrayList<>());
 
-                    try (PreparedStatement ps2 = con.prepareStatement(FIND_DETAILS)) {
+                    try {
+                        PreparedStatement ps2;
+                        if (sql) {
+                            ps2 = con.prepareStatement(SQL_FIND_DETAILS);
+                        } else {
+                            ps2 = con.prepareStatement(H2_FIND_DETAILS);
+                        }
                         List<Detalles> detallesList = new ArrayList<>();
                         ps2.setInt(1, p.getIdPedido());
                         try (ResultSet rs2 = ps2.executeQuery()) {
@@ -215,6 +293,8 @@ public class pedidoDAO implements DAO<Pedido>{
                             }
                         }
                         p.setDetalles(detallesList);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                     allLS.add(p);
                 }
@@ -233,7 +313,13 @@ public class pedidoDAO implements DAO<Pedido>{
      */
     public List<Pedido> findByUser(User u) {
         List<Pedido> byUserLS = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_USER)){
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_USER);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_USER);
+            }
             ps.setString(1, u.getPhone());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -247,7 +333,13 @@ public class pedidoDAO implements DAO<Pedido>{
                     p.setUser(userDAO.build().findByPK(new User(rs.getString("telefonoUsuario"))));
                     p.setDetalles(new ArrayList<>());
 
-                    try (PreparedStatement ps2 = con.prepareStatement(FIND_DETAILS)) {
+                    try {
+                        PreparedStatement ps2;
+                        if (sql) {
+                            ps2 = con.prepareStatement(SQL_FIND_DETAILS);
+                        } else {
+                            ps2 = con.prepareStatement(H2_FIND_DETAILS);
+                        }
                         List<Detalles> detallesList = new ArrayList<>();
                         ps2.setInt(1, p.getIdPedido());
                         try (ResultSet rs2 = ps2.executeQuery()) {
@@ -262,6 +354,8 @@ public class pedidoDAO implements DAO<Pedido>{
                             }
                         }
                         p.setDetalles(detallesList);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                     byUserLS.add(p);
                 }
@@ -282,7 +376,13 @@ public class pedidoDAO implements DAO<Pedido>{
     @Override
     public Pedido delete(Pedido entity) throws SQLException {
         if (entity != null) {
-            try (PreparedStatement pst = con.prepareStatement(DELETE)) {
+            try {
+                PreparedStatement pst;
+                if (sql) {
+                    pst = con.prepareStatement(SQL_DELETE);
+                } else {
+                    pst = con.prepareStatement(H2_DELETE);
+                }
                 pst.setString(1, String.valueOf(entity.getIdPedido()));
                 pst.executeUpdate();
             } catch (SQLException e) {
@@ -330,7 +430,14 @@ public class pedidoDAO implements DAO<Pedido>{
      */
     public Map<String, Integer> FindStatsMonth() {
         Map<String, Integer> result = new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_STATS_MONTH)) {
+
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_STATS_MONTH);
+            } else {
+                ps = con.prepareStatement(H2_FIND_STATS_MONTH);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String month = rs.getString("mes");
@@ -384,10 +491,8 @@ public class pedidoDAO implements DAO<Pedido>{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
         return result;
     }
-
-
-
 
 }
