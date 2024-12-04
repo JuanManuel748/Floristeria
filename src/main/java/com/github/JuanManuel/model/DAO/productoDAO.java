@@ -3,6 +3,7 @@ package com.github.JuanManuel.model.DAO;
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.Producto;
 import com.github.JuanManuel.view.Alerta;
+import com.github.JuanManuel.view.WelcomeController;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -13,21 +14,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class productoDAO  implements DAO<Producto>{
-    private static final String INSERT = "INSERT INTO Producto (idProducto, nombre, precio, stock, tipo, description, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE = "UPDATE Producto SET nombre = ?, precio = ?, stock = ?, tipo = ?, description = ?, imagen = ? WHERE idProducto = ?";
-    private static final String DELETE = "DELETE FROM Producto WHERE idProducto = ?";
-    private static final String FIND_ALL = "SELECT * FROM Producto";
-    private static final String FIND_BY_PK = "SELECT * FROM Producto WHERE idProducto = ?";
-    private static final String FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?";
-    private static final String FIND_COMP_BY_NAME = "SELECT * FROM Producto WHERE LOWER(nombre) LIKE ? AND (tipo = ? OR tipo = ?)";
-    private static final String FIND_GROUPBY = "SELECT p.*, SUM(pp.cantidad) AS cantidadVendida FROM Producto p JOIN Pedido_Producto pp ON p.idProducto = pp.Producto_idProducto WHERE p.tipo = ? GROUP BY p.nombre HAVING cantidadVendida >= ?";
+    private static final String SQL_INSERT = "INSERT INTO producto (idProducto, nombre, precio, stock, tipo, description, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_UPDATE = "UPDATE producto SET nombre = ?, precio = ?, stock = ?, tipo = ?, description = ?, imagen = ? WHERE idProducto = ?";
+    private static final String SQL_DELETE = "DELETE FROM producto WHERE idProducto = ?";
+    private static final String SQL_FIND_ALL = "SELECT * FROM producto";
+    private static final String SQL_FIND_BY_PK = "SELECT * FROM producto WHERE idProducto = ?";
+    private static final String SQL_FIND_BY_TYPE = "SELECT * FROM producto WHERE tipo = ?";
+    private static final String SQL_FIND_COMP_BY_NAME = "SELECT * FROM producto WHERE LOWER(nombre) LIKE ? AND (tipo = ? OR tipo = ?)";
+    private static final String SQL_FIND_GROUPBY = "SELECT p.*, SUM(pp.cantidad) AS cantidadVendida FROM producto p JOIN Pedido_Producto pp ON p.idProducto = pp.Producto_idProducto WHERE p.tipo = ? GROUP BY p.nombre HAVING cantidadVendida >= ?";
+    // ===============
+    private static final String H2_INSERT = "INSERT INTO \"producto\" (\"idProducto\", \"nombre\", \"precio\", \"stock\", \"tipo\", \"description\", \"imagen\") VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String H2_UPDATE = "UPDATE \"producto\" SET \"nombre\" = ?, \"precio\" = ?, \"stock\" = ?, \"tipo\" = ?, \"description\" = ?, \"imagen\" = ? WHERE \"idProducto\" = ?";
+    private static final String H2_DELETE = "DELETE FROM \"producto\" WHERE \"idProducto\" = ?";
+    private static final String H2_FIND_ALL = "SELECT * FROM \"producto\"";
+    private static final String H2_FIND_BY_PK = "SELECT * FROM \"producto\" WHERE \"idProducto\" = ?";
+    private static final String H2_FIND_BY_TYPE = "SELECT * FROM \"producto\" WHERE \"tipo\" = ?";
+    private static final String H2_FIND_COMP_BY_NAME = "SELECT * FROM \"producto\" WHERE LOWER(\"nombre\") LIKE ? AND (\"tipo\" = ? OR \"tipo\" = ?)";
+    private static final String H2_FIND_GROUPBY = "SELECT p.*, SUM(pp.\"cantidad\") AS \"cantidadVendida\" FROM \"producto\" p JOIN \"Pedido_Producto\" pp ON p.\"idProducto\" = pp.\"Producto_idProducto\" WHERE p.\"tipo\" = ? GROUP BY p.\"nombre\" HAVING \"cantidadVendida\" >= ?";
 
     private Connection con;
+    private boolean sql;
 
     /**
      * Constructor that initializes the connection to the database.
      */
-    public productoDAO() { con = MySQLConnection.getConnection();}
+    public productoDAO() {
+        con = WelcomeController.mainCon;
+        sql = WelcomeController.isSQL;
+    }
 
     /**
      * Saves a Producto entity to the database. If the product exists, it is updated, otherwise it is inserted.
@@ -54,7 +68,13 @@ public class productoDAO  implements DAO<Producto>{
      * @param entity The Producto entity to be inserted.
      */
     public void insertProducto(Producto entity){
-        try (PreparedStatement ps = con.prepareStatement(INSERT)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_INSERT);
+            } else {
+                ps = con.prepareStatement(H2_INSERT);
+            }
             ps.setInt(1, entity.getIdProducto());
             ps.setString(2, entity.getNombre());
             ps.setDouble(3, entity.getPrecio());
@@ -74,7 +94,13 @@ public class productoDAO  implements DAO<Producto>{
      * @param entity The Producto entity to be updated.
      */
     public void updateProducto(Producto entity){
-        try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_UPDATE);
+            } else {
+                ps = con.prepareStatement(H2_UPDATE);
+            }
             ps.setString(1, entity.getNombre());
             ps.setDouble(2, entity.getPrecio());
             ps.setInt(3, entity.getStock());
@@ -97,7 +123,13 @@ public class productoDAO  implements DAO<Producto>{
     @Override
     public Producto findByPK(Producto pk) {
         Producto result = null;
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_PK);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_PK);
+            }
             ps.setInt(1, pk.getIdProducto());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -126,7 +158,13 @@ public class productoDAO  implements DAO<Producto>{
     @Override
     public List<Producto> findAll() {
         List <Producto> result = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_ALL);
+            } else {
+                ps = con.prepareStatement(H2_FIND_ALL);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     Producto p = new Producto();
@@ -154,8 +192,13 @@ public class productoDAO  implements DAO<Producto>{
      */
     public List<Producto> findByType(String type) {
         List<Producto> result = new ArrayList<>();
-        //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_TYPE);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_TYPE);
+            }
             ps.setString(1, type);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -185,8 +228,13 @@ public class productoDAO  implements DAO<Producto>{
      */
     public List<Producto> findGroupBy(int quantity, String type) {
         List<Producto> result = new ArrayList<>();
-        //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
-        try (PreparedStatement ps = con.prepareStatement(FIND_GROUPBY)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_GROUPBY);
+            } else {
+                ps = con.prepareStatement(H2_FIND_GROUPBY);
+            }
             ps.setString(1, type);
             ps.setInt(2, quantity);
             try (ResultSet rs = ps.executeQuery()) {
@@ -220,8 +268,13 @@ public class productoDAO  implements DAO<Producto>{
      */
     public List<Producto> findByComplName(String name, String tipo1, String tipo2) {
         List<Producto> result = new ArrayList<>();
-        //FIND_BY_TYPE = "SELECT * FROM Producto WHERE tipo = ?"
-        try (PreparedStatement ps = con.prepareStatement(FIND_COMP_BY_NAME)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_COMP_BY_NAME);
+            } else {
+                ps = con.prepareStatement(H2_FIND_COMP_BY_NAME);
+            }
             ps.setString(1, "%" + name.toLowerCase() + "%");
             ps.setString(2, tipo1);
             ps.setString(3, tipo2);
@@ -254,9 +307,15 @@ public class productoDAO  implements DAO<Producto>{
     @Override
     public Producto delete(Producto entity) throws SQLException {
         if (entity != null) {
-            try (PreparedStatement pst = con.prepareStatement(DELETE)) {
-                pst.setInt(1, entity.getIdProducto());
-                pst.executeUpdate();
+            try {
+                PreparedStatement ps;
+                if (sql) {
+                    ps = con.prepareStatement(SQL_DELETE);
+                } else {
+                    ps = con.prepareStatement(H2_DELETE);
+                }
+                ps.setInt(1, entity.getIdProducto());
+                ps.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
                 entity = null;

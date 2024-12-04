@@ -5,6 +5,7 @@ module com.github.JuanManuel {
     requires java.desktop;
     requires com.h2database;
 
+
     opens com.github.JuanManuel.view to javafx.fxml;
     opens com.github.JuanManuel.view.admin to javafx.fxml;
     opens com.github.JuanManuel to javafx.fxml;

@@ -3,6 +3,7 @@ package com.github.JuanManuel.model.DAO;
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.Flor;
 import com.github.JuanManuel.model.entity.Producto;
+import com.github.JuanManuel.view.WelcomeController;
 import org.h2.util.json.JSONItemType;
 
 import java.io.IOException;
@@ -11,20 +12,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class florDAO implements DAO<Flor>{
-    private static final String INSERT = "INSERT INTO Flor (idFlor, color, tipo) VALUES  (?,?,?)";
-    private static final String UPDATE = "UPDATE Flor SET color = ?, tipo = ? WHERE idFlor = ?";
-    private static final String DELETE = "DELETE FROM Flor WHERE idFlor = ?";
-    private static final String FIND_ALL = "SELECT * FROM Flor";
-    private static final String FIND_BY_PK = "SELECT * FROM Flor WHERE idFlor = ?";
-    private static final String FIND_BY_TYPE = "SELECT * FROM Flor WHERE tipo = ?";
-    private static final String FIND_BY_NAME = "SELECT f.*, p.* FROM Flor f JOIN Producto p ON p.idProducto = f.idFlor WHERE LOWER(p.nombre) LIKE ?";
+    private static final String SQL_INSERT = "INSERT INTO flor (idFlor, color, tipo) VALUES  (?,?,?)";
+    private static final String SQL_UPDATE = "UPDATE flor SET color = ?, tipo = ? WHERE idFlor = ?";
+    private static final String SQL_DELETE = "DELETE FROM flor WHERE idFlor = ?";
+    private static final String SQL_FIND_ALL = "SELECT * FROM flor";
+    private static final String SQL_FIND_BY_PK = "SELECT * FROM flor WHERE idFlor = ?";
+    private static final String SQL_FIND_BY_TYPE = "SELECT * FROM flor WHERE tipo = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT f.*, p.* FROM flor f JOIN producto p ON p.idProducto = f.idFlor WHERE LOWER(p.nombre) LIKE ?";
+    // ==============
+    private static final String H2_INSERT = "INSERT INTO \"flor\" (\"idFlor\", \"color\", \"tipo\") VALUES  (?,?,?)";
+    private static final String H2_UPDATE = "UPDATE \"flor\" SET \"color\" = ?, \"tipo\" = ? WHERE \"idFlor\" = ?";
+    private static final String H2_DELETE = "DELETE FROM \"flor\" WHERE \"idFlor\" = ?";
+    private static final String H2_FIND_ALL = "SELECT * FROM \"flor\"";
+    private static final String H2_FIND_BY_PK = "SELECT * FROM \"flor\" WHERE \"idFlor\" = ?";
+    private static final String H2_FIND_BY_TYPE = "SELECT * FROM \"flor\" WHERE \"tipo\" = ?";
+    private static final String H2_FIND_BY_NAME = "SELECT f.*, p.* FROM \"flor\" f JOIN \"producto\" p ON p.\"idProducto\" = f.\"idFlor\" WHERE LOWER(p.\"nombre\") LIKE ?";
 
 
     private Connection con;
+    private boolean sql;
+
     /**
      * Constructor that initializes the database connection.
      */
-    public florDAO() {con = MySQLConnection.getConnection();}
+    public florDAO() {
+        con = WelcomeController.mainCon;
+        sql = WelcomeController.isSQL;
+    }
 
     /**
      * Saves a Flor entity. Inserts it if it does not exist; updates it otherwise.
@@ -51,9 +65,14 @@ public class florDAO implements DAO<Flor>{
      * @param entity the Flor entity to insert
      */
     public void insertFlor(Flor entity) {
-
         productoDAO.build().insertProducto(entity);
-        try (PreparedStatement ps = con.prepareStatement(INSERT)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_INSERT);
+            } else {
+                ps = con.prepareStatement(H2_INSERT);
+            }
             ps.setInt(1, entity.getIdFlor());
             ps.setString(2, entity.getColor());
             ps.setBoolean(3, entity.getTipoFlor());
@@ -70,7 +89,13 @@ public class florDAO implements DAO<Flor>{
      */
     public void updateFlor(Flor entity) {
         productoDAO.build().updateProducto(entity);
-        try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_UPDATE);
+            } else {
+                ps = con.prepareStatement(H2_UPDATE);
+            }
             ps.setString(1, entity.getColor());
             ps.setBoolean(2, entity.getTipoFlor());
             ps.setInt(3, entity.getIdFlor());
@@ -90,7 +115,13 @@ public class florDAO implements DAO<Flor>{
     @Override
     public Flor delete(Flor entity) throws SQLException {
         if (entity != null) {
-            try (PreparedStatement ps = con.prepareStatement(DELETE)) {
+            try {
+                PreparedStatement ps;
+                if (sql) {
+                    ps = con.prepareStatement(SQL_DELETE);
+                } else {
+                    ps = con.prepareStatement(H2_DELETE);
+                }
                 ps.setInt(1, entity.getIdProducto());
                 ps.executeUpdate();
                 productoDAO.build().delete(entity);
@@ -112,7 +143,13 @@ public class florDAO implements DAO<Flor>{
     public Flor findByPK(Flor pk) {
         Producto pro = productoDAO.build().findByPK(pk);
         Flor result = null;
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_PK);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_PK);
+            }
             ps.setInt(1, pk.getIdProducto());
             try (ResultSet rs = ps.executeQuery()) {
                 if(rs.next()) {
@@ -146,7 +183,13 @@ public class florDAO implements DAO<Flor>{
     @Override
     public List<Flor> findAll() {
         List<Flor> result = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_ALL);
+            } else {
+                ps = con.prepareStatement(H2_FIND_ALL);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     Flor f = new Flor();
@@ -180,7 +223,13 @@ public class florDAO implements DAO<Flor>{
      */
     public List<Flor> findByType(boolean tipo) {
         List<Flor> result = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_TYPE);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_TYPE);
+            }
             ps.setBoolean(1, tipo);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
@@ -215,7 +264,13 @@ public class florDAO implements DAO<Flor>{
      */
     public List<Flor> findByName(String name) {
         List<Flor> result = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_NAME);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_NAME);
+            }
             ps.setString(1, "%" + name.toLowerCase() + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {

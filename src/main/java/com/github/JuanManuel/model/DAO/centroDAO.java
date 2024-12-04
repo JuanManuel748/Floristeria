@@ -2,6 +2,7 @@ package com.github.JuanManuel.model.DAO;
 
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.*;
+import com.github.JuanManuel.view.WelcomeController;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -14,25 +15,41 @@ import java.util.List;
 import java.util.Map;
 
 public class centroDAO implements DAO<Centro>{
-    private static final String INSERT = "INSERT INTO Centro (idCentro, florPrincipal, tamaño, frase) VALUES  (?,?,?,?)";
-    private static final String INSERT_FLORES = "INSERT INTO CentroFlores (Centro_idCentro, Flor_idFlor) VALUES (?,?)";
-    private static final String UPDATE = "UPDATE Centro SET florPrincipal = ?, tamaño = ?, frase = ? WHERE idCentro = ?";
-    private static final String UPDATE_FLORES = "UPDATE CentroFlores SET Flor_idFlor = ? WHERE Centro_idCentro = ?";
-    private static final String DELETE = "DELETE FROM Centro WHERE idCentro = ?";
-    private static final String DELETE_FLORES = "DELETE FROM CentroFlores WHERE Centro_idCentro = ?";
-    private static final String FIND_ALL = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor";
-    private static final String FIND_BY_PK = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor WHERE c.idCentro = ?";
-    private static final String FIND_BY_NAME = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.nombre) LIKE ? AND LOWER(p.description) LIKE ?";
-    private static final String FIND_BY_RANGE = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE p.precio >= ? AND p.precio <= ? AND LOWER(p.description) LIKE ?";
-    private static final String FIND_BY_NAMES = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.nombre) LIKE ?";
-    private static final String FIND_BY_TYPE = "SELECT c.*, cf.*, f.* FROM Centro c JOIN CentroFlores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.description) LIKE ?";
+    private static final String SQL_INSERT = "INSERT INTO centro (idCentro, florPrincipal, tamaño, frase) VALUES  (?,?,?,?)";
+    private static final String SQL_INSERT_FLORES = "INSERT INTO centroflores (Centro_idCentro, Flor_idFlor) VALUES (?,?)";
+    private static final String SQL_UPDATE = "UPDATE centro SET florPrincipal = ?, tamaño = ?, frase = ? WHERE idCentro = ?";
+    private static final String SQL_DELETE = "DELETE FROM centro WHERE idCentro = ?";
+    private static final String SQL_DELETE_FLORES = "DELETE FROM centroflores WHERE Centro_idCentro = ?";
+    private static final String SQL_FIND_ALL = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor";
+    private static final String SQL_FIND_BY_PK = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor WHERE c.idCentro = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.nombre) LIKE ? AND LOWER(p.description) LIKE ?";
+    private static final String SQL_FIND_BY_RANGE = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE p.precio >= ? AND p.precio <= ? AND LOWER(p.description) LIKE ?";
+    private static final String SQL_FIND_BY_NAMES = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.nombre) LIKE ?";
+    private static final String SQL_FIND_BY_TYPE = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.description) LIKE ?";
+    // ============
+    private static final String H2_INSERT = "INSERT INTO \"centro\" (\"idCentro\", \"florPrincipal\", \"tamaño\", \"frase\") VALUES  (?,?,?,?)";
+    private static final String H2_INSERT_FLORES = "INSERT INTO \"centroflores\" (\"Centro_idCentro\", \"Flor_idFlor\") VALUES (?,?)";
+    private static final String H2_UPDATE = "UPDATE \"centro\" SET \"florPrincipal\" = ?, \"tamaño\" = ?, \"frase\" = ? WHERE \"idCentro\" = ?";
+    private static final String H2_DELETE = "DELETE FROM \"centro\" WHERE \"idCentro\" = ?";
+    private static final String H2_DELETE_FLORES = "DELETE FROM \"centroflores\" WHERE \"Centro_idCentro\" = ?";
+    private static final String H2_FIND_ALL = "SELECT c.*, cf.*, f.* FROM \"centro\" c JOIN \"centroflores\" cf ON c.\"idCentro\" = cf.\"Centro_idCentro\" JOIN \"flor\" f ON cf.\"Flor_idFlor\" = f.\"idFlor\"";
+    private static final String H2_FIND_BY_PK = "SELECT c.*, cf.*, f.* FROM \"centro\" c JOIN \"centroflores\" cf ON c.\"idCentro\" = cf.\"Centro_idCentro\" JOIN \"flor\" f ON cf.\"Flor_idFlor\" = f.\"idFlor\" WHERE c.\"idCentro\" = ?";
+    private static final String H2_FIND_BY_NAME = "SELECT c.*, cf.*, f.* FROM \"centro\" c JOIN \"centroflores\" cf ON c.\"idCentro\" = cf.\"Centro_idCentro\" JOIN \"flor\" f ON cf.\"Flor_idFlor\" = f.\"idFlor\" JOIN \"producto\" p ON c.\"idCentro\" = p.\"idProducto\" WHERE LOWER(p.\"nombre\") LIKE ? AND LOWER(p.\"description\") LIKE ?";
+    private static final String H2_FIND_BY_RANGE = "SELECT c.*, cf.*, f.* FROM \"centro\" c JOIN \"centroflores\" cf ON c.\"idCentro\" = cf.\"Centro_idCentro\" JOIN \"flor\" f ON cf.\"Flor_idFlor\" = f.\"idFlor\" JOIN \"producto\" p ON c.\"idCentro\" = p.\"idProducto\" WHERE p.\"precio\" >= ? AND p.\"precio\" <= ? AND LOWER(p.\"description\") LIKE ?";
+    private static final String H2_FIND_BY_NAMES = "SELECT c.*, cf.*, f.* FROM \"centro\" c JOIN \"centroflores\" cf ON c.\"idCentro\" = cf.\"Centro_idCentro\" JOIN \"flor\" f ON cf.\"Flor_idFlor\" = f.\"idFlor\" JOIN \"producto\" p ON c.\"idCentro\" = p.\"idProducto\" WHERE LOWER(p.\"nombre\") LIKE ?";
+    private static final String H2_FIND_BY_TYPE = "SELECT c.*, cf.*, f.* FROM \"centro\" c JOIN \"centroflores\" cf ON c.\"idCentro\" = cf.\"Centro_idCentro\" JOIN \"flor\" f ON cf.\"Flor_idFlor\" = f.\"idFlor\" JOIN \"producto\" p ON c.\"idCentro\" = p.\"idProducto\" WHERE LOWER(p.\"description\") LIKE ?";
+
 
     private Connection con;
+    private boolean sql;
 
     /**
      * Constructs a new `centroDAO` instance and initializes the database connection.
      */
-    public centroDAO() {con = MySQLConnection.getConnection();}
+    public centroDAO() {
+        con = WelcomeController.mainCon;
+        sql = WelcomeController.isSQL;
+    }
 
     /**
      * Saves a `Centro` entity to the database.
@@ -61,7 +78,13 @@ public class centroDAO implements DAO<Centro>{
      */
     public void insertCentro(Centro entity) {
         productoDAO.build().insertProducto(entity);
-        try (PreparedStatement ps = con.prepareStatement(INSERT)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_INSERT);
+            } else {
+                ps = con.prepareStatement(H2_INSERT);
+            }
             ps.setInt(1, entity.getIdCentro());
             ps.setInt(2, entity.getFlorPr().getIdFlor());
             ps.setString(3, entity.getSize());
@@ -69,10 +92,18 @@ public class centroDAO implements DAO<Centro>{
             ps.executeUpdate();
             List<Flor> flores = entity.getFloresSecun();
             for (Flor f : flores) {
-                try (PreparedStatement ps2 = con.prepareStatement(INSERT_FLORES)) {
+                try {
+                    PreparedStatement ps2;
+                    if (sql) {
+                        ps2 = con.prepareStatement(SQL_INSERT_FLORES);
+                    } else {
+                        ps2 = con.prepareStatement(H2_INSERT_FLORES);
+                    }
                     ps2.setInt(1, entity.getIdCentro());
                     ps2.setInt(2, f.getIdFlor());
                     ps2.executeUpdate();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
         } catch (SQLException e) {
@@ -87,23 +118,43 @@ public class centroDAO implements DAO<Centro>{
      */
     public void updateCentro(Centro entity) {
         productoDAO.build().updateProducto(entity);
-        try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_UPDATE);
+            } else {
+                ps = con.prepareStatement(H2_UPDATE);
+            }
             ps.setInt(1, entity.getFlorPr().getIdFlor());
             ps.setString(2, entity.getSize());
             ps.setString(3, entity.getFrase());
             ps.setInt(4, entity.getIdCentro());
             ps.executeUpdate();
 
-            PreparedStatement ps3 = con.prepareStatement(DELETE_FLORES);
+
+                PreparedStatement ps3;
+                if (sql) {
+                    ps3 = con.prepareStatement(SQL_DELETE_FLORES);
+                } else {
+                    ps3 = con.prepareStatement(H2_DELETE_FLORES);
+                }
             ps3.setInt(1, entity.getIdCentro());
             ps3.executeUpdate();
 
             List<Flor> flores = entity.getFloresSecun();
             for (Flor f : flores) {
-                try (PreparedStatement ps2 = con.prepareStatement(INSERT_FLORES)) {
+                try {
+                    PreparedStatement ps2;
+                    if (sql) {
+                        ps2 = con.prepareStatement(SQL_INSERT_FLORES);
+                    } else {
+                        ps2 = con.prepareStatement(H2_INSERT_FLORES);
+                    }
                     ps2.setInt(1, entity.getIdCentro());
                     ps2.setInt(2, f.getIdFlor());
                     ps2.executeUpdate();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
         } catch (SQLException e) {
@@ -121,7 +172,13 @@ public class centroDAO implements DAO<Centro>{
     @Override
     public Centro delete(Centro entity) throws SQLException {
         if (entity != null) {
-            try (PreparedStatement ps = con.prepareStatement(DELETE)) {
+            try {
+                PreparedStatement ps;
+                if (sql) {
+                    ps = con.prepareStatement(SQL_DELETE);
+                } else {
+                    ps = con.prepareStatement(H2_DELETE);
+                }
                 ps.setInt(1, entity.getIdCentro());
                 ps.executeUpdate();
                 productoDAO.build().delete(entity);
@@ -143,7 +200,13 @@ public class centroDAO implements DAO<Centro>{
     public Centro findByPK(Centro pk) {
         Centro result = null;
         List<Flor> flores = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PK)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_PK);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_PK);
+            }
             ps.setInt(1, pk.getIdCentro());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -158,13 +221,13 @@ public class centroDAO implements DAO<Centro>{
                     c.setDescripcion(pro.getDescripcion());
                     c.setImg(pro.getImg());
                     // Atributos centro
-                    c.setIdCentro(rs.getInt("c.idCentro"));
-                    c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("c.florPrincipal"))));
-                    c.setSize(rs.getString("c.tamaño"));
-                    c.setFrase(rs.getString("c.frase"));
+                    c.setIdCentro(rs.getInt("idCentro"));
+                    c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("florPrincipal"))));
+                    c.setSize(rs.getString("tamaño"));
+                    c.setFrase(rs.getString("frase"));
 
                     // Atributos de las flores del array
-                    Flor f = florDAO.build().findByPK(new Flor(rs.getInt("f.idFlor")));
+                    Flor f = florDAO.build().findByPK(new Flor(rs.getInt("idFlor")));
                     flores.add(f);
 
                     c.setFloresSecun(flores);
@@ -186,10 +249,16 @@ public class centroDAO implements DAO<Centro>{
     public List<Centro> findAll() {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_ALL);
+            } else {
+                ps = con.prepareStatement(H2_FIND_ALL);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idCentro = rs.getInt("c.idCentro");
+                    int idCentro = rs.getInt("idCentro");
                     Centro c = centrosMap.get(idCentro);
 
                     if (c == null) {
@@ -205,14 +274,14 @@ public class centroDAO implements DAO<Centro>{
                         c.setImg(pro.getImg());
                         // Atributos del Centro
                         c.setIdCentro(idCentro);
-                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("c.florPrincipal"))));
-                        c.setSize(rs.getString("c.tamaño"));
-                        c.setFrase(rs.getString("c.frase"));
+                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("florPrincipal"))));
+                        c.setSize(rs.getString("tamaño"));
+                        c.setFrase(rs.getString("frase"));
 
                         c.setFloresSecun(new ArrayList<>());
                         centrosMap.put(idCentro, c);
                     }
-                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("cf.Flor_idFlor")));
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("Flor_idFlor")));
                     c.getFloresSecun().add(florSecundaria);
                 }
             }
@@ -233,12 +302,18 @@ public class centroDAO implements DAO<Centro>{
     public List<Centro> findByName(String name) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_NAME);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_NAME);
+            }
             ps.setString(1, "%" + name.toLowerCase() + "%");
             ps.setString(2, "%prehecho%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idCentro = rs.getInt("c.idCentro");
+                    int idCentro = rs.getInt("idCentro");
                     Centro c = centrosMap.get(idCentro);
 
                     if (c == null) {
@@ -254,14 +329,14 @@ public class centroDAO implements DAO<Centro>{
                         c.setImg(pro.getImg());
                         // Atributos del centro
                         c.setIdCentro(idCentro);
-                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("c.florPrincipal"))));
-                        c.setSize(rs.getString("c.tamaño"));
-                        c.setFrase(rs.getString("c.frase"));
+                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("florPrincipal"))));
+                        c.setSize(rs.getString("tamaño"));
+                        c.setFrase(rs.getString("frase"));
 
                         c.setFloresSecun(new ArrayList<>());
                         centrosMap.put(idCentro, c);
                     }
-                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("cf.Flor_idFlor")));
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("Flor_idFlor")));
                     c.getFloresSecun().add(florSecundaria);
                 }
             }
@@ -281,11 +356,17 @@ public class centroDAO implements DAO<Centro>{
     public List<Centro> findByNames(String name) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAMES)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_NAMES);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_NAMES);
+            }
             ps.setString(1, "%" + name.toLowerCase() + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idCentro = rs.getInt("c.idCentro");
+                    int idCentro = rs.getInt("idCentro");
                     Centro c = centrosMap.get(idCentro);
 
                     if (c == null) {
@@ -301,14 +382,14 @@ public class centroDAO implements DAO<Centro>{
                         c.setImg(pro.getImg());
                         // Atributos del centro
                         c.setIdCentro(idCentro);
-                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("c.florPrincipal"))));
-                        c.setSize(rs.getString("c.tamaño"));
-                        c.setFrase(rs.getString("c.frase"));
+                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("florPrincipal"))));
+                        c.setSize(rs.getString("tamaño"));
+                        c.setFrase(rs.getString("frase"));
 
                         c.setFloresSecun(new ArrayList<>());
                         centrosMap.put(idCentro, c);
                     }
-                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("cf.Flor_idFlor")));
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("Flor_idFlor")));
                     c.getFloresSecun().add(florSecundaria);
                 }
             }
@@ -330,13 +411,19 @@ public class centroDAO implements DAO<Centro>{
     public List<Centro> findByRange(int min, int max) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_RANGE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_RANGE);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_RANGE);
+            }
             ps.setInt(1, min);
             ps.setInt(2, max);
             ps.setString(3, "%prehecho%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idCentro = rs.getInt("c.idCentro");
+                    int idCentro = rs.getInt("idCentro");
                     Centro c = centrosMap.get(idCentro);
 
                     if (c == null) {
@@ -352,14 +439,14 @@ public class centroDAO implements DAO<Centro>{
                         c.setImg(pro.getImg());
                         // Atributos del centro
                         c.setIdCentro(idCentro);
-                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("c.florPrincipal"))));
-                        c.setSize(rs.getString("c.tamaño"));
-                        c.setFrase(rs.getString("c.frase"));
+                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("florPrincipal"))));
+                        c.setSize(rs.getString("tamaño"));
+                        c.setFrase(rs.getString("frase"));
 
                         c.setFloresSecun(new ArrayList<>());
                         centrosMap.put(idCentro, c);
                     }
-                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("cf.Flor_idFlor")));
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("Flor_idFlor")));
                     c.getFloresSecun().add(florSecundaria);
                 }
             }
@@ -379,7 +466,13 @@ public class centroDAO implements DAO<Centro>{
     public List<Centro> findByType(Boolean prehecho) {
         List<Centro> result = new ArrayList<>();
         Map<Integer, Centro>centrosMap =new HashMap<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_TYPE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_TYPE);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_TYPE);
+            }
             if (prehecho) {
                 ps.setString(1, "%prehecho%");
             } else {
@@ -387,7 +480,7 @@ public class centroDAO implements DAO<Centro>{
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int idCentro = rs.getInt("c.idCentro");
+                    int idCentro = rs.getInt("idCentro");
                     Centro c = centrosMap.get(idCentro);
 
                     if (c == null) {
@@ -403,14 +496,14 @@ public class centroDAO implements DAO<Centro>{
                         c.setImg(pro.getImg());
                         // Atributos del Centro
                         c.setIdCentro(idCentro);
-                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("c.florPrincipal"))));
-                        c.setSize(rs.getString("c.tamaño"));
-                        c.setFrase(rs.getString("c.frase"));
+                        c.setFlorPr(florDAO.build().findByPK(new Flor(rs.getInt("florPrincipal"))));
+                        c.setSize(rs.getString("tamaño"));
+                        c.setFrase(rs.getString("frase"));
 
                         c.setFloresSecun(new ArrayList<>());
                         centrosMap.put(idCentro, c);
                     }
-                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("cf.Flor_idFlor")));
+                    Flor florSecundaria = florDAO.build().findByPK(new Flor(rs.getInt("Flor_idFlor")));
                     c.getFloresSecun().add(florSecundaria);
                 }
             }

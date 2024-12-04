@@ -3,6 +3,7 @@ package com.github.JuanManuel.model.DAO;
 import com.github.JuanManuel.model.connection.MySQLConnection;
 import com.github.JuanManuel.model.entity.User;
 import com.github.JuanManuel.view.Alerta;
+import com.github.JuanManuel.view.WelcomeController;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -13,21 +14,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class userDAO implements DAO<User>{
-    private static final String INSERT = "INSERT INTO Usuario (telefono, nombre, contraseña, isAdmin) VALUES  (?,?,?, ?)";
-    private static final String UPDATE = "UPDATE Usuario SET nombre = ?, contraseña = ?, isAdmin = ? WHERE telefono = ?";
-    private static final String DELETE = "DELETE FROM Usuario WHERE telefono = ?";
-    private static final String FIND_ALL = "SELECT * FROM Usuario";
-    private static final String FIND_BY_PHONE = "SELECT * FROM Usuario WHERE telefono = ?";
-    private static final String FIND_ADMINS = "SELECT * FROM Usuario WHERE isAdmin = ?";
-    private static final String FIND_BY_NAME = "SELECT * FROM Usuario WHERE LOWER(nombre) LIKE ?";
+    private static final String SQL_INSERT = "INSERT INTO usuario (telefono, nombre, contraseña, isAdmin) VALUES  (?,?,?, ?)";
+    private static final String SQL_UPDATE = "UPDATE usuario SET nombre = ?, contraseña = ?, isAdmin = ? WHERE telefono = ?";
+    private static final String SQL_DELETE = "DELETE FROM usuario WHERE telefono = ?";
+    private static final String SQL_FIND_ALL = "SELECT * FROM usuario";
+    private static final String SQL_FIND_BY_PHONE = "SELECT * FROM usuario WHERE telefono = ?";
+    private static final String SQL_FIND_ADMINS = "SELECT * FROM usuario WHERE isAdmin = ?";
+    private static final String SQL_FIND_BY_NAME = "SELECT * FROM usuario WHERE LOWER(nombre) LIKE ?";
+    //==================
+    private static final String H2_INSERT = "INSERT INTO \"usuario\" (\"telefono\", \"nombre\", \"contraseña\", \"isAdmin\") VALUES  (?,?,?, ?)";
+    private static final String H2_UPDATE = "UPDATE \"usuario\" SET \"nombre\" = ?, \"contraseña\" = ?, \"isAdmin\" = ? WHERE \"telefono\" = ?";
+    private static final String H2_DELETE = "DELETE FROM \"usuario\" WHERE \"telefono\" = ?";
+    private static final String H2_FIND_ALL = "SELECT * FROM \"usuario\"";
+    private static final String H2_FIND_BY_PHONE = "SELECT * FROM \"usuario\" WHERE \"telefono\" = ?";
+    private static final String H2_FIND_ADMINS = "SELECT * FROM \"usuario\" WHERE \"isAdmin\" = ?";
+    private static final String H2_FIND_BY_NAME = "SELECT * FROM \"usuario\" WHERE LOWER(\"nombre\") LIKE ?";
 
+    private boolean sql;
     private Connection con;
 
     /**
      * Constructor that initializes the database connection.
      */
     public userDAO() {
-        con = MySQLConnection.getConnection();
+        con = WelcomeController.mainCon;
+        sql = WelcomeController.isSQL;
     }
 
     /**
@@ -60,7 +71,14 @@ public class userDAO implements DAO<User>{
     @Override
     public User findByPK(User pk) {
         User result = null;
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_PHONE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_PHONE);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_PHONE);
+            }
+
             ps.setString(1, pk.getPhone());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -86,7 +104,13 @@ public class userDAO implements DAO<User>{
     @Override
     public List<User> findAll() {
         List<User> list = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ALL)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_ALL);
+            } else {
+                ps = con.prepareStatement(H2_FIND_ALL);
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     User temp = new User();
@@ -115,9 +139,15 @@ public class userDAO implements DAO<User>{
     @Override
     public User delete(User entity) throws SQLException {
         if (entity != null) {
-            try (PreparedStatement pst = con.prepareStatement(DELETE)) {
-                pst.setString(1, String.valueOf(entity.getPhone()));
-                pst.executeUpdate();
+            try {
+                PreparedStatement ps;
+                if (sql) {
+                    ps = con.prepareStatement(SQL_DELETE);
+                } else {
+                    ps = con.prepareStatement(H2_DELETE);
+                }
+                ps.setString(1, String.valueOf(entity.getPhone()));
+                ps.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
                 entity = null;
@@ -132,7 +162,13 @@ public class userDAO implements DAO<User>{
      * @param entity The User entity to be inserted.
      */
     public void insertUser(User entity) {
-        try (PreparedStatement ps = con.prepareStatement(INSERT)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_INSERT);
+            } else {
+                ps = con.prepareStatement(H2_INSERT);
+            }
             ps.setString(1, entity.getPhone());
             ps.setString(2, entity.getName());
             ps.setString(3, entity.getPassword());
@@ -150,7 +186,13 @@ public class userDAO implements DAO<User>{
      */
     public void updateUser(User entity) {
         // UPDATE Usuario SET nombre = ?, contraseña = ?, isAdmin = ? WHERE telefono = ?
-        try (PreparedStatement ps = con.prepareStatement(UPDATE)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_UPDATE);
+            } else {
+                ps = con.prepareStatement(H2_UPDATE);
+            }
             ps.setString(1, entity.getName());
             ps.setString(2, entity.getPassword());
             ps.setBoolean(3, entity.isAdmin());
@@ -171,7 +213,13 @@ public class userDAO implements DAO<User>{
      */
     public List<User> findAdmins(boolean admin) {
         List<User> list = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_ADMINS)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_ADMINS);
+            } else {
+                ps = con.prepareStatement(H2_FIND_ADMINS);
+            }
             ps.setBoolean(1, admin);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -199,7 +247,13 @@ public class userDAO implements DAO<User>{
      */
     public List<User> findByName(String name) {
         List<User> list = new ArrayList<>();
-        try (PreparedStatement ps = con.prepareStatement(FIND_BY_NAME)) {
+        try {
+            PreparedStatement ps;
+            if (sql) {
+                ps = con.prepareStatement(SQL_FIND_BY_NAME);
+            } else {
+                ps = con.prepareStatement(H2_FIND_BY_NAME);
+            }
             ps.setString(1, "%" + name.toLowerCase() + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
