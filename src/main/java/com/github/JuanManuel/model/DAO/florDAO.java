@@ -19,7 +19,7 @@ public class florDAO implements DAO<Flor>{
     private static final String SQL_FIND_BY_PK = "SELECT * FROM flor WHERE idFlor = ?";
     private static final String SQL_FIND_BY_TYPE = "SELECT * FROM flor WHERE tipo = ?";
     private static final String SQL_FIND_BY_NAME = "SELECT f.*, p.* FROM flor f JOIN producto p ON p.idProducto = f.idFlor WHERE LOWER(p.nombre) LIKE ?";
-    // ==============
+    // =======================================================================================================================================================================================================================================================================================================
     private static final String H2_INSERT = "INSERT INTO \"flor\" (\"idFlor\", \"color\", \"tipo\") VALUES  (?,?,?)";
     private static final String H2_UPDATE = "UPDATE \"flor\" SET \"color\" = ?, \"tipo\" = ? WHERE \"idFlor\" = ?";
     private static final String H2_DELETE = "DELETE FROM \"flor\" WHERE \"idFlor\" = ?";

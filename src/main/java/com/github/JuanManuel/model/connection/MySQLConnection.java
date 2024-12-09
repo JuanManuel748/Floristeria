@@ -11,9 +11,15 @@ public class MySQLConnection {
     private static final String PASS = "";
 
 
-    public MySQLConnection() {
-    }
+    public MySQLConnection() {}
 
+    /**
+     * Retrieves a connection to the MySQL database.
+     * If no connection exists, it initializes one using the specified URL, username, and password.
+     *
+     * @return a Connection object to the MySQL database.
+     * @throws RuntimeException if the connection cannot be established.
+     */
     public static Connection getConnection() {
         if (con == null) {
             try {
@@ -25,6 +31,10 @@ public class MySQLConnection {
         return con;
     }
 
+    /**
+     * Closes the current connection to the MySQL database, if one exists.
+     * If the connection is already closed or null, this method does nothing.
+     */
     public static void closeConnection() {
         if (con != null) {
             try {

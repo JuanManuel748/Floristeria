@@ -16,6 +16,13 @@ public class H2Connection {
 
     public H2Connection() {}
 
+    /**
+     * Retrieves a temporary connection to the H2 database.
+     * If no connection exists, it initializes one using the specified URL, username, and password.
+     *
+     * @return a Connection object to the H2 database.
+     * @throws RuntimeException if the connection cannot be established.
+     */
     public static Connection getTEMPConnection() {
         if (con == null) {
             try {
@@ -28,6 +35,10 @@ public class H2Connection {
         return con;
     }
 
+    /**
+     * Closes the current temporary connection to the H2 database, if one exists.
+     * If the connection is already closed or null, this method does nothing.
+     */
     public static void closeTEMPConnection() {
         if (con != null) {
             try {
@@ -38,6 +49,13 @@ public class H2Connection {
         }
     }
 
+    /**
+     * Loads the database schema and initial data from an external SQL script.
+     * If the database is not already initialized, it reads and executes the script from
+     * the file "floreyesdb.sql" located in the resources directory.
+     *
+     * If the script file is not found or cannot be read, it displays an alert.
+     */
     public static void loadDB() {
         try (Connection con = getTEMPConnection();
              Statement stmt = con.createStatement()) {
@@ -69,7 +87,12 @@ public class H2Connection {
         }
     }
 
-
+    /**
+     * Checks if the database is already initialized by querying a known table.
+     *
+     * @param con the Connection object to the H2 database.
+     * @return true if the database is initialized, false otherwise.
+     */
     private static boolean isDatabaseInitialized(Connection con) {
         try (Statement stmt = con.createStatement()) {
             stmt.executeQuery("SELECT 1 FROM centro LIMIT 1");

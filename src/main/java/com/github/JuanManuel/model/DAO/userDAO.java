@@ -21,7 +21,7 @@ public class userDAO implements DAO<User>{
     private static final String SQL_FIND_BY_PHONE = "SELECT * FROM usuario WHERE telefono = ?";
     private static final String SQL_FIND_ADMINS = "SELECT * FROM usuario WHERE isAdmin = ?";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM usuario WHERE LOWER(nombre) LIKE ?";
-    //==================
+    // ==============================================================================================================================================
     private static final String H2_INSERT = "INSERT INTO \"usuario\" (\"telefono\", \"nombre\", \"contraseña\", \"isAdmin\") VALUES  (?,?,?, ?)";
     private static final String H2_UPDATE = "UPDATE \"usuario\" SET \"nombre\" = ?, \"contraseña\" = ?, \"isAdmin\" = ? WHERE \"telefono\" = ?";
     private static final String H2_DELETE = "DELETE FROM \"usuario\" WHERE \"telefono\" = ?";

@@ -22,7 +22,7 @@ public class productoDAO  implements DAO<Producto>{
     private static final String SQL_FIND_BY_TYPE = "SELECT * FROM producto WHERE tipo = ?";
     private static final String SQL_FIND_COMP_BY_NAME = "SELECT * FROM producto WHERE LOWER(nombre) LIKE ? AND (tipo = ? OR tipo = ?)";
     private static final String SQL_FIND_GROUPBY = "SELECT p.*, SUM(pp.cantidad) AS cantidadVendida FROM producto p JOIN Pedido_Producto pp ON p.idProducto = pp.Producto_idProducto WHERE p.tipo = ? GROUP BY p.nombre HAVING cantidadVendida >= ?";
-    // ===============
+    // =======================================================================================================================================================================================================================================================================================================
     private static final String H2_INSERT = "INSERT INTO \"producto\" (\"idProducto\", \"nombre\", \"precio\", \"stock\", \"tipo\", \"description\", \"imagen\") VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String H2_UPDATE = "UPDATE \"producto\" SET \"nombre\" = ?, \"precio\" = ?, \"stock\" = ?, \"tipo\" = ?, \"description\" = ?, \"imagen\" = ? WHERE \"idProducto\" = ?";
     private static final String H2_DELETE = "DELETE FROM \"producto\" WHERE \"idProducto\" = ?";

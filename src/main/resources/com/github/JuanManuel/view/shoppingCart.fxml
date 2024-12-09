@@ -43,14 +43,14 @@
       </VBox>
       <Pane prefHeight="80.0" prefWidth="800.0" style="-fx-background-color: #61e761;">
          <children>
-            <Text fx:id="nametext" layoutX="190.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CARRITO" textAlignment="CENTER" wrappingWidth="420.0">
+            <Text fx:id="nametext" fill="#044004" layoutX="190.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CARRITO" textAlignment="CENTER" wrappingWidth="420.0">
                <font>
-                  <Font size="36.0" />
+                  <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button fx:id="exitButton" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="Volver" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+            <Button fx:id="exitButton" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="volver" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
-                  <Font name="System Bold" size="16.0" />
+                  <Font name="System Bold" size="20.0" />
                </font>
             </Button>
             <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="14.0" layoutY="15.0" onMouseClicked="#goToHome" pickOnBounds="true" preserveRatio="true">
@@ -63,7 +63,7 @@
             </ImageView>
          </children>
       </Pane>
-      <Label fx:id="totalText" layoutX="36.0" layoutY="532.0" text="TOTAL: X.XX €">
+      <Label fx:id="totalText" layoutX="36.0" layoutY="532.0" text="TOTAL: X.XX €" textFill="#044004">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -77,12 +77,12 @@
       </TableView>
       <Button fx:id="purchaseButton" layoutX="585.0" layoutY="524.0" mnemonicParsing="false" onAction="#purchase" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Realizar pedido" textAlignment="CENTER" textFill="WHITE" wrapText="true">
          <font>
-            <Font name="System Bold" size="16.0" />
+            <Font name="System Bold" size="20.0" />
          </font>
       </Button>
       <Button fx:id="productButton" layoutX="312.0" layoutY="524.0" mnemonicParsing="false" onAction="#seeProduct" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Ver producto" textAlignment="CENTER" textFill="WHITE" wrapText="true">
          <font>
-            <Font name="System Bold" size="16.0" />
+            <Font name="System Bold" size="20.0" />
          </font>
       </Button>
    </children>
