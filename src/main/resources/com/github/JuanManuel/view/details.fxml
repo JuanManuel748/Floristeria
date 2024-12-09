@@ -44,21 +44,16 @@
             </ImageView>
          </children>
       </Pane>
-      <ImageView fx:id="previewImage" fitHeight="300.0" fitWidth="300.0" layoutX="40.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@images/noPicture.jpg" />
-         </image>
-      </ImageView>
       <Pane layoutX="350.0" layoutY="100.0" prefHeight="240.0" prefWidth="430.0">
          <children>
-            <Label fx:id="nameField" maxWidth="430.0" text="Nombre:" textFill="#044004" wrapText="true">
+            <Label fx:id="nameField" alignment="TOP_LEFT" maxWidth="430.0" prefHeight="70.0" prefWidth="430.0" text="Nombre:" textFill="#044004" wrapText="true">
                <font>
-                  <Font name="System Bold" size="36.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <Label fx:id="priceField" layoutY="50.0" text="Precio:" textFill="#044004">
+            <Label fx:id="priceField" layoutY="70.0" prefHeight="35.0" prefWidth="430.0" text="Precio:" textFill="#044004">
                <font>
-                  <Font name="System Bold" size="36.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
             <Label layoutY="105.0" text="Descripción:" textFill="#044004">
@@ -151,5 +146,14 @@
             </GridPane>
          </children>
       </Pane>
+      <VBox alignment="CENTER" layoutX="40.0" layoutY="100.0" prefHeight="300.0" prefWidth="300.0">
+         <children>
+            <ImageView fx:id="previewImage" fitHeight="300.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/noPicture.jpg" />
+               </image>
+            </ImageView>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

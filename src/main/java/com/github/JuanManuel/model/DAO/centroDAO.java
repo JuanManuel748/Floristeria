@@ -26,7 +26,7 @@ public class centroDAO implements DAO<Centro>{
     private static final String SQL_FIND_BY_RANGE = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE p.precio >= ? AND p.precio <= ? AND LOWER(p.description) LIKE ?";
     private static final String SQL_FIND_BY_NAMES = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.nombre) LIKE ?";
     private static final String SQL_FIND_BY_TYPE = "SELECT c.*, cf.*, f.* FROM centro c JOIN centroflores cf ON c.idCentro = cf.Centro_idCentro JOIN Flor f ON cf.Flor_idFlor = f.idFlor JOIN Producto p ON c.idCentro = p.idProducto WHERE LOWER(p.description) LIKE ?";
-    // ============
+    // =======================================================================================================================================================================================================================================================================================================
     private static final String H2_INSERT = "INSERT INTO \"centro\" (\"idCentro\", \"florPrincipal\", \"tamaño\", \"frase\") VALUES  (?,?,?,?)";
     private static final String H2_INSERT_FLORES = "INSERT INTO \"centroflores\" (\"Centro_idCentro\", \"Flor_idFlor\") VALUES (?,?)";
     private static final String H2_UPDATE = "UPDATE \"centro\" SET \"florPrincipal\" = ?, \"tamaño\" = ?, \"frase\" = ? WHERE \"idCentro\" = ?";

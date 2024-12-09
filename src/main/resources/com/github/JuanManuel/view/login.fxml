@@ -15,15 +15,15 @@
         </Button>
         <Button fx:id="goToRegisterButton" layoutX="441.0" layoutY="518.0" mnemonicParsing="false" onAction="#goToRegister" style="-fx-background-color: transparent;" text="Registrarse" textFill="#044004" underline="true">
          <font>
-            <Font size="18.0" />
+            <Font name="System Bold" size="18.0" />
          </font></Button>
         <Text layoutX="195.0" layoutY="545.0" strokeType="OUTSIDE" strokeWidth="0.0" text="¿No tienes una cuenta?">
          <font>
-            <Font size="18.0" />
+            <Font name="System Bold" size="18.0" />
          </font></Text>
         <Text fill="#044004" layoutY="167.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Iniciar Sesión" textAlignment="CENTER" wrappingWidth="800.0">
             <font>
-                <Font size="72.0" />
+                <Font name="System Bold" size="72.0" />
             </font>
         </Text>
         <TextField fx:id="phoneField" layoutX="356.0" layoutY="229.0" prefHeight="50.0" prefWidth="300.0">

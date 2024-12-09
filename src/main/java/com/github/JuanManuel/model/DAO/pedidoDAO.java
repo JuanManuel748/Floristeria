@@ -27,7 +27,7 @@ public class pedidoDAO implements DAO<Pedido>{
     private static final String SQL_FIND_BY_USER = "SELECT * FROM pedido WHERE telefonoUsuario = ?";
     private static final String SQL_FIND_DETAILS = "SELECT * FROM pedido_producto WHERE Pedido_idPedido = ?";
     private static final String SQL_FIND_STATS_MONTH = "SELECT MONTH(STR_TO_DATE(fechaPedido, '%d/%m/%Y')) AS mes, COUNT(idPedido) AS cantidadPedidos  FROM pedido GROUP BY mes ORDER BY mes";
-    // ===============
+    // =======================================================================================================================================================================================================================================================================================================
     private static final String H2_INSERT = "INSERT INTO \"pedido\" (\"idPedido\", \"fechaPedido\", \"fechaEntrega\", \"total\", \"estado\", \"telefonoUsuario\") VALUES (?, ?, ?, ?, ?, ?)";
     private static final String H2_INSERT_DETALLES = "INSERT INTO \"pedido_producto\" (\"Pedido_idPedido\", \"Producto_idProducto\", \"cantidad\", \"subtotal\") VALUES (?,?,?,?)";
     private static final String H2_UPDATE = "UPDATE \"pedido\" SET \"fechaPedido\" = ?, \"fechaEntrega\" = ?, \"total\" = ?, \"estado\" = ?, \"telefonoUsuario\" = ? WHERE \"idPedido\" = ?";

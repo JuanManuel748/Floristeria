@@ -27,16 +27,13 @@ public class ramoDAO implements DAO<Ramo>{
     private static final String SQL_FIND_BY_NAME = "SELECT r.*, rf.*, f.* FROM ramo r JOIN ramoflores rf ON r.idRamo = rf.Ramo_idRamo JOIN flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE LOWER(p.nombre) LIKE ? AND LOWER(p.description) LIKE ?";
     private static final String SQL_FIND_BY_RANGE = "SELECT r.*, rf.*, f.* FROM ramo r JOIN ramoflores rf ON r.idRamo = rf.Ramo_idRamo JOIN flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE p.precio >= ? AND p.precio <= ? AND LOWER(p.description) LIKE ?";
     private static final String SQL_FIND_BY_TYPE = "SELECT r.*, rf.*, f.* FROM ramo r JOIN ramoflores rf ON r.idRamo = rf.Ramo_idRamo JOIN flor f ON rf.Flor_idFlor = f.idFlor JOIN Producto p ON r.idRamo = p.idProducto WHERE LOWER(p.description) LIKE ?";
-    // ==============
+    // =======================================================================================================================================================================================================================================================================================================
     private static final String H2_INSERT = "INSERT INTO \"ramo\" (\"idRamo\", \"florPrincipal\", \"cantidadFlores\", \"colorEnvoltorio\") VALUES  (?,?,?,?)";
     private static final String H2_INSERT_FLORES = "INSERT INTO \"ramoflores\" (\"Ramo_idRamo\", \"Flor_idFlor\") VALUES (?,?)";
     private static final String H2_UPDATE = "UPDATE \"ramo\" SET \"florPrincipal\" = ?, \"cantidadFlores\" = ?, \"colorEnvoltorio\" = ? WHERE \"idRamo\" = ?";
     private static final String H2_DELETE = "DELETE FROM \"ramo\" WHERE \"idRamo\" = ?";
     private static final String H2_DELETE_FLORES = "DELETE FROM \"ramoflores\" WHERE \"Ramo_idRamo\" = ?";
-    private static final String H2_FIND_ALL = "SELECT r.\"idRamo\", r.\"florPrincipal\", r.\"cantidadFlores\", r.\"colorEnvoltorio\", rf.\"Flor_idFlor\", f.\"idFlor\""
-            + "FROM \"ramo\" r "
-            + "JOIN \"ramoflores\" rf ON r.\"idRamo\" = rf.\"Ramo_idRamo\" "
-            + "JOIN \"flor\" f ON rf.\"Flor_idFlor\" = f.\"idFlor\"";
+    private static final String H2_FIND_ALL = "SELECT r.\"idRamo\", r.\"florPrincipal\", r.\"cantidadFlores\", r.\"colorEnvoltorio\", rf.\"Flor_idFlor\", f.\"idFlor\" FROM \"ramo\" r JOIN \"ramoflores\" rf ON r.\"idRamo\" = rf.\"Ramo_idRamo\" JOIN \"flor\" f ON rf.\"Flor_idFlor\" = f.\"idFlor\"";
     private static final String H2_FIND_BY_PK = "SELECT r.*, rf.*, f.* FROM \"ramo\" r JOIN \"ramoflores\" rf ON r.\"idRamo\" = rf.\"Ramo_idRamo\" JOIN \"flor\" f ON rf.\"Flor_idFlor\" = f.\"idFlor\" WHERE \"idRamo\" = ?";
     private static final String H2_FIND_BY_NAMES = "SELECT r.*, rf.*, f.* FROM \"ramo\" r JOIN \"ramoflores\" rf ON r.\"idRamo\" = rf.\"Ramo_idRamo\" JOIN \"flor\" f ON rf.\"Flor_idFlor\" = f.\"idFlor\" JOIN \"producto\" p ON r.\"idRamo\" = p.\"idProducto\" WHERE LOWER(p.\"nombre\") LIKE ?";
     private static final String H2_FIND_BY_NAME = "SELECT r.*, rf.*, f.* FROM \"ramo\" r JOIN \"ramoflores\" rf ON r.\"idRamo\" = rf.\"Ramo_idRamo\" JOIN \"flor\" f ON rf.\"Flor_idFlor\" = f.\"idFlor\" JOIN \"producto\" p ON r.\"idRamo\" = p.\"idProducto\" WHERE LOWER(p.\"nombre\") LIKE ? AND LOWER(p.\"description\") LIKE ?";

@@ -14,9 +14,9 @@
                 <Image url="@images/logoBlanco.png" />
             </image>
         </ImageView>
-        <Button fx:id="adminWayButton" layoutX="350.0" layoutY="435.0" mnemonicParsing="false" onAction="#setAdminWayButton" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="Iniciar" textFill="WHITE">
+        <Button fx:id="adminWayButton" layoutX="350.0" layoutY="435.0" mnemonicParsing="false" onAction="#setAdminWayButton" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="Iniciar" textAlignment="CENTER" textFill="WHITE">
             <font>
-                <Font size="21.0" />
+                <Font name="System Bold" size="20.0" />
             </font>
         </Button>
       <CheckBox fx:id="connectionChoice" layoutX="620.0" layoutY="550.0" mnemonicParsing="false" text="¿Usar MySQL?">

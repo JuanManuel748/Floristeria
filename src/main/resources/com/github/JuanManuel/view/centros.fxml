@@ -20,19 +20,19 @@
    <children>
       <Pane prefHeight="80.0" prefWidth="800.0" style="-fx-background-color: #61e761;">
          <children>
-            <Text fx:id="nametext" layoutX="190.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CENTROS" textAlignment="CENTER" wrappingWidth="420.0">
+            <Text fx:id="nametext" fill="#044004" layoutX="190.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CENTROS" textAlignment="CENTER" wrappingWidth="420.0">
                <font>
-                  <Font size="36.0" />
+                  <Font name="System Bold" size="40.0" />
                </font>
             </Text>
-            <Button fx:id="exitButton" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="Volver" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+            <Button fx:id="exitButton" layoutX="90.0" layoutY="15.0" mnemonicParsing="false" onAction="#goToHome" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #044004;" text="volver" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
-                  <Font name="System Bold" size="12.0" />
+                  <Font name="System Bold" size="20.0" />
                </font>
             </Button>
             <Button fx:id="cartButton" layoutX="610.0" layoutY="14.0" mnemonicParsing="false" onAction="#goToCart" prefHeight="50.0" prefWidth="175.0" style="-fx-background-color: #044004;" text="Carrito" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
-                  <Font name="System Bold" size="12.0" />
+                  <Font name="System Bold" size="20.0" />
                </font>
             </Button>
             <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="14.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
@@ -45,11 +45,9 @@
             </ImageView>
          </children>
       </Pane>
-      <ScrollPane layoutX="50.0" layoutY="141.0" prefHeight="425.0" prefWidth="700.0"
-                  style="-fx-background: #a8ffb2; -fx-background-color: transparent;" vbarPolicy="ALWAYS">
+      <ScrollPane layoutX="50.0" layoutY="141.0" prefHeight="425.0" prefWidth="700.0" style="-fx-background: #a8ffb2; -fx-background-color: transparent;" vbarPolicy="ALWAYS">
          <content>
-            <GridPane fx:id="boxGrid" hgap="20.0" vgap="20.0"
-                      style="-fx-background: #a8ffb2; -fx-background-color: #a8ffb2;">
+            <GridPane fx:id="boxGrid" hgap="20.0" style="-fx-background: #a8ffb2; -fx-background-color: #a8ffb2;" vgap="20.0">
                <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
